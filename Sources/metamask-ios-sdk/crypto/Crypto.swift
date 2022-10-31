@@ -1,7 +1,7 @@
 import Foundation
 
 /// Encryption module using ECIES encryption standard
-public protocol Encryption {
+public protocol Crypto {
     /// Generates keypair and returns the asymmetric private key
     /// - Returns: Asymmetric private key
     static func generatePrivateKey() -> String
@@ -19,16 +19,16 @@ public protocol Encryption {
     static func encrypt(_ message: String, publicKey: String) -> String
 }
 
-struct ECIES: Encryption {
-    static func generatePrivateKey() -> String {
+public enum ECIES: Crypto {
+    public static func generatePrivateKey() -> String {
         ""
     }
     
-    static func publicKey(from privateKey: String) -> String {
+    public static func publicKey(from privateKey: String) -> String {
         ""
     }
     
-    static func encrypt(_ message: String, publicKey: String) -> String {
+    public static func encrypt(_ message: String, publicKey: String) -> String {
         ""
     }
 }
