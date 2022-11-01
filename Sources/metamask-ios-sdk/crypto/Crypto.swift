@@ -11,12 +11,20 @@ public protocol Crypto {
     /// - Returns: Public key
     static func publicKey(from privateKey: String) -> String
     
-    /// Encrypts plain text using provided public key
+    /// Encrypts the supplied plain text using provided public key
     /// - Parameters:
     ///   - message: Plain text to encrypt
-    ///   - publicKey: Sender public key
+    ///   - publicKey: Sender public key to encrypt with
     /// - Returns: Encrypted text
     static func encrypt(_ message: String, publicKey: String) -> String
+    
+    
+    /// Decrypts the supplied cyphertext with the provided private key
+    /// - Parameters:
+    ///   - message: Cyphertext to decrypt
+    ///   - privateKey: Private key to decrypt with
+    /// - Returns: Decrypted plain text
+    static func decrypt(_ message: String, privateKey: String) -> String
 }
 
 public enum ECIES: Crypto {
@@ -29,6 +37,10 @@ public enum ECIES: Crypto {
     }
     
     public static func encrypt(_ message: String, publicKey: String) -> String {
+        ""
+    }
+    
+    public static func decrypt(_ message: String, privateKey: String) -> String {
         ""
     }
 }
