@@ -7,14 +7,14 @@
 
 import Foundation
 
-public enum KeyExchangeType: String {
+public enum KeyExchangeType: String, Codable {
     case handshakeStart = "key_handshake_start"
     case handshakeAcknowledge = "key_handshake_ACK"
     case handshakeSynchronise = "key_handshake_SYN"
     case handshakeSynchroniseAcknowledgement = "key_handshake_SYNACK"
 }
 
-public struct KeyExchangeMessage {
+public struct KeyExchangeMessage: Codable {
     public let type: KeyExchangeType
     public let publicKey: String
 }
