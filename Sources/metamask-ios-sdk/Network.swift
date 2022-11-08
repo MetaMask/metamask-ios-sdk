@@ -6,54 +6,32 @@
 //
 
 import Foundation
-import SocketIO
+
 import OSLog
 
 public class Network {
-    private var socket: SocketIOClient?
-    private let keyExchange = KeyExchange()
+
+    private var keyExchange: KeyExchange!
+    private var networkClient: NetworkClient!
+    
     private var keysExchanged: Bool = false
     private var connectionPaused: Bool = false
-    
-    public var socketUrl: String = "https://socket.codefi.network" {
-        didSet {
-            self.socket = makeSocketClient(url: socketUrl)
-        }
-    }
+    private var channelId = UUID().uuidString
     
     public var name: String?
     public var connected: Bool = false
     public var onClientReady: (() -> Void)?
     
-    private func makeSocketClient(url: String) -> SocketIOClient? {
-        guard let url = URL(string: url) else { return nil }
-        let options: SocketIOClientOption = .extraHeaders(
-            [
-                "User-Agent": "SocketIOClient"
-            ]
-        )
-        let manager = SocketManager(
-            socketURL: url,
-            config: [
-                .log(true),
-                options
-            ]
-        )
-        return manager.defaultSocket
-    }
-    
     public func connect() {
-        let keyExchange = KeyExchange()
-        let metaMaskUrl = "https://metamask.app.link/connect?channelId=" + UUID().uuidString + "&pubkey=" + keyExchange.publicKey
-        Logger().log("\(metaMaskUrl)")
+        keyExchange = KeyExchange()
+        networkClient = NetworkClient()
         
-        socket = makeSocketClient(url: socketUrl)
-        socket?.on(clientEvent: .connect) { [weak self] _,_ in
-            Logger().log("Socket connected")
-            self?.recieveMessages(on: "")
-            self?.socket?.emit(SocketEvent.joinChannel, with: [])
-        }
-        socket?.connect()
+        let metaMaskUrl = "https://metamask.app.link/connect?channelId=" + channelId + "&pubkey=" + keyExchange.publicKey
+        Logger().log("\(metaMaskUrl)")
+        handleReceiveKeyExchange()
+        handleRecieveMessages(on: channelId ?? "")
+ 
+        networkClient.connect()
     }
 }
 
@@ -62,7 +40,7 @@ extension Network {
     private func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: name ?? "",
-            url: socketUrl)
+            url: networkClient.networkUrl)
         
         let requestInfo = RequestInfo(
             type: "originator_info",
@@ -71,112 +49,130 @@ extension Network {
         sendMessage(requestInfo, encrypt: true)
     }
     
-    public func recieveMessages(on channelId: String) {
+    public func handleRecieveMessages(on channelId: String) {
         handleReceiveMessage(on: channelId)
         handleReceiveConnection(on: channelId)
         handleReceiveDisonnection(on: channelId)
     }
     
+    private func handleReceiveKeyExchange() {
+        networkClient.on(ClientEvent.keyExchange) { [weak self] data in
+            guard
+                let self = self,
+                let message = data.first as? [String: AnyHashable],
+                let keyMessage = self.keyExchangeMessage(from: message) else {
+                return
+            }
+            self.keyExchange.handleKeyExchangeMessage?(keyMessage)
+        }
+    }
+    
     private func handleReceiveConnection(on channelId: String) {
-        socket?.on(clientEvent: .connect) { [weak self] _, _ in
+        networkClient.on(clientEvent: .connect) { [weak self] _ in
             Logger().log("Clients connected")
             guard let self = self else { return }
             
-            if !self.keysExchanged {
-                let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .handshakeSynchronise)
+            if self.keysExchanged {
+                self.networkClient.emit(
+                    ClientEvent.joinChannel,
+                    with: [])
+            } else {
+                let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
                 self.sendMessage(keyExchangeSync, encrypt: false)
             }
         }
     }
     
     private func handleReceiveDisonnection(on channelId: String) {
-        socket?.on(clientEvent: .connect) { [weak self] _, _ in
+        networkClient.on(clientEvent: .disconnect) { [weak self] _ in
             Logger().log("Clients disconnected")
             guard let self = self else { return }
             
             if !self.connectionPaused {
                 self.connected = false
                 self.keysExchanged = false
-                // self.id = nil
+                self.channelId = ""
                 // Ethereum.disconnect()
             }
         }
     }
     
     private func handleReceiveMessage(on channelId: String) {
-        socket?.on(SocketEvent.receive(on: channelId)) { [weak self] data, ack in
+        networkClient.on(ClientEvent.receive(on: channelId)) { [weak self] data in
             guard
                 let self = self,
-                let data = data.first,
-                let receivedMessage = data as? Message
+                let response = data.first as? [String: AnyHashable]
             else { return }
             
             let keysExchanged: Bool = self.keysExchanged
             let connectionPaused: Bool = self.connectionPaused
             
+            /*
             if !keysExchanged {
-                let message = receivedMessage.message
                 
-                if message.type == .handshakeSynchroniseAcknowledgement {
+                switch message.type {
+                case .start:
+                    
+                    
+                }
+                if message.type == .synack {
                     self.keyExchange.theirPublicKey = message.publicKey
-                    let keyExchangeAck = self.keyExchange.keyExchangeMessage(with: .handshakeAcknowledge)
+                    let keyExchangeAck = self.keyExchange.keyExchangeMessage(with: .ack)
                     self.sendMessage(keyExchangeAck, encrypt: false)
                     self.keysExchanged = true
                     self.sendOriginatorInfo()
+                } else {
+                    
                 }
             } else {
-                if connectionPaused && receivedMessage.message.type == .handshakeStart {
+                if message.type == .start {
                     self.keysExchanged = true
                     self.connectionPaused = false
-                    self.connected = true
-                    let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .handshakeSynchronise)
+                    self.connected = false
+                    let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
                     self.sendMessage(keyExchangeSync, encrypt: false)
                     return
                 }
             }
             
-            // more logic here
+            
+            let decrypted = keyExchange.decryptMessage()
+             */
         }
     }
     
     public func sendMessage(_ message: Codable, encrypt: Bool) {
-//        let message = encrypt
-//            ? keyExchange.encryptMessage(message)
-//            : message
-//        Message(id: id)
+
     }
 }
 
 private extension Network {
-    struct SocketEvent {
-        static let message = "message"
-        static let joinChannel = "join_channel"
-        
-        static func clientConnected(on channel: String)-> String {
-            "clients_connected".appending("-").appending(channel)
-        }
-        
-        static func clientDisconnected(on channel: String)-> String {
-            "clients_disconnected".appending("-").appending(channel)
-        }
-        
-        static func receive(on channelId: String) -> String {
-            "message".appending("-").appending(channelId)
-        }
-    }
-    
     struct OriginatorInfo: Codable {
         let title: String
         let url: String
     }
     
-    struct Message: Codable {
-        let id: String
-        var message: KeyExchangeMessage
+    struct Message<T: Codable>: Codable {
+        let type: KeyExchangeStep
+        var message: T?
     }
     
     struct RequestInfo: Codable {
         let type: String
         let originator: OriginatorInfo
+    }
+}
+
+private extension Network {
+    func keyExchangeMessage(from dictionary: [String: AnyHashable]) -> KeyExchangeMessage? {
+        do {
+            let json = try JSONSerialization.data(withJSONObject: dictionary)
+            let decoder = JSONDecoder()
+            let keyExchange = try decoder.decode(KeyExchangeMessage.self, from: json)
+            return keyExchange
+        } catch {
+            Logger().log("\(error.localizedDescription)")
+        }
+        return nil
     }
 }

@@ -1,22 +1,19 @@
 import Foundation
 
-/// Encryption module using ECIES encryption standard
-public protocol Crypto {
-    /// Generates keypair and returns the asymmetric private key
-    /// - Returns: Asymmetric private key
-    static func generatePrivateKey() -> String
+/// Encryption module using the public key authentication standard
+public protocol Encryption {
+    /// Generates a private key
+    var privateKey: String { get }
     
     /// Computes public key from given private key
-    /// - Parameter privateKey: Sender's private key
-    /// - Returns: Public key
-    static func publicKey(from privateKey: String) -> String
+    var publicKey: String { get }
     
     /// Encrypts the supplied plain text using provided public key
     /// - Parameters:
     ///   - message: Plain text to encrypt
     ///   - publicKey: Sender public key to encrypt with
     /// - Returns: Encrypted text
-    static func encrypt(_ message: String, publicKey: String) -> String
+    func encrypt(_ message: String, publicKey: String) -> String
     
     
     /// Decrypts the supplied cyphertext with the provided private key
@@ -24,23 +21,30 @@ public protocol Crypto {
     ///   - message: Cyphertext to decrypt
     ///   - privateKey: Private key to decrypt with
     /// - Returns: Decrypted plain text
-    static func decrypt(_ message: String, privateKey: String) -> String
+    func decrypt(_ message: String, privateKey: String) -> String
 }
 
-public enum ECIES: Crypto {
-    public static func generatePrivateKey() -> String {
+/// Encryption implementation using ECIES encryption standard
+public struct ECIES: Encryption {
+    private let _privateKey: String
+    
+    public init() {
+        _privateKey = "" // generate ECIES private key
+    }
+    
+    public var privateKey: String {
+        _privateKey
+    }
+    
+    public var publicKey: String {
+        "" // generate public key from private key
+    }
+    
+    public func encrypt(_ message: String, publicKey: String) -> String {
         ""
     }
     
-    public static func publicKey(from privateKey: String) -> String {
-        ""
-    }
-    
-    public static func encrypt(_ message: String, publicKey: String) -> String {
-        ""
-    }
-    
-    public static func decrypt(_ message: String, privateKey: String) -> String {
+    public func decrypt(_ message: String, privateKey: String) -> String {
         ""
     }
 }
