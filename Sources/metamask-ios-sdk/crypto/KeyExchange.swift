@@ -15,6 +15,11 @@ public enum KeyExchangeStep: String, Codable {
     case synack = "key_handshake_SYNACK"
 }
 
+public enum KeyExchangeError: Error {
+    case keysNotExchanged
+    case encodingError
+}
+
 public struct KeyExchangeMessage: Codable {
     public let type: KeyExchangeStep
     public var publicKey: String?
@@ -32,16 +37,11 @@ public class KeyExchange {
     public var theirPublicKey: String?
     
     private let encyption: Encryption
-    private var keysExchanged: Bool = false
+    public private(set) var keysExchanged: Bool = false
     private var keyExchangeStep: KeyExchangeStep = .none
     
     public var handleKeyExchangeMessage: ((KeyExchangeMessage) -> Void)?
     public var updateKeyExchangeStep: ((KeyExchangeStep, String?) -> Void)?
-    
-    enum KeyExchangeError: Error {
-        case keysNotExchanged
-        case encodingError
-    }
     
     public init(encryption: Encryption = ECIES()) {
         self.encyption = encryption

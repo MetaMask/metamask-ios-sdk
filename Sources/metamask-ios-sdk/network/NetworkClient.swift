@@ -5,8 +5,9 @@
 //  Created by Mpendulo Ndlovu on 2022/11/07.
 //
 
-import Foundation
+import OSLog
 import SocketIO
+import Foundation
 
 enum ClientEvent {
     case connect
@@ -70,13 +71,13 @@ class NetworkClient {
         return manager.defaultSocket
     }
     
-    func on(_ event: String, callback: @escaping ([Any]) -> Void) {
+    func on(_ event: String, callback: @escaping (Any...) -> Void) {
         socket?.on(event) { data, _ in
             callback(data)
         }
     }
     
-    func on(clientEvent: ClientEvent, callback: @escaping ([Any]) -> Void) {
+    func on(clientEvent: ClientEvent, callback: @escaping (Any...) -> Void) {
         let socketEvent: SocketClientEvent
         switch clientEvent {
         case .connect:
@@ -89,7 +90,7 @@ class NetworkClient {
         }
     }
     
-    func emit(_ event: String, with items: [Any]) {
+    func emit(_ event: String, with items: Any...) {
         socket?.emit(event, with: items)
     }
 }

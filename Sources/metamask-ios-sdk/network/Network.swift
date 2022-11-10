@@ -28,9 +28,9 @@ public class Network {
         
         let metaMaskUrl = "https://metamask.app.link/connect?channelId=" + channelId + "&pubkey=" + keyExchange.publicKey
         Logger().log("\(metaMaskUrl)")
+        
         handleReceiveKeyExchange()
-        handleRecieveMessages(on: channelId ?? "")
- 
+        handleRecieveMessages(on: channelId)
         networkClient.connect()
     }
 }
@@ -142,7 +142,20 @@ extension Network {
     }
     
     public func sendMessage(_ message: Codable, encrypt: Bool) {
-
+        guard keyExchange.keysExchanged else {
+            Logger().log(level: .error, "Keys not exchanged")
+            return
+        }
+        
+        let encryptedMessage = try? keyExchange.encryptMessage(message)
+        
+        networkClient.emit(
+            ClientEvent.message,
+            with: [
+                Message(
+                    id: channelId,
+                    message: encryptedMessage)
+            ])
     }
 }
 
@@ -153,7 +166,8 @@ private extension Network {
     }
     
     struct Message<T: Codable>: Codable {
-        let type: KeyExchangeStep
+        //let type: KeyExchangeStep
+        var id: String
         var message: T?
     }
     
@@ -171,7 +185,9 @@ private extension Network {
             let keyExchange = try decoder.decode(KeyExchangeMessage.self, from: json)
             return keyExchange
         } catch {
-            Logger().log("\(error.localizedDescription)")
+            Logger().log(
+                level: .error,
+                "\(error.localizedDescription)")
         }
         return nil
     }
