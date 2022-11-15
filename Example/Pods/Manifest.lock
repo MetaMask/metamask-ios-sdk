@@ -1,0 +1,16 @@
+PODS:
+  - metamask-ios-sdk (0.1.0)
+
+DEPENDENCIES:
+  - metamask-ios-sdk (from `../`)
+
+EXTERNAL SOURCES:
+  metamask-ios-sdk:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  metamask-ios-sdk: 7cba623bface769938982ff2715cae42165924c2
+
+PODFILE CHECKSUM: 64c5cf825b9dd7e7bc8e46ecb6ff0980089b91de
+
+COCOAPODS: 1.11.3

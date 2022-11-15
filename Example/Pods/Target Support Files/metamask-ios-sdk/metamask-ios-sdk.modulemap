@@ -1,0 +1,7 @@
+framework module metamask_ios_sdk {
+  umbrella header "metamask-ios-sdk-umbrella.h"
+  header "Ecies.h"
+
+  export *
+  module * { export * }
+}
