@@ -36,17 +36,17 @@ public class KeyExchange {
     public let publicKey: String
     public var theirPublicKey: String?
     
-    private let encyption: Encryption
+    private let encyption: Crypto.Type
     public private(set) var keysExchanged: Bool = false
     private var keyExchangeStep: KeyExchangeStep = .none
     
     public var handleKeyExchangeMessage: ((KeyExchangeMessage) -> Void)?
     public var updateKeyExchangeStep: ((KeyExchangeStep, String?) -> Void)?
     
-    public init(encryption: Encryption = ECIES()) {
+    public init(encryption: Crypto.Type = ECIES.self) {
         self.encyption = encryption
-        self.privateKey = encyption.privateKey
-        self.publicKey = encyption.publicKey
+        self.privateKey = encyption.generatePrivateKey()
+        self.publicKey = encyption.publicKey(from: privateKey)
         setupKeyExchangeHandling()
     }
     

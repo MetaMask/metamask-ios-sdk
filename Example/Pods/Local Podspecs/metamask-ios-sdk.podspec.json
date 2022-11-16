@@ -2,7 +2,8 @@
   "name": "metamask-ios-sdk",
   "version": "0.1.0",
   "summary": "A short description of metamask-ios-sdk.",
-  "description": "TODO: Add long description of the pod here.",
+  "swift_versions": "5.0",
+  "description": "An SDK that enables native iOS apps to interact with the Ethereum blockchain via the MetaMask wallet.",
   "homepage": "github.com/MetaMask/metamask-ios-sdk",
   "license": {
     "type": "MIT",
@@ -18,5 +19,11 @@
   "platforms": {
     "ios": "14.0"
   },
-  "source_files": "metamask-ios-sdk/Classes/**/*"
+  "source_files": "metamask-ios-sdk/Classes/**/*",
+  "dependencies": {
+    "Socket.IO-Client-Swift": [
+      "~> 15.2.0"
+    ]
+  },
+  "swift_version": "5.0"
 }
