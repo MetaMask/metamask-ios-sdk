@@ -13,6 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		848653C2F18EC51DE1FAACF8 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB03F87569C12495A3FA25B2 /* Pods_metamask_ios_sdk_Tests.framework */; };
 		AD2863425B5CADFA16D43788 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DAE46B53157944A991EE7D5 /* Pods_metamask_ios_sdk_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				848653C2F18EC51DE1FAACF8 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,10 +269,14 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
+				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/metamask-ios-sdk/metamask_ios_sdk.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketIO.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/metamask_ios_sdk.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

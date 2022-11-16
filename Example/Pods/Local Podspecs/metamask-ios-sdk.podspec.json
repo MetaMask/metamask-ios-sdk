@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "summary": "A short description of metamask-ios-sdk.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/Mpendulo Ndlovu/metamask-ios-sdk",
+  "homepage": "github.com/MetaMask/metamask-ios-sdk",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,11 +12,11 @@
     "Mpendulo Ndlovu": "mpendulo@elefantel.com"
   },
   "source": {
-    "git": "https://github.com/Mpendulo Ndlovu/metamask-ios-sdk.git",
+    "git": "https://github.com/MetaMask/metamask-ios-sdk.git",
     "tag": "0.1.0"
   },
   "platforms": {
-    "ios": "10.0"
+    "ios": "14.0"
   },
   "source_files": "metamask-ios-sdk/Classes/**/*"
 }

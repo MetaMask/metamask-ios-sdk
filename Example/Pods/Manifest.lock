@@ -1,16 +1,27 @@
 PODS:
   - metamask-ios-sdk (0.1.0)
+  - Socket.IO-Client-Swift (15.2.0):
+    - Starscream (~> 3.1)
+  - Starscream (3.1.1)
 
 DEPENDENCIES:
   - metamask-ios-sdk (from `../`)
+  - Socket.IO-Client-Swift (~> 15.2.0)
+
+SPEC REPOS:
+  trunk:
+    - Socket.IO-Client-Swift
+    - Starscream
 
 EXTERNAL SOURCES:
   metamask-ios-sdk:
     :path: "../"
 
 SPEC CHECKSUMS:
-  metamask-ios-sdk: 7cba623bface769938982ff2715cae42165924c2
+  metamask-ios-sdk: 7af56170ff28971f9f54431d88362a2d0c064467
+  Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
+  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
-PODFILE CHECKSUM: 64c5cf825b9dd7e7bc8e46ecb6ff0980089b91de
+PODFILE CHECKSUM: 026e64eb555d3c5edc1ef3a30b5351699af90edf
 
 COCOAPODS: 1.11.3
