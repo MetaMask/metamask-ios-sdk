@@ -5,9 +5,8 @@
 //  Created by Mpendulo Ndlovu on 2022/11/01.
 //
 
-import Foundation
-
 import OSLog
+import Foundation
 
 public class Network {
 

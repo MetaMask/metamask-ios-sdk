@@ -10,6 +10,7 @@ Pod::Spec.new do |s|
   s.name             = 'metamask-ios-sdk'
   s.version          = '0.1.0'
   s.summary          = 'A short description of metamask-ios-sdk.'
+  s.swift_version    = '5.0'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +19,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+An SDK that enables native iOS apps to interact with the Ethereum blockchain via the MetaMask wallet.
                        DESC
 
   s.homepage         = 'github.com/MetaMask/metamask-ios-sdk'
@@ -31,6 +32,7 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '14.0'
 
   s.source_files = 'metamask-ios-sdk/Classes/**/*'
+  s.dependency = 'Socket.IO-Client-Swift', '~> 15.2.0'
   
   # s.resource_bundles = {
   #   'metamask-ios-sdk' => ['metamask-ios-sdk/Assets/*.png']

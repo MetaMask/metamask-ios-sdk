@@ -6,8 +6,8 @@
 //
 
 import OSLog
-import SocketIO
 import Foundation
+import SocketIO
 
 enum ClientEvent {
     case connect
