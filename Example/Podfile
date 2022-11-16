@@ -11,7 +11,3 @@ target 'metamask-ios-sdk_Example' do
 
   end
 end
-
-installer.pods_project.build_configurations.each do |config|
-  config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-end
