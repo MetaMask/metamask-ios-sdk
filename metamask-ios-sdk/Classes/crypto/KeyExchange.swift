@@ -28,7 +28,7 @@ public struct KeyExchangeMessage: Codable {
 /*
  A module for handling key exchange between client and server
  The key exchange sequence is defined as:
- none -> syn -> synack -> ack
+ syn -> synack -> ack
  */
 
 public class KeyExchange {
@@ -52,7 +52,13 @@ public class KeyExchange {
     
     private func setupKeyExchangeHandling() {
         handleKeyExchangeMessage = { [weak self, keysExchanged] message in
-            if keysExchanged { return }
+            
+            if keysExchanged {
+                print("Keys exchanged!")
+                return
+            }
+            
+            print("Keys exchange status: \(message.type)")
             
             switch message.type {
             case .syn:
@@ -64,7 +70,6 @@ public class KeyExchange {
                 
                 self?.updateKeyExchangeStep?(.synack, self?.publicKey)
             case .synack:
-                self?.setTheirPublicKey(message.publicKey)
                 self?.updateKeyExchangeStep?(.ack, nil)
                 self?.keysExchanged = true
             case .ack:

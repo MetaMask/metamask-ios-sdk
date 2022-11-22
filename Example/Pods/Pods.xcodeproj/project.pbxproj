@@ -42,7 +42,7 @@
 		91E2C6151E92DC87BC2D19E63D86A543 /* SocketIOStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709468B11EB3826ED8EA9AFE35DE4662 /* SocketIOStatus.swift */; };
 		99FB5F355DA5A926F227CA0E39925328 /* Socket.IO-Client-Swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F37C29DB74FC083DFF1E45FD1C6D709E /* Socket.IO-Client-Swift-dummy.m */; };
 		A06629EC737C31A2FF321147A4155F86 /* SocketPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC72E8C71B16B672269470BEC06CBAA5 /* SocketPacket.swift */; };
-		A15B684B07B0E5E29442905315AA34CC /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F3031F4DACBC3AFF8392AF542272D4 /* Network.swift */; };
+		A15B684B07B0E5E29442905315AA34CC /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F3031F4DACBC3AFF8392AF542272D4 /* Connection.swift */; };
 		A17911AB2960F1B504715C35635D5989 /* Starscream-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 09BEEC55E11371B9E76830109874DC9E /* Starscream-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A4D59C1C079FB21654E3FEB8E60B4274 /* SocketIOClientSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10FFADBEB1C45D20BEAD70D5C6B43C3 /* SocketIOClientSpec.swift */; };
 		A622B67A92DA74B140F8E471E1A628DF /* SocketEnginePacketType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C6B1735BB353A333C76806060A3F5C1 /* SocketEnginePacketType.swift */; };
@@ -52,12 +52,13 @@
 		BF356057E0C3A6E3C4FBAEB9F8AE65FF /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF2DCA295132B4F22EF0829961663BC /* QRCodeView.swift */; };
 		C5D9F6F9A18E6930E76601318341645E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		CE13959E42AFE711D989EC44893212D0 /* SocketExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B660B5209235C9F283EF0A1FB8555721 /* SocketExtensions.swift */; };
+		D1561D01292BB22400D25F29 /* MetaMaskSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1561D00292BB22400D25F29 /* MetaMaskSDK.swift */; };
 		D1F906E9292501EA004F8BB1 /* Ecies.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5B28C04C2D574F1A6DD7F92D5A78F1C /* Ecies.a */; };
 		D4B9E246C7860EF3F7E9C53964DC108F /* SocketIOClientConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BE6943A21D90A8DC099D27B2E97416 /* SocketIOClientConfiguration.swift */; };
 		E3ED27EAE16940C906CCA6B52CA78B9B /* SocketEngineClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4A4CB27321FE07384EF2EA0E5F21BD /* SocketEngineClient.swift */; };
 		E6F1C5585689A31C9B1700BE049EF8F9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		ECD1BE7E24DD9D418C514C7E23CEA3FD /* SSLClientCertificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C19C2299E68090A9CA330CC820AD25 /* SSLClientCertificate.swift */; };
-		EFAB92FF98799AD37AE5FD0162DC5598 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEF63260D2AD6237C39383F07AE7508 /* NetworkClient.swift */; };
+		EFAB92FF98799AD37AE5FD0162DC5598 /* ConnectionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEF63260D2AD6237C39383F07AE7508 /* ConnectionClient.swift */; };
 		F1528E8CD43D8150DB8E51BEEBEEE103 /* Socket.IO-Client-Swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 197A8D72525E3B7D2E76E53E30509A23 /* Socket.IO-Client-Swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9D446FF688B073F73A1657E2CB705DD /* SocketEngineSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0E60D0DF9E488980FB8C8DD18DCB08 /* SocketEngineSpec.swift */; };
 /* End PBXBuildFile section */
@@ -108,12 +109,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		01F3031F4DACBC3AFF8392AF542272D4 /* Network.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		01F3031F4DACBC3AFF8392AF542272D4 /* Connection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		056126CC78D9FBBF8E949E77273E0F3E /* metamask-ios-sdk.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = "metamask-ios-sdk.podspec"; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		088312397ACB47B83D9AE2703E972B0E /* metamask-ios-sdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "metamask-ios-sdk.modulemap"; sourceTree = "<group>"; };
 		0954FCDA5266683E57A649404C1334F6 /* Starscream-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Starscream-dummy.m"; sourceTree = "<group>"; };
 		09BEEC55E11371B9E76830109874DC9E /* Starscream-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Starscream-umbrella.h"; sourceTree = "<group>"; };
-		0FEF63260D2AD6237C39383F07AE7508 /* NetworkClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		0FEF63260D2AD6237C39383F07AE7508 /* ConnectionClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConnectionClient.swift; sourceTree = "<group>"; };
 		166B66ACE340750E2596F08B92E34DAD /* metamask-ios-sdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "metamask-ios-sdk-dummy.m"; sourceTree = "<group>"; };
 		17707D4822CD225B5452AE821798B69D /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		197A8D72525E3B7D2E76E53E30509A23 /* Socket.IO-Client-Swift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Socket.IO-Client-Swift-umbrella.h"; sourceTree = "<group>"; };
@@ -178,6 +179,7 @@
 		C2856AD18F6A19C24A80D2422799B511 /* SSLSecurity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SSLSecurity.swift; path = Source/SocketIO/Util/SSLSecurity.swift; sourceTree = "<group>"; };
 		CC4CDCF73BFBFDCA4BE1AD78730EAFB4 /* metamask-ios-sdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "metamask-ios-sdk.release.xcconfig"; sourceTree = "<group>"; };
 		CE75E1A9DE668B3013ED5AC8CACF2168 /* Pods-metamask-ios-sdk_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-metamask-ios-sdk_Example-dummy.m"; sourceTree = "<group>"; };
+		D1561D00292BB22400D25F29 /* MetaMaskSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MetaMaskSDK.swift; path = "metamask-ios-sdk/Classes/sdk/MetaMaskSDK.swift"; sourceTree = "<group>"; };
 		D4A7D807324D2CBB73D1AE117584D660 /* Pods-metamask-ios-sdk_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-metamask-ios-sdk_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		D61D7ADCC68126D5E0A1C9BD15AB3702 /* Compression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Compression.swift; path = Sources/Starscream/Compression.swift; sourceTree = "<group>"; };
 		D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -307,9 +309,10 @@
 		59FADD5BC9A0AC2F68A421D00ECDC719 /* metamask-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				D1561D00292BB22400D25F29 /* MetaMaskSDK.swift */,
 				78EC15093C7282BEB94764338039C847 /* crypto */,
 				E01C2C48493CABFFC6148EF1B92B8D78 /* ecies */,
-				E1D2B7DDDBD255703CDC4043499F1C59 /* network */,
+				E1D2B7DDDBD255703CDC4043499F1C59 /* connection */,
 				D5005727DD36835A8A689D334CCE6ACD /* Pod */,
 				F8AE7D8E902D907403588CC86463736D /* qrcode */,
 				61FF13C64EA8B99CEF24263594C73C75 /* Support Files */,
@@ -457,14 +460,14 @@
 			path = "metamask-ios-sdk/Classes/ecies";
 			sourceTree = "<group>";
 		};
-		E1D2B7DDDBD255703CDC4043499F1C59 /* network */ = {
+		E1D2B7DDDBD255703CDC4043499F1C59 /* connection */ = {
 			isa = PBXGroup;
 			children = (
-				01F3031F4DACBC3AFF8392AF542272D4 /* Network.swift */,
-				0FEF63260D2AD6237C39383F07AE7508 /* NetworkClient.swift */,
+				01F3031F4DACBC3AFF8392AF542272D4 /* Connection.swift */,
+				0FEF63260D2AD6237C39383F07AE7508 /* ConnectionClient.swift */,
 			);
-			name = network;
-			path = "metamask-ios-sdk/Classes/network";
+			name = connection;
+			path = "metamask-ios-sdk/Classes/connection";
 			sourceTree = "<group>";
 		};
 		F8AE7D8E902D907403588CC86463736D /* qrcode */ = {
@@ -765,10 +768,11 @@
 			files = (
 				4A43C75C20D32B73A1929561288251B7 /* Crypto.swift in Sources */,
 				917C08635B60218FC6744991A223EFF1 /* Ecies.a in Sources */,
+				D1561D01292BB22400D25F29 /* MetaMaskSDK.swift in Sources */,
 				4E39AB9A9193E898D59D3D65509E8E60 /* KeyExchange.swift in Sources */,
 				4D27633CB990BBF757FA0417D8FAF9CC /* metamask-ios-sdk-dummy.m in Sources */,
-				A15B684B07B0E5E29442905315AA34CC /* Network.swift in Sources */,
-				EFAB92FF98799AD37AE5FD0162DC5598 /* NetworkClient.swift in Sources */,
+				A15B684B07B0E5E29442905315AA34CC /* Connection.swift in Sources */,
+				EFAB92FF98799AD37AE5FD0162DC5598 /* ConnectionClient.swift in Sources */,
 				5CDC8CC7E75EA956259A151B29442E5D /* QRCodeGenerator.swift in Sources */,
 				BF356057E0C3A6E3C4FBAEB9F8AE65FF /* QRCodeView.swift in Sources */,
 			);

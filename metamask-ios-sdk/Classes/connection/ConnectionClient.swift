@@ -23,6 +23,10 @@ extension ClientEvent {
         "key_exchange"
     }
     
+    static var keysExchanged: String {
+        "keys_exchanged"
+    }
+    
     static var joinChannel: String {
         "join_channel"
     }
@@ -40,7 +44,7 @@ extension ClientEvent {
     }
 }
 
-class NetworkClient {
+class ConnectionClient {
     private var socket: SocketIOClient?
     
     public let networkUrl: String
@@ -52,6 +56,10 @@ class NetworkClient {
     
     func connect() {
         socket?.connect()
+    }
+    
+    func disconnect() {
+        socket?.disconnect()
     }
     
     private func makeSocketClient(url: String) -> SocketIOClient? {

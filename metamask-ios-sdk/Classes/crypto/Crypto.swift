@@ -26,6 +26,7 @@ public protocol Crypto {
     static func decrypt(_ message: String, privateKey: String) -> String
 }
 
+/// Encryption module using ECIES encryption standard
 public enum ECIES: Crypto {
     public static func generatePrivateKey() -> String {
         String(cString: GeneratePrivateKey())

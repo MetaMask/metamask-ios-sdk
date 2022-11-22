@@ -1,5 +1,5 @@
 //
-//  Network.swift
+//  Connection.swift
 //  
 //
 //  Created by Mpendulo Ndlovu on 2022/11/01.
@@ -8,38 +8,69 @@
 import OSLog
 import Foundation
 
-public class Network {
+public class Connection {
 
-    private var keyExchange: KeyExchange!
-    private var networkClient: NetworkClient!
+    private let keyExchange: KeyExchange
+    private let connectionClient: ConnectionClient
     
     private var keysExchanged: Bool = false
     private var connectionPaused: Bool = false
-    private var channelId = UUID().uuidString
+    private var channelId: String!
     
     public var name: String?
     public var connected: Bool = false
     public var onClientReady: (() -> Void)?
     
-    public func connect() {
+    var qrCodeUrl: String {
+        "https://metamask.app.link/connect?channelId=" + channelId + "&pubkey=" + keyExchange.publicKey
+    }
+    
+    init(channelId: String) {
+        self.channelId = channelId
         keyExchange = KeyExchange()
-        networkClient = NetworkClient()
-        
-        let metaMaskUrl = "https://metamask.app.link/connect?channelId=" + channelId + "&pubkey=" + keyExchange.publicKey
-        Logger().log("\(metaMaskUrl)")
-        
+        connectionClient = ConnectionClient()
         handleReceiveKeyExchange()
         handleRecieveMessages(on: channelId)
-        networkClient.connect()
+    }
+    
+    public func connect(on channelID: String? = nil) {
+        if let channelId = channelID {
+            self.channelId = channelId
+            handleRecieveMessages(on: channelId)
+        }
+        connectionClient.connect()
+        
+        let channel = channelID ?? ""
+        connectionClient.on(ClientEvent.clientConnected(on: channelId)) { _ in
+            print("Clients connected on \(channel)!")
+        }
+        
+        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { _ in
+            print("Clients disconnected on \(channel)!")
+        }
+        
+        // Start key exchange negotiation
+        sendMessage(KeyExchangeMessage(type: .syn), encrypt: false)
+    }
+    
+    public func disconnect() {
+        channelId = ""
+        connected = false
+        keysExchanged = false
+        connectionClient.disconnect()
+    }
+    
+    public func on(_ event: String, callback: @escaping (Any...) -> Void) {
+        connectionClient.on(event, callback: callback)
     }
 }
 
-extension Network {
+extension Connection {
     
     private func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: name ?? "",
-            url: networkClient.networkUrl)
+            url: connectionClient.networkUrl)
         
         let requestInfo = RequestInfo(
             type: "originator_info",
@@ -48,14 +79,28 @@ extension Network {
         sendMessage(requestInfo, encrypt: true)
     }
     
-    public func handleRecieveMessages(on channelId: String) {
+    private func handleRecieveMessages(on channelId: String) {
         handleReceiveMessage(on: channelId)
         handleReceiveConnection(on: channelId)
         handleReceiveDisonnection(on: channelId)
     }
     
     private func handleReceiveKeyExchange() {
-        networkClient.on(ClientEvent.keyExchange) { [weak self] data in
+        // Whenever key exchange step changes, send new step info
+        keyExchange.updateKeyExchangeStep = { [weak self] step, publickKey in
+            let keyExchangeMessage = KeyExchangeMessage(
+                type: step,
+            publicKey: publickKey)
+            
+            self?.sendMessage(keyExchangeMessage,
+                              encrypt: false)
+            if step == .synack {
+                self?.connectionClient.emit(ClientEvent.keysExchanged, with: [])
+            }
+        }
+        
+        // Whenever new key exchange event is received, handle it
+        connectionClient.on(ClientEvent.keyExchange) { [weak self] data in
             guard
                 let self = self,
                 let message = data.first as? [String: AnyHashable],
@@ -67,12 +112,12 @@ extension Network {
     }
     
     private func handleReceiveConnection(on channelId: String) {
-        networkClient.on(clientEvent: .connect) { [weak self] _ in
+        connectionClient.on(clientEvent: .connect) { [weak self] _ in
             Logger().log("Clients connected")
             guard let self = self else { return }
             
             if self.keysExchanged {
-                self.networkClient.emit(
+                self.connectionClient.emit(
                     ClientEvent.joinChannel,
                     with: [])
             } else {
@@ -83,7 +128,7 @@ extension Network {
     }
     
     private func handleReceiveDisonnection(on channelId: String) {
-        networkClient.on(clientEvent: .disconnect) { [weak self] _ in
+        connectionClient.on(clientEvent: .disconnect) { [weak self] _ in
             Logger().log("Clients disconnected")
             guard let self = self else { return }
             
@@ -97,7 +142,11 @@ extension Network {
     }
     
     private func handleReceiveMessage(on channelId: String) {
-        networkClient.on(ClientEvent.receive(on: channelId)) { [weak self] data in
+        connectionClient.on(ClientEvent.keysExchanged) { [weak self] _ in
+            self?.sendOriginatorInfo()
+        }
+        
+        connectionClient.on(ClientEvent.receive(on: channelId)) { [weak self] data in
             guard
                 let self = self,
                 let response = data.first as? [String: AnyHashable]
@@ -108,32 +157,6 @@ extension Network {
             
             /*
             if !keysExchanged {
-                
-                switch message.type {
-                case .start:
-                    
-                    
-                }
-                if message.type == .synack {
-                    self.keyExchange.theirPublicKey = message.publicKey
-                    let keyExchangeAck = self.keyExchange.keyExchangeMessage(with: .ack)
-                    self.sendMessage(keyExchangeAck, encrypt: false)
-                    self.keysExchanged = true
-                    self.sendOriginatorInfo()
-                } else {
-                    
-                }
-            } else {
-                if message.type == .start {
-                    self.keysExchanged = true
-                    self.connectionPaused = false
-                    self.connected = false
-                    let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
-                    self.sendMessage(keyExchangeSync, encrypt: false)
-                    return
-                }
-            }
-            
             
             let decrypted = keyExchange.decryptMessage()
              */
@@ -148,7 +171,7 @@ extension Network {
         
         let encryptedMessage = try? keyExchange.encryptMessage(message)
         
-        networkClient.emit(
+        connectionClient.emit(
             ClientEvent.message,
             with: [
                 Message(
@@ -158,7 +181,7 @@ extension Network {
     }
 }
 
-private extension Network {
+private extension Connection {
     struct OriginatorInfo: Codable {
         let title: String
         let url: String
@@ -176,8 +199,8 @@ private extension Network {
     }
 }
 
-private extension Network {
-    func keyExchangeMessage(from dictionary: [String: AnyHashable]) -> KeyExchangeMessage? {
+private extension Connection {
+    private func keyExchangeMessage(from dictionary: [String: AnyHashable]) -> KeyExchangeMessage? {
         do {
             let json = try JSONSerialization.data(withJSONObject: dictionary)
             let decoder = JSONDecoder()
