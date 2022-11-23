@@ -10,13 +10,12 @@ import UIKit
 import metamask_ios_sdk
 
 class ViewController: UIViewController {
-    private let sdk = MetaMaskSDK.shared
+    private let mm = MetaMaskSDK.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        print("Private key: \(ECIES.generatePrivateKey())")
-        sdk.connect()
+        mm.connect()
     }
 
     override func didReceiveMemoryWarning() {

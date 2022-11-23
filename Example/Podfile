@@ -3,7 +3,7 @@ use_frameworks!
 platform :ios, '14.0'
 
 target 'metamask-ios-sdk_Example' do  
-  pod 'Socket.IO-Client-Swift', '~> 15.2.0'
+  pod 'Socket.IO-Client-Swift', '~> 16.0.1'
   pod 'metamask-ios-sdk', :path => '../'
   
   target 'metamask-ios-sdk_Tests' do

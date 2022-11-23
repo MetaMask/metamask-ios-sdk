@@ -22,7 +22,7 @@
   "source_files": "metamask-ios-sdk/Classes/**/*",
   "dependencies": {
     "Socket.IO-Client-Swift": [
-      "~> 15.2.0"
+      "~> 16.0.1"
     ]
   },
   "swift_version": "5.0"

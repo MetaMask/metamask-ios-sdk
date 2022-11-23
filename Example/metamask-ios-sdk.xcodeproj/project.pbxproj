@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4FC1C22B346BF58D185E8A6B /* Pods_metamask_ios_sdk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DAE46B53157944A991EE7D5 /* Pods_metamask_ios_sdk_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -14,7 +15,6 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		848653C2F18EC51DE1FAACF8 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB03F87569C12495A3FA25B2 /* Pods_metamask_ios_sdk_Tests.framework */; };
-		AD2863425B5CADFA16D43788 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DAE46B53157944A991EE7D5 /* Pods_metamask_ios_sdk_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD2863425B5CADFA16D43788 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */,
+				4FC1C22B346BF58D185E8A6B /* Pods_metamask_ios_sdk_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

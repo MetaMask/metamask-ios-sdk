@@ -9,12 +9,17 @@ import OSLog
 import Foundation
 import SocketIO
 
-enum ClientEvent {
-    case connect
-    case disconnect
-}
+enum ClientEvent { }
 
 extension ClientEvent {
+    static var connected: String {
+        "connection"
+    }
+    
+    static var disconnected: String {
+        "disconnect"
+    }
+    
     static var message: String {
         "message"
     }
@@ -31,7 +36,15 @@ extension ClientEvent {
         "join_channel"
     }
     
-    static func clientConnected(on channel: String)-> String {
+    static var createChannel: String {
+        "create_channel"
+    }
+    
+    static func channelCreated(_ channel: String)-> String {
+        "channel_created".appending("-").appending(channel)
+    }
+    
+    static func clientsConnected(on channel: String)-> String {
         "clients_connected".appending("-").appending(channel)
     }
     
@@ -39,66 +52,67 @@ extension ClientEvent {
         "clients_disconnected".appending("-").appending(channel)
     }
     
-    static func receive(on channelId: String) -> String {
+    static func message(on channelId: String) -> String {
         "message".appending("-").appending(channelId)
     }
 }
 
 class ConnectionClient {
-    private var socket: SocketIOClient?
+    static let shared = ConnectionClient()
     
-    public let networkUrl: String
+    let connectionUrl = "https://socket.codefi.network"
+    let socket: SocketIOClient
+    private var socketManager: SocketManager
+    var onConnect: (() -> Void)?
     
-    init(networkUrl: String = "https://socket.codefi.network") {
-        self.networkUrl = networkUrl
-        self.socket = makeSocketClient(url: networkUrl)
-    }
-    
-    func connect() {
-        socket?.connect()
-    }
-    
-    func disconnect() {
-        socket?.disconnect()
-    }
-    
-    private func makeSocketClient(url: String) -> SocketIOClient? {
-        guard let url = URL(string: url) else { return nil }
+    private init() {
+        let url = URL(string: connectionUrl)!
         let options: SocketIOClientOption = .extraHeaders(
             [
                 "User-Agent": "SocketIOClient"
             ]
         )
-        let manager = SocketManager(
+        
+        socketManager = SocketManager(
             socketURL: url,
             config: [
                 .log(true),
                 options
-            ]
-        )
-        return manager.defaultSocket
+            ])
+        socket = socketManager.defaultSocket
     }
     
+    func connect() {
+        socket.connect()
+        socket.on(clientEvent: .error) { data, _ in
+            print(">>>>>>")
+            print("Error: \(data)")
+            print("<<<<<<")
+        }
+
+        socket.on(clientEvent: .connect) { [weak self] data, _ in
+            print(">>>>>>")
+            print("Client connected!: \(data)")
+            print("<<<<<<")
+            self?.onConnect?()
+        }
+    }
+    
+    func disconnect() {
+        socket.disconnect()
+    }
+
     func on(_ event: String, callback: @escaping (Any...) -> Void) {
-        socket?.on(event) { data, _ in
+        socket.on(event) { data, _ in
             callback(data)
         }
     }
     
-    func on(clientEvent: ClientEvent, callback: @escaping (Any...) -> Void) {
-        let socketEvent: SocketClientEvent
-        switch clientEvent {
-        case .connect:
-            socketEvent = .connect
-        case .disconnect:
-            socketEvent = .disconnect
-        }
-        socket?.on(clientEvent: socketEvent) { data, _ in
-            callback(data)
-        }
+    func emit(_ event: String, _ item: String, completion: (() -> Void)? = nil) {
+        socket.emit(event, item, completion: completion)
     }
     
-    func emit(_ event: String, with items: Any...) {
-        socket?.emit(event, with: items)
+    func emit(_ event: String, items: SocketData..., completion: (() -> Void)? = nil) {
+        socket.emit(event, items, completion: completion)
     }
 }

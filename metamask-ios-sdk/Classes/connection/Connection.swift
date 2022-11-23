@@ -6,12 +6,13 @@
 //
 
 import OSLog
+import SocketIO
 import Foundation
 
 public class Connection {
 
-    private let keyExchange: KeyExchange
-    private let connectionClient: ConnectionClient
+    private let keyExchange = KeyExchange()
+    private let connectionClient = ConnectionClient.shared
     
     private var keysExchanged: Bool = false
     private var connectionPaused: Bool = false
@@ -27,30 +28,12 @@ public class Connection {
     
     init(channelId: String) {
         self.channelId = channelId
-        keyExchange = KeyExchange()
-        connectionClient = ConnectionClient()
         handleReceiveKeyExchange()
         handleRecieveMessages(on: channelId)
     }
     
-    public func connect(on channelID: String? = nil) {
-        if let channelId = channelID {
-            self.channelId = channelId
-            handleRecieveMessages(on: channelId)
-        }
+    public func connect() {
         connectionClient.connect()
-        
-        let channel = channelID ?? ""
-        connectionClient.on(ClientEvent.clientConnected(on: channelId)) { _ in
-            print("Clients connected on \(channel)!")
-        }
-        
-        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { _ in
-            print("Clients disconnected on \(channel)!")
-        }
-        
-        // Start key exchange negotiation
-        sendMessage(KeyExchangeMessage(type: .syn), encrypt: false)
     }
     
     public func disconnect() {
@@ -70,7 +53,7 @@ extension Connection {
     private func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: name ?? "",
-            url: connectionClient.networkUrl)
+            url: connectionClient.connectionUrl)
         
         let requestInfo = RequestInfo(
             type: "originator_info",
@@ -87,6 +70,7 @@ extension Connection {
     
     private func handleReceiveKeyExchange() {
         // Whenever key exchange step changes, send new step info
+        let channel: String = channelId
         keyExchange.updateKeyExchangeStep = { [weak self] step, publickKey in
             let keyExchangeMessage = KeyExchangeMessage(
                 type: step,
@@ -95,7 +79,9 @@ extension Connection {
             self?.sendMessage(keyExchangeMessage,
                               encrypt: false)
             if step == .synack {
-                self?.connectionClient.emit(ClientEvent.keysExchanged, with: [])
+                self?.emit(
+                    ClientEvent.keysExchanged,
+                    channel)
             }
         }
         
@@ -112,14 +98,49 @@ extension Connection {
     }
     
     private func handleReceiveConnection(on channelId: String) {
-        connectionClient.on(clientEvent: .connect) { [weak self] _ in
-            Logger().log("Clients connected")
+        
+        connectionClient.onConnect = { [weak self, channelId] in
+            self?.emit(
+                ClientEvent.joinChannel,
+                channelId, completion: {
+                    DispatchQueue.main.async {
+                        let url = self?.qrCodeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                        print("Deeplinking url: \(url)")
+                        print("===========")
+                        if let url = URL(string: url) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                })
+            
+//            self?.emit(
+//                ClientEvent.connected,
+//                channelId, completion: { [weak self] in
+//                    self?.emit(
+//                        ClientEvent.createChannel,
+//                        channelId)
+//                })
+        }
+        
+//        connectionClient.on(ClientEvent.channelCreated(channelId)) { _ in
+//            let url = "https://metamask.app.link/connect?channelId=\(channelId)&pubkey=\(pubKey)"
+//            print("Deeplink url: \(url)")
+//            print("===========")
+//            if let url = URL(string: url) {
+//                UIApplication.shared.open(url)
+//            }
+//        }
+        
+        connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] _ in
+            
             guard let self = self else { return }
+            guard !self.connected else { return }
+            
             
             if self.keysExchanged {
-                self.connectionClient.emit(
-                    ClientEvent.joinChannel,
-                    with: [])
+//                self.emit(
+//                    ClientEvent.joinChannel,
+//                    items: channelId)
             } else {
                 let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
                 self.sendMessage(keyExchangeSync, encrypt: false)
@@ -128,8 +149,9 @@ extension Connection {
     }
     
     private func handleReceiveDisonnection(on channelId: String) {
-        connectionClient.on(clientEvent: .disconnect) { [weak self] _ in
-            Logger().log("Clients disconnected")
+
+        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] _ in
+            Logger().log("Clients disconnected on \(channelId)")
             guard let self = self else { return }
             
             if !self.connectionPaused {
@@ -146,14 +168,16 @@ extension Connection {
             self?.sendOriginatorInfo()
         }
         
-        connectionClient.on(ClientEvent.receive(on: channelId)) { [weak self] data in
-            guard
-                let self = self,
-                let response = data.first as? [String: AnyHashable]
-            else { return }
+        connectionClient.on(ClientEvent.message(on: channelId)) { [weak self] data in
+//            guard
+//                //let self = self,
+//                let response = data.first
+//            else { return }
             
-            let keysExchanged: Bool = self.keysExchanged
-            let connectionPaused: Bool = self.connectionPaused
+            print("Receive response: \(data)")
+            
+//            let keysExchanged: Bool = self.keysExchanged
+//            let connectionPaused: Bool = self.connectionPaused
             
             /*
             if !keysExchanged {
@@ -164,20 +188,33 @@ extension Connection {
     }
     
     public func sendMessage(_ message: Codable, encrypt: Bool) {
-        guard keyExchange.keysExchanged else {
-            Logger().log(level: .error, "Keys not exchanged")
-            return
-        }
+//        guard keyExchange.keysExchanged else {
+//            Logger().log(level: .error, "Keys not exchanged")
+//            return
+//        }
         
-        let encryptedMessage = try? keyExchange.encryptMessage(message)
-        
-        connectionClient.emit(
-            ClientEvent.message,
-            with: [
-                Message(
+        if encrypt {
+            let encryptedMessage = try? keyExchange.encryptMessage(message)
+            emit(
+                ClientEvent.message,
+                items: Message(
                     id: channelId,
-                    message: encryptedMessage)
-            ])
+                    message: encryptedMessage))
+        } else {
+//            emit(
+//                ClientEvent.message,
+//                items: message)
+        }
+    }
+}
+
+private extension Connection {
+    func emit(_ event: String, _ item: String, completion: (() -> Void)? = nil) {
+        connectionClient.emit(event, item, completion: completion)
+    }
+    
+    func emit(_ event: String, items: SocketData, completion: (() -> Void)? = nil)  {
+        connectionClient.emit(event, items: items, completion: completion)
     }
 }
 
@@ -187,7 +224,7 @@ private extension Connection {
         let url: String
     }
     
-    struct Message<T: Codable>: Codable {
+    struct Message<T: Codable>: Codable, SocketData {
         //let type: KeyExchangeStep
         var id: String
         var message: T?
