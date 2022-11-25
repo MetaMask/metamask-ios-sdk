@@ -23,7 +23,7 @@ public class Connection {
     public var onClientReady: (() -> Void)?
     
     var qrCodeUrl: String {
-        "https://metamask.app.link/connect?channelId=" + channelId + "&pubkey=" + keyExchange.publicKey
+        "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.publicKey
     }
     
     init(channelId: String) {
@@ -43,14 +43,14 @@ public class Connection {
         connectionClient.disconnect()
     }
     
-    public func on(_ event: String, callback: @escaping (Any...) -> Void) {
-        connectionClient.on(event, callback: callback)
-    }
+//    public func on(_ event: String, callback: @escaping (Any...) -> Void) {
+//        connectionClient.on(event, callback: callback)
+//    }
 }
 
 extension Connection {
     
-    private func sendOriginatorInfo() {
+    private func sendOriginatorInfo() async {
         let originatorInfo = OriginatorInfo(
             title: name ?? "",
             url: connectionClient.connectionUrl)
@@ -59,7 +59,7 @@ extension Connection {
             type: "originator_info",
             originator: originatorInfo)
         
-        sendMessage(requestInfo, encrypt: true)
+        await sendMessage(requestInfo, encrypt: true)
     }
     
     private func handleRecieveMessages(on channelId: String) {
@@ -70,89 +70,99 @@ extension Connection {
     
     private func handleReceiveKeyExchange() {
         // Whenever key exchange step changes, send new step info
-        let channel: String = channelId
-        keyExchange.updateKeyExchangeStep = { [weak self] step, publickKey in
-            let keyExchangeMessage = KeyExchangeMessage(
-                type: step,
-            publicKey: publickKey)
-            
-            self?.sendMessage(keyExchangeMessage,
-                              encrypt: false)
-            if step == .synack {
-                self?.emit(
-                    ClientEvent.keysExchanged,
-                    channel)
-            }
-        }
+//        let channel: String = channelId
+//        keyExchange.updateKeyExchangeStep = { [weak self] step, publickKey in
+//            let keyExchangeMessage = KeyExchangeMessage(
+//                type: step,
+//            publicKey: publickKey)
+//
+//            self?.sendMessage(keyExchangeMessage,
+//                              encrypt: false)
+//            if step == .synack {
+//                self?.emit(
+//                    ClientEvent.keysExchanged,
+//                    channel)
+//            }
+//        }
         
         // Whenever new key exchange event is received, handle it
-        connectionClient.on(ClientEvent.keyExchange) { [weak self] data in
+        Task {
+            let data = await connectionClient.on(ClientEvent.keyExchange)
+            Logging.log("mmsdk| Key exchange: \(data)")
+            
             guard
-                let self = self,
                 let message = data.first as? [String: AnyHashable],
-                let keyMessage = self.keyExchangeMessage(from: message) else {
+                let keyMessage = keyExchangeMessage(from: message) else {
                 return
             }
-            self.keyExchange.handleKeyExchangeMessage?(keyMessage)
+            keyExchange.handleKeyExchangeMessage?(keyMessage)
+        }
+    }
+    
+    func deeplinkToMetaMask() {
+        let url = qrCodeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        Logging.log("mmsdk| === Deeplink url: ===\n \(url)")
+        if let url = URL(string: url) {
+            DispatchQueue.main.async {
+                Logging.log("mmsdk| \n=== Opening MetaMask ===\n")
+                UIApplication.shared.open(url)
+            }
+        }
+    }
+    
+    struct JoinInfo: Codable, SocketData {
+        let name: String
+        let reason: String
+        
+        func socketRepresentation() -> SocketData {
+            return ["name": name, "reason": reason]
         }
     }
     
     private func handleReceiveConnection(on channelId: String) {
-        
-        connectionClient.onConnect = { [weak self, channelId] in
-            self?.emit(
-                ClientEvent.joinChannel,
-                channelId, completion: {
-                    DispatchQueue.main.async {
-                        let url = self?.qrCodeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                        print("Deeplinking url: \(url)")
-                        print("===========")
-                        if let url = URL(string: url) {
-                            UIApplication.shared.open(url)
-                        }
-                    }
-                })
-            
-//            self?.emit(
-//                ClientEvent.connected,
-//                channelId, completion: { [weak self] in
-//                    self?.emit(
-//                        ClientEvent.createChannel,
-//                        channelId)
-//                })
+        Task {
+            let error = await connectionClient.on(clientEvent: .error)
+            Logging.log("mmsdk| >>> Client connection error: \(error) <<<")
         }
         
-//        connectionClient.on(ClientEvent.channelCreated(channelId)) { _ in
-//            let url = "https://metamask.app.link/connect?channelId=\(channelId)&pubkey=\(pubKey)"
-//            print("Deeplink url: \(url)")
-//            print("===========")
-//            if let url = URL(string: url) {
-//                UIApplication.shared.open(url)
-//            }
-//        }
+        Task {
+            let data = await connectionClient.on(clientEvent: .connect)
+            Logging.log("mmsdk| >>> Client connected: \(data) <<<")
+            
+            await emit(ClientEvent.joinChannel, JoinInfo(name: "Peter John", reason: "Social chat"))
+            Logging.log("mmsdk| >>> Joined channel \(channelId)")
+            
+            //deeplinkToMetaMask()
+
+            let keyExchangeSync = keyExchange.keyExchangeMessage(with: .syn)
+            Logging.log("mmsdk| >>> Initiating key exchange: \(keyExchangeSync) <<<")
+            await emit(ClientEvent.keyExchange, keyExchangeSync)
+            await sendMessage(keyExchangeSync, encrypt: false)
+        }
         
-        connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] _ in
+        Task {
+            let data = await connectionClient.on("join_ack")
+            Logging.log("mmsdk| >>> Server confirms my join: \(data) <<<")
+        }
+        
+        Task {
+            let data = await connectionClient.on(ClientEvent.clientsConnected(on: channelId))
+            Logging.log("mmsdk| >>> Both clients connected: \(data) <<<")
+            connected = true
             
-            guard let self = self else { return }
-            guard !self.connected else { return }
-            
-            
-            if self.keysExchanged {
-//                self.emit(
-//                    ClientEvent.joinChannel,
-//                    items: channelId)
+            if keysExchanged {
+
             } else {
-                let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
-                self.sendMessage(keyExchangeSync, encrypt: false)
+                let keyExchangeSync = keyExchange.keyExchangeMessage(with: .syn)
+                await sendMessage(keyExchangeSync, encrypt: false)
             }
         }
     }
     
     private func handleReceiveDisonnection(on channelId: String) {
-
-        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] _ in
-            Logger().log("Clients disconnected on \(channelId)")
-            guard let self = self else { return }
+        Task {
+            let _ = await connectionClient.on(ClientEvent.clientDisconnected(on: channelId))
+            Logging.log("mmsdk| Clients disconnected on \(channelId)")
             
             if !self.connectionPaused {
                 self.connected = false
@@ -164,75 +174,72 @@ extension Connection {
     }
     
     private func handleReceiveMessage(on channelId: String) {
-        connectionClient.on(ClientEvent.keysExchanged) { [weak self] _ in
-            self?.sendOriginatorInfo()
+        Task {
+            let _ = await connectionClient.on(ClientEvent.keysExchanged)
+            Logging.log("mmsdk| Keys exchanged")
+            await sendOriginatorInfo()
         }
         
-        connectionClient.on(ClientEvent.message(on: channelId)) { [weak self] data in
-//            guard
-//                //let self = self,
-//                let response = data.first
-//            else { return }
-            
-            print("Receive response: \(data)")
-            
-//            let keysExchanged: Bool = self.keysExchanged
-//            let connectionPaused: Bool = self.connectionPaused
-            
-            /*
-            if !keysExchanged {
-            
-            let decrypted = keyExchange.decryptMessage()
-             */
+        Task {
+            let data = await connectionClient.on(ClientEvent.message(on: channelId))
+            Logging.log("mmsdk| Received message: \(data)")
         }
     }
     
-    public func sendMessage(_ message: Codable, encrypt: Bool) {
-//        guard keyExchange.keysExchanged else {
-//            Logger().log(level: .error, "Keys not exchanged")
-//            return
-//        }
+    public func sendMessage<T: Codable & SocketData>(_ message: T, encrypt: Bool) async {
+        if encrypt && !keyExchange.keysExchanged {
+            Logging.log("mmsdk| Keys not exchanged")
+            return
+        }
         
         if encrypt {
             let encryptedMessage = try? keyExchange.encryptMessage(message)
-            emit(
+            await emit(
                 ClientEvent.message,
-                items: Message(
+                Message(
                     id: channelId,
-                    message: encryptedMessage))
+                    message: encryptedMessage ?? ""))
         } else {
-//            emit(
-//                ClientEvent.message,
-//                items: message)
+            await emit(
+                ClientEvent.message,
+                message)
         }
     }
 }
 
 private extension Connection {
-    func emit(_ event: String, _ item: String, completion: (() -> Void)? = nil) {
-        connectionClient.emit(event, item, completion: completion)
-    }
-    
-    func emit(_ event: String, items: SocketData, completion: (() -> Void)? = nil)  {
-        connectionClient.emit(event, items: items, completion: completion)
+    func emit(_ event: String, _ item: SocketData) async {
+        await connectionClient.emit(event, item)
     }
 }
 
 private extension Connection {
-    struct OriginatorInfo: Codable {
+    struct OriginatorInfo: Codable, SocketData {
         let title: String
         let url: String
+        
+        func socketRepresentation() -> SocketData {
+            ["title": title, "url": url]
+        }
     }
     
-    struct Message<T: Codable>: Codable, SocketData {
+    struct Message<T: Codable & SocketData>: SocketData {
         //let type: KeyExchangeStep
         var id: String
-        var message: T?
+        var message: T
+        
+        func socketRepresentation() -> SocketData {
+            ["id": id, "message": message]
+        }
     }
     
-    struct RequestInfo: Codable {
+    struct RequestInfo: Codable, SocketData {
         let type: String
         let originator: OriginatorInfo
+        
+        func socketRepresentation() -> SocketData {
+            ["type": type, "originator": originator]
+        }
     }
 }
 

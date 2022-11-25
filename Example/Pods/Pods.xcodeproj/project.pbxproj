@@ -144,7 +144,7 @@
 		27E69E6C4A5EB43C470B1F7BE1FDD0E4 /* SocketIOClientOption.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOClientOption.swift; path = Source/SocketIO/Client/SocketIOClientOption.swift; sourceTree = "<group>"; };
 		284A1174A72B2EA30F69216D0418873D /* QRCodeGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
 		28CFF92C93D59CEC052852B8D96A4487 /* Pods-metamask-ios-sdk_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-metamask-ios-sdk_Example-umbrella.h"; sourceTree = "<group>"; };
-		28D797DAEDAC81915860E23C15A838CE /* metamask-ios-sdk */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "metamask-ios-sdk"; path = metamask_ios_sdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		28D797DAEDAC81915860E23C15A838CE /* metamask_ios_sdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = metamask_ios_sdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BD3AFD89454F40D5A5B5ABF9653B744 /* Socket.IO-Client-Swift-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Socket.IO-Client-Swift-Info.plist"; sourceTree = "<group>"; };
 		2DDB6161C5B82A4CAF2D3D0E1DBFEDED /* SocketPacket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketPacket.swift; path = Source/SocketIO/Parse/SocketPacket.swift; sourceTree = "<group>"; };
 		2E8C57B624103A1DCD126DA0689E4CD7 /* SocketEngineWebsocket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngineWebsocket.swift; path = Source/SocketIO/Engine/SocketEngineWebsocket.swift; sourceTree = "<group>"; };
@@ -157,7 +157,7 @@
 		48E812F00FD10317B7B9FBD1A26643FD /* Connection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		4DA34940E93CFF53668DD8D334E462AE /* SocketStringReader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketStringReader.swift; path = Source/SocketIO/Util/SocketStringReader.swift; sourceTree = "<group>"; };
 		4E41E697BF985E3EC382E606B3CC4FD7 /* Pods-metamask-ios-sdk_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-metamask-ios-sdk_Tests-umbrella.h"; sourceTree = "<group>"; };
-		50C0B0879B7086918A819F704BF40B4B /* Socket.IO-Client-Swift */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Socket.IO-Client-Swift"; path = SocketIO.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		50C0B0879B7086918A819F704BF40B4B /* SocketIO.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SocketIO.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		558D4B9816AE80AA84C79E6D7F08A603 /* SocketEngineSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngineSpec.swift; path = Source/SocketIO/Engine/SocketEngineSpec.swift; sourceTree = "<group>"; };
 		570C5C43DB3658E30610C95C052DC026 /* Pods-metamask-ios-sdk_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-metamask-ios-sdk_Tests-dummy.m"; sourceTree = "<group>"; };
 		57DC864BC63EA48DF2DB1B36ECD184C9 /* Pods-metamask-ios-sdk_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		5BCC7F65FF8C05C8C2CE5B588FAB7150 /* WebSocket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WebSocket.swift; path = Sources/Starscream/WebSocket.swift; sourceTree = "<group>"; };
 		5EC8C69285FE049E846237CB8781BE55 /* logger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		5EF246BB470919F67C9CB1B75858D525 /* Starscream-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Starscream-umbrella.h"; sourceTree = "<group>"; };
-		63C0748AD6080BD4BA27D3A593814E15 /* Pods-metamask-ios-sdk_Tests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-metamask-ios-sdk_Tests"; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		63C0748AD6080BD4BA27D3A593814E15 /* Pods_metamask_ios_sdk_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		640E8FF222FEFD4F1CC040C4C31651D7 /* SocketAckEmitter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketAckEmitter.swift; path = Source/SocketIO/Ack/SocketAckEmitter.swift; sourceTree = "<group>"; };
 		6823321B9E8B30DF51870BDB19D6B354 /* Socket.IO-Client-Swift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Socket.IO-Client-Swift-dummy.m"; sourceTree = "<group>"; };
 		6B2BA1FF0D5FAB5654FD2009FE5C5876 /* Pods-metamask-ios-sdk_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-metamask-ios-sdk_Example.modulemap"; sourceTree = "<group>"; };
@@ -184,9 +184,9 @@
 		84EF426740479F1665A93EC0C789F448 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		8709E11637F9E7FA4350BA6263010612 /* Pods-metamask-ios-sdk_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-metamask-ios-sdk_Tests.modulemap"; sourceTree = "<group>"; };
 		88482AA60ABA82E5084F43B08BA279CA /* Transport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Transport.swift; path = Sources/Transport/Transport.swift; sourceTree = "<group>"; };
-		891B2270823847ED23F2ECFC28F935EC /* Starscream */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Starscream; path = Starscream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		891B2270823847ED23F2ECFC28F935EC /* Starscream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Starscream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D446BED68DBFBDF4B442BC3A8C5F5BF /* Starscream-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Starscream-prefix.pch"; sourceTree = "<group>"; };
-		8E2B6B83E8895E25C610CD90322B80FA /* Pods-metamask-ios-sdk_Example */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-metamask-ios-sdk_Example"; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E2B6B83E8895E25C610CD90322B80FA /* Pods_metamask_ios_sdk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		935756E7C08D66D047424EF2B64801C9 /* Pods-metamask-ios-sdk_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-metamask-ios-sdk_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A18E820BB8949ADB687530B6633D3CD8 /* metamask-ios-sdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "metamask-ios-sdk-Info.plist"; sourceTree = "<group>"; };
@@ -313,11 +313,11 @@
 		28CDE19827B4751519F64153CB9CAE83 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				28D797DAEDAC81915860E23C15A838CE /* metamask-ios-sdk */,
-				8E2B6B83E8895E25C610CD90322B80FA /* Pods-metamask-ios-sdk_Example */,
-				63C0748AD6080BD4BA27D3A593814E15 /* Pods-metamask-ios-sdk_Tests */,
-				50C0B0879B7086918A819F704BF40B4B /* Socket.IO-Client-Swift */,
-				891B2270823847ED23F2ECFC28F935EC /* Starscream */,
+				28D797DAEDAC81915860E23C15A838CE /* metamask_ios_sdk.framework */,
+				8E2B6B83E8895E25C610CD90322B80FA /* Pods_metamask_ios_sdk_Example.framework */,
+				63C0748AD6080BD4BA27D3A593814E15 /* Pods_metamask_ios_sdk_Tests.framework */,
+				50C0B0879B7086918A819F704BF40B4B /* SocketIO.framework */,
+				891B2270823847ED23F2ECFC28F935EC /* Starscream.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -624,7 +624,7 @@
 			);
 			name = Starscream;
 			productName = Starscream;
-			productReference = 891B2270823847ED23F2ECFC28F935EC /* Starscream */;
+			productReference = 891B2270823847ED23F2ECFC28F935EC /* Starscream.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		A44D85440C5D58BC5C4D70A539C5EEF0 /* Socket.IO-Client-Swift */ = {
@@ -643,7 +643,7 @@
 			);
 			name = "Socket.IO-Client-Swift";
 			productName = SocketIO;
-			productReference = 50C0B0879B7086918A819F704BF40B4B /* Socket.IO-Client-Swift */;
+			productReference = 50C0B0879B7086918A819F704BF40B4B /* SocketIO.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		AF41F9553345A528745E334E9ECE5C32 /* Pods-metamask-ios-sdk_Example */ = {
@@ -664,7 +664,7 @@
 			);
 			name = "Pods-metamask-ios-sdk_Example";
 			productName = Pods_metamask_ios_sdk_Example;
-			productReference = 8E2B6B83E8895E25C610CD90322B80FA /* Pods-metamask-ios-sdk_Example */;
+			productReference = 8E2B6B83E8895E25C610CD90322B80FA /* Pods_metamask_ios_sdk_Example.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		DECA121C3DB6E876BBF1C56D59A523A8 /* metamask-ios-sdk */ = {
@@ -683,7 +683,7 @@
 			);
 			name = "metamask-ios-sdk";
 			productName = metamask_ios_sdk;
-			productReference = 28D797DAEDAC81915860E23C15A838CE /* metamask-ios-sdk */;
+			productReference = 28D797DAEDAC81915860E23C15A838CE /* metamask_ios_sdk.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		EBF396BD46639368D13907F08A17BA21 /* Pods-metamask-ios-sdk_Tests */ = {
@@ -702,7 +702,7 @@
 			);
 			name = "Pods-metamask-ios-sdk_Tests";
 			productName = Pods_metamask_ios_sdk_Tests;
-			productReference = 63C0748AD6080BD4BA27D3A593814E15 /* Pods-metamask-ios-sdk_Tests */;
+			productReference = 63C0748AD6080BD4BA27D3A593814E15 /* Pods_metamask_ios_sdk_Tests.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -712,7 +712,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1400;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -915,7 +915,6 @@
 			baseConfigurationReference = D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -948,7 +947,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A425AA20E60413BECC2CC0B6FB152FD1 /* Starscream.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -960,7 +958,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Starscream/Starscream-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Starscream/Starscream-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Starscream/Starscream.modulemap";
 				PRODUCT_MODULE_NAME = Starscream;
@@ -980,7 +978,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB4022F5A0C208CF5F6F21E4FC624345 /* metamask-ios-sdk.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1043,6 +1040,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1081,7 +1079,6 @@
 			baseConfigurationReference = 71D1B2CACE272EFB97E920335B54EE5F /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1115,7 +1112,6 @@
 			baseConfigurationReference = 57DC864BC63EA48DF2DB1B36ECD184C9 /* Pods-metamask-ios-sdk_Example.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1180,6 +1176,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1210,7 +1207,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F8D6F382B9F72DA1E5462A681BAC0311 /* Socket.IO-Client-Swift.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1223,7 +1219,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift.modulemap";
 				PRODUCT_MODULE_NAME = SocketIO;
@@ -1241,7 +1237,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CD73B8690C440A4A68D9AEC3C473D788 /* metamask-ios-sdk.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1275,7 +1270,6 @@
 			baseConfigurationReference = 1C7A50F5899AA821AA86B7D62543883D /* Pods-metamask-ios-sdk_Tests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1309,7 +1303,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = ACC08AB39DB9E8B83BE61755A6E2C9D1 /* Starscream.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1321,7 +1314,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Starscream/Starscream-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Starscream/Starscream-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Starscream/Starscream.modulemap";
 				PRODUCT_MODULE_NAME = Starscream;
@@ -1340,7 +1333,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 79F00478D9E0E723D6FBA19B9B76D7BD /* Socket.IO-Client-Swift.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1353,7 +1345,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift.modulemap";
 				PRODUCT_MODULE_NAME = SocketIO;

@@ -10,7 +10,7 @@ import Foundation
 
 public class MetaMaskSDK {
     public static var shared = MetaMaskSDK()
-    private let connection = Connection(channelId: UUID().uuidString)
+    private let connection = Connection(channelId: UUID().uuidString.lowercased())
     
     public func connect() {
         connection.connect()

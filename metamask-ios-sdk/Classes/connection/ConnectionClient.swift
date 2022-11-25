@@ -9,9 +9,7 @@ import OSLog
 import Foundation
 import SocketIO
 
-enum ClientEvent { }
-
-extension ClientEvent {
+struct ClientEvent {
     static var connected: String {
         "connection"
     }
@@ -40,15 +38,19 @@ extension ClientEvent {
         "create_channel"
     }
     
-    static func channelCreated(_ channel: String)-> String {
+    static func waitingToJoin(_ channel: String) -> String {
+        "clients_waiting_to_join".appending("-").appending(channel)
+    }
+    
+    static func channelCreated(_ channel: String) -> String {
         "channel_created".appending("-").appending(channel)
     }
     
-    static func clientsConnected(on channel: String)-> String {
+    static func clientsConnected(on channel: String) -> String {
         "clients_connected".appending("-").appending(channel)
     }
     
-    static func clientDisconnected(on channel: String)-> String {
+    static func clientDisconnected(on channel: String) -> String {
         "clients_disconnected".appending("-").appending(channel)
     }
     
@@ -60,10 +62,10 @@ extension ClientEvent {
 class ConnectionClient {
     static let shared = ConnectionClient()
     
-    let connectionUrl = "https://socket.codefi.network"
+    // older url: "https://socket.codefi.network"
+    let connectionUrl = "https://metamask-sdk-socket.metafi.codefi.network/"
     let socket: SocketIOClient
-    private var socketManager: SocketManager
-    var onConnect: (() -> Void)?
+    private let socketManager: SocketManager
     
     private init() {
         let url = URL(string: connectionUrl)!
@@ -80,39 +82,45 @@ class ConnectionClient {
                 options
             ])
         socket = socketManager.defaultSocket
+    
     }
     
     func connect() {
         socket.connect()
-        socket.on(clientEvent: .error) { data, _ in
-            print(">>>>>>")
-            print("Error: \(data)")
-            print("<<<<<<")
-        }
-
-        socket.on(clientEvent: .connect) { [weak self] data, _ in
-            print(">>>>>>")
-            print("Client connected!: \(data)")
-            print("<<<<<<")
-            self?.onConnect?()
-        }
     }
     
     func disconnect() {
         socket.disconnect()
     }
+    
+    func on(clientEvent: SocketClientEvent) async -> [Any] {
+        await withCheckedContinuation { continuation in
+            // prevent "Swift task continuation misuse" fatal error from resuming continuation more than once
+            var promise: CheckedContinuation<[Any], Never>? = continuation
+            socket.on(clientEvent: clientEvent) { data, _ in
+                promise?.resume(returning: data)
+                promise = nil
+            }
+        }
+    }
 
-    func on(_ event: String, callback: @escaping (Any...) -> Void) {
-        socket.on(event) { data, _ in
-            callback(data)
+    func on(_ event: String) async -> [Any] {
+        await withCheckedContinuation { continuation in
+            var promise: CheckedContinuation<[Any], Never>? = continuation
+            socket.on(event) { data, _ in
+                promise?.resume(returning: data)
+                promise = nil
+            }
         }
     }
     
-    func emit(_ event: String, _ item: String, completion: (() -> Void)? = nil) {
-        socket.emit(event, item, completion: completion)
-    }
-    
-    func emit(_ event: String, items: SocketData..., completion: (() -> Void)? = nil) {
-        socket.emit(event, items, completion: completion)
+    func emit(_ event: String, _ item: SocketData) async {
+        await withCheckedContinuation { continuation in
+            var promise: CheckedContinuation<Void, Never>? = continuation
+            socket.emit(event, item, completion: {
+                promise?.resume()
+                promise = nil
+            })
+        }
     }
 }

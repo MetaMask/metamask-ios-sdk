@@ -6,13 +6,26 @@
 //
 
 import Foundation
+import SocketIO
 
 public enum KeyExchangeStep: String, Codable {
     case none = "none"
-    case start = "key_handshake_start"
     case ack = "key_handshake_ACK"
     case syn = "key_handshake_SYN"
     case synack = "key_handshake_SYNACK"
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let status = try? container.decode(String.self)
+        switch status {
+              case "none": self = .none
+              case "key_handshake_ACK": self = .ack
+              case "key_handshake_SYN": self = .syn
+              case "key_handshake_SYNACK": self = .synack
+              default:
+                 self = .none
+          }
+      }
 }
 
 public enum KeyExchangeError: Error {
@@ -20,9 +33,15 @@ public enum KeyExchangeError: Error {
     case encodingError
 }
 
-public struct KeyExchangeMessage: Codable {
+public struct KeyExchangeMessage: Codable, SocketData {
     public let type: KeyExchangeStep
     public var publicKey: String?
+    
+    public func socketRepresentation() -> SocketData {
+        publicKey != nil
+            ? ["type": type.rawValue, "publicKey": publicKey]
+            : ["type": type.rawValue]
+    }
 }
 
 /*
@@ -54,11 +73,11 @@ public class KeyExchange {
         handleKeyExchangeMessage = { [weak self, keysExchanged] message in
             
             if keysExchanged {
-                print("Keys exchanged!")
+                Logging.log("Keys exchanged!")
                 return
             }
             
-            print("Keys exchange status: \(message.type)")
+            Logging.log("Keys exchange status: \(message.type)")
             
             switch message.type {
             case .syn:
@@ -91,7 +110,7 @@ public class KeyExchange {
         theirPublicKey = publicKey
     }
     
-    public func encryptMessage(_ message: Codable) throws -> String {
+    public func encryptMessage<T: Codable & SocketData>(_ message: T) throws -> String {
         guard let theirPublicKey = theirPublicKey else {
             throw KeyExchangeError.keysNotExchanged
         }
