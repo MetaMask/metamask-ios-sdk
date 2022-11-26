@@ -14,7 +14,7 @@ struct ClientEvent {
         "connection"
     }
     
-    static var disconnected: String {
+    static var disconnect: String {
         "disconnect"
     }
     
@@ -63,7 +63,7 @@ class ConnectionClient {
     static let shared = ConnectionClient()
     
     // older url: "https://socket.codefi.network"
-    let connectionUrl = "https://metamask-sdk-socket.metafi.codefi.network/"
+    let connectionUrl = "http://127.0.0.1:4000"//"https://metamask-sdk-socket.metafi.codefi.network/"
     let socket: SocketIOClient
     private let socketManager: SocketManager
     
@@ -82,9 +82,12 @@ class ConnectionClient {
                 options
             ])
         socket = socketManager.defaultSocket
-    
+        
     }
-    
+}
+
+// MARK: Session
+extension ConnectionClient {
     func connect() {
         socket.connect()
     }
@@ -92,34 +95,33 @@ class ConnectionClient {
     func disconnect() {
         socket.disconnect()
     }
-    
-    func on(clientEvent: SocketClientEvent) async -> [Any] {
-        await withCheckedContinuation { continuation in
-            // prevent "Swift task continuation misuse" fatal error from resuming continuation more than once
-            var promise: CheckedContinuation<[Any], Never>? = continuation
-            socket.on(clientEvent: clientEvent) { data, _ in
-                promise?.resume(returning: data)
-                promise = nil
-            }
-        }
-    }
+}
 
-    func on(_ event: String) async -> [Any] {
-        await withCheckedContinuation { continuation in
-            var promise: CheckedContinuation<[Any], Never>? = continuation
-            socket.on(event) { data, _ in
-                promise?.resume(returning: data)
-                promise = nil
+// MARK: Events
+extension ConnectionClient {
+    // Connection event callback
+    func on(clientEvent: SocketClientEvent) -> AsyncStream<any Sequence> {
+        AsyncStream { continuation in
+            socket.on(clientEvent: clientEvent) { data, _ in
+                continuation.yield(data)
             }
         }
     }
     
+    // Custom event callback
+    func on(_ event: String) -> AsyncStream<any Sequence> {
+        AsyncStream { continuation in
+            socket.on(event) { data, _ in
+                continuation.yield(data)
+            }
+        }
+    }
+    
+    // Custom events sending
     func emit(_ event: String, _ item: SocketData) async {
         await withCheckedContinuation { continuation in
-            var promise: CheckedContinuation<Void, Never>? = continuation
             socket.emit(event, item, completion: {
-                promise?.resume()
-                promise = nil
+                continuation.resume()
             })
         }
     }

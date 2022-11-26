@@ -33,14 +33,12 @@ public enum KeyExchangeError: Error {
     case encodingError
 }
 
-public struct KeyExchangeMessage: Codable, SocketData {
+public struct KeyExchangeMessage: CodableSocketData {
     public let type: KeyExchangeStep
-    public var publicKey: String?
+    public let publicKey: String
     
-    public func socketRepresentation() -> SocketData {
-        publicKey != nil
-            ? ["type": type.rawValue, "publicKey": publicKey]
-            : ["type": type.rawValue]
+    public func socketRepresentation() -> CodableSocketData {
+        ["type": type.rawValue, "publicKey": publicKey]
     }
 }
 
