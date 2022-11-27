@@ -100,29 +100,45 @@ extension ConnectionClient {
 // MARK: Events
 extension ConnectionClient {
     // Connection event callback
-    func on(clientEvent: SocketClientEvent) -> AsyncStream<any Sequence> {
-        AsyncStream { continuation in
-            socket.on(clientEvent: clientEvent) { data, _ in
-                continuation.yield(data)
-            }
-        }
-    }
+//    func on(clientEvent: SocketClientEvent) -> AsyncStream<any Sequence> {
+//        AsyncStream { continuation in
+//            socket.on(clientEvent: clientEvent) { data, _ in
+//                continuation.yield(data)
+//            }
+//        }
+//    }
     
     // Custom event callback
-    func on(_ event: String) -> AsyncStream<any Sequence> {
-        AsyncStream { continuation in
-            socket.on(event) { data, _ in
-                continuation.yield(data)
-            }
-        }
+//    func on(_ event: String) -> AsyncStream<any Sequence> {
+//        AsyncStream { continuation in
+//            socket.on(event) { data, _ in
+//                continuation.yield(data)
+//            }
+//        }
+//    }
+    
+    func on(clientEvent: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
+        socket.on(clientEvent: clientEvent, callback: { data, _ in
+            completion(data)
+        })
+    }
+    
+    func on(_ event: String, completion: @escaping ([Any]) -> Void) {
+        socket.on(event, callback: { data, _ in
+            completion(data)
+        })
     }
     
     // Custom events sending
-    func emit(_ event: String, _ item: SocketData) async {
-        await withCheckedContinuation { continuation in
-            socket.emit(event, item, completion: {
-                continuation.resume()
-            })
-        }
+    func emit(_ event: String, _ item: SocketData) {
+        socket.emit(event, item)
     }
+    
+//    func emit(_ event: String, _ item: SocketData) async {
+//        await withCheckedContinuation { continuation in
+//            socket.emit(event, item, completion: {
+//                continuation.resume()
+//            })
+//        }
+//    }
 }

@@ -29,9 +29,9 @@ public class Connection {
     init(channelId: String) {
         self.channelId = channelId
         
+        handleReceiveMessages(on: channelId)
         handleConnection(on: channelId)
-        handleReceiveKeyExchange()
-        handleReceiveMessage(on: channelId)
+        //handleReceiveKeyExchange()
         handleDisconnection()
     }
     
@@ -49,7 +49,7 @@ public class Connection {
 
 extension Connection {
     
-    private func sendOriginatorInfo() async {
+    private func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: name ?? "",
             url: connectionClient.connectionUrl)
@@ -58,22 +58,20 @@ extension Connection {
             type: "originator_info",
             originator: originatorInfo)
         
-        await sendMessage(requestInfo, encrypt: true)
+        sendMessage(requestInfo, encrypt: true)
     }
     
     private func handleReceiveKeyExchange() {
         // Whenever new key exchange event is received, handle it
-        Task {
-            for await data in connectionClient.on(ClientEvent.keyExchange) {
-                Logging.log("mmsdk| Key exchange: \(data)")
-                
+        connectionClient.on(ClientEvent.keyExchange) { data in
+            Logging.log("mmsdk| Key exchange: \(data)")
+            
 //                guard
 //                    let message = data.first as? [String: AnyHashable],
 //                    let keyMessage = keyExchangeMessage(from: message) else {
 //                    return
 //                }
 //                keyExchange.handleKeyExchangeMessage?(keyMessage)
-            }
         }
     }
     
@@ -91,38 +89,37 @@ extension Connection {
     private func handleConnection(on channelId: String) {
         
         // MARK: Connection error event
-        Task {
-            for await error in connectionClient.on(clientEvent: .error) {
-                Logging.log("mmsdk| >>> Client connection error: \(error) <<<")
-            }
+        connectionClient.on(clientEvent: .error) { data in
+            Logging.log("mmsdk| >>> Client connection error: \(data) <<<")
         }
         
         // MARK: Clients connected event
-        Task {
-            for await data in connectionClient.on(ClientEvent.clientsConnected(on: channelId)) {
-                Logging.log("mmsdk| >>> Clients connected: \(data) <<<")
-                connected = true
-                
-                guard !keysExchanged else { return }
-                
-                Logging.log("mmsdk| >>> Initiating key exchange <<<")
-                
-                let keyExchangeSync = keyExchange.keyExchangeMessage(with: .syn)
-                await sendMessage(keyExchangeSync, encrypt: false)
-            }
+        connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
+            guard let self = self else { return }
+            Logging.log("mmsdk| >>> Clients connected: \(data) <<<")
+            
+            self.connected = true
+            guard !self.keysExchanged else { return }
+            
+            Logging.log("mmsdk| >>> Initiating key exchange <<<")
+            
+            let keyExchangeSync = self.keyExchange.keyExchangeMessage(with: .syn)
+            self.sendMessage(keyExchangeSync, encrypt: false)
+            
+            let keyExchangeAck = self.keyExchange.keyExchangeMessage(with: .ack)
+            self.sendMessage(keyExchangeAck, encrypt: true)
         }
         
         // MARK: Socket connected event
-        Task {
-            for await data in connectionClient.on(clientEvent: .connect) {
-                Logging.log("mmsdk| >>> SDK connected: \(data) <<<")
-                
-                await emit(ClientEvent.joinChannel, channelId)
-                Logging.log("mmsdk| >>> Joined channel \(channelId)")
-                
-                if !connected {
-                    deeplinkToMetaMask()
-                }
+        connectionClient.on(clientEvent: .connect) { [weak self] data in
+            guard let self = self else { return }
+            Logging.log("mmsdk| >>> SDK connected: \(data) <<<")
+            
+            self.connectionClient.emit(ClientEvent.joinChannel, channelId)
+            Logging.log("mmsdk| >>> Joined channel \(channelId)")
+            
+            if !self.connected {
+                self.deeplinkToMetaMask()
             }
         }
     }
@@ -130,41 +127,50 @@ extension Connection {
     private func handleDisconnection() {
         
         // MARK: Socket disconnected event
-        Task {
-            for await error in connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) {
-                Logging.log("mmsdk| SDK disconnected: \(error)")
+        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
+            guard let self = self else { return }
+            Logging.log("mmsdk| SDK disconnected: \(data)")
+            
+            if !self.connectionPaused {
+                self.connected = false
+                self.keysExchanged = false
+                self.channelId = ""
+                // Ethereum.disconnect()
+            }
+        }
+    }
+    
+    private func handleReceiveMessages(on channelId: String) {
+        connectionClient.on(ClientEvent.message(on: channelId)) { [weak self] data in
+            guard let self = self else { return }
+
+            Logging.log("mmsdk| Received message on channel NOW \(data.first) THEN \n \(data)")
+            
+            if !self.keyExchange.keysExchanged {
+                guard
+                    let json = data.first as? String,
+                    let keyExchangeMessage = Message<KeyExchangeMessage>.keyExchangeMessage(from: json),
+                    let nextKeyExchangeMessage = self.keyExchange.nextKeyExchangeMessage(keyExchangeMessage.message)
+                else {
+                    Logging.log("Couldn't handle data")
+                    return
+                }
                 
-                if !self.connectionPaused {
-                    self.connected = false
-                    self.keysExchanged = false
-                    self.channelId = ""
-                    // Ethereum.disconnect()
-                }
+                let message = Message(
+                    id: channelId,
+                    message: nextKeyExchangeMessage)
+                Logging.log("Sending message")
+                self.sendMessage(message, encrypt: true)
+                self.sendOriginatorInfo()
+            } else {
+                Logging.log("Keys all good")
             }
         }
     }
     
-    private func handleReceiveMessage(on channelId: String) {
-        Task {
-            for await data in connectionClient.on(ClientEvent.keysExchanged) {
-                Logging.log("mmsdk| Keys exchanged \(data)")
-                await sendOriginatorInfo()
-            }
-        }
-        
-        Task {
-            for await data in connectionClient.on(ClientEvent.message(on: channelId)) {
-                Logging.log("mmsdk| Received message on channel: \(data)")
-                if let message = data[0] as? Message<KeyExchangeMessage> {
-                    
-                }
-            }
-        }
-    }
-    
-    public func sendMessage<T: Codable & SocketData>(_ message: T, encrypt: Bool) async {
+    public func sendMessage<T: Codable & SocketData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
-            Logging.log("mmsdk| Keys not exchanged")
+            Logging.error("mmsdk| Keys not exchanged")
             return
         }
         
@@ -173,20 +179,14 @@ extension Connection {
                 let message = Message(
                     id: channelId,
                     message: encryptedMessage)
-                await emit(ClientEvent.message, message)
+                connectionClient.emit(ClientEvent.message, message)
             }
         } else {
             let message = Message(
                 id: channelId,
                 message: message)
-            await emit(ClientEvent.message, message)
+            connectionClient.emit(ClientEvent.message, message)
         }
-    }
-}
-
-private extension Connection {
-    func emit(_ event: String, _ item: SocketData) async {
-        await connectionClient.emit(event, item)
     }
 }
 

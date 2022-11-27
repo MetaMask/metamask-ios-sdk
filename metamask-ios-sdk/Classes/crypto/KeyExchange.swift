@@ -35,10 +35,15 @@ public enum KeyExchangeError: Error {
 
 public struct KeyExchangeMessage: CodableSocketData {
     public let type: KeyExchangeStep
-    public let publicKey: String
+    public let publicKey: String?
     
-    public func socketRepresentation() -> CodableSocketData {
-        ["type": type.rawValue, "publicKey": publicKey]
+    enum CodingKeys: String, CodingKey {
+        case type
+        case publicKey = "pubkey"
+    }
+    
+    public func socketRepresentation() -> SocketData {
+        ["type": type.rawValue, "pubkey": publicKey]
     }
 }
 
@@ -55,45 +60,46 @@ public class KeyExchange {
     
     private let encyption: Crypto.Type
     public private(set) var keysExchanged: Bool = false
-    private var keyExchangeStep: KeyExchangeStep = .none
-    
-    public var handleKeyExchangeMessage: ((KeyExchangeMessage) -> Void)?
-    public var updateKeyExchangeStep: ((KeyExchangeStep, String?) -> Void)?
     
     public init(encryption: Crypto.Type = ECIES.self) {
         self.encyption = encryption
         self.privateKey = encyption.generatePrivateKey()
         self.publicKey = encyption.publicKey(from: privateKey)
-        setupKeyExchangeHandling()
     }
     
-    private func setupKeyExchangeHandling() {
-        handleKeyExchangeMessage = { [weak self, keysExchanged] message in
-            
-            if keysExchanged {
-                Logging.log("Keys exchanged!")
-                return
+    func nextKeyExchangeMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
+        
+        Logging.log("Keys exchange status: \(message.type)")
+        
+        switch message.type {
+        case .syn:
+            if let publicKey = message.publicKey {
+                setTheirPublicKey(publicKey)
             }
             
-            Logging.log("Keys exchange status: \(message.type)")
+            return KeyExchangeMessage(
+                type: .synack,
+                publicKey: publicKey)
             
-            switch message.type {
-            case .syn:
-                self?.keyExchangeStep = .ack
-                
-                if self?.theirPublicKey == nil, message.publicKey != nil {
-                    self?.setTheirPublicKey(message.publicKey)
-                }
-                
-                self?.updateKeyExchangeStep?(.synack, self?.publicKey)
-            case .synack:
-                self?.updateKeyExchangeStep?(.ack, nil)
-                self?.keysExchanged = true
-            case .ack:
-                self?.keysExchanged = true
-            default:
-                break
+        case .synack:
+            
+            if let publicKey = message.publicKey {
+                setTheirPublicKey(publicKey)
             }
+            
+            keysExchanged = true
+            Logging.log("Keys have been exchanged")
+            return KeyExchangeMessage(
+                type: .ack,
+                publicKey: publicKey)
+            
+        case .ack:
+            keysExchanged = true
+            Logging.log("Keys exchange complete!")
+            return nil
+            
+        default:
+            return nil
         }
     }
     
