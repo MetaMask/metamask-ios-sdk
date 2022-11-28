@@ -30,12 +30,15 @@ struct Message<T: CodableSocketData>: CodableSocketData {
         ]
     }
     
-    static func keyExchangeMessage(from json: String) -> Message<KeyExchangeMessage>? {
-        guard
-            let jsonData = json.data(using: .utf8),
-            let model = try? JSONDecoder().decode(Message<KeyExchangeMessage>.self, from: jsonData)
-        else { return nil }
-        return model
+    static func message(from message: [String: Any]) -> Message<T>? {
+        do {
+            let json = try JSONSerialization.data(withJSONObject: message)
+            let message = try JSONDecoder().decode(Message<T>.self, from: json)
+            return message
+        } catch {
+            Logging.error(error.localizedDescription)
+        }
+        return nil
     }
 }
 

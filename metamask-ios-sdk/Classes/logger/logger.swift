@@ -16,4 +16,8 @@ class Logging {
     static func error(_ error: String) {
         Logger().log(level: .error, "\(error)")
     }
+    
+    static func error(_ error: Error) {
+        Logger().log(level: .error, "\(error.localizedDescription)")
+    }
 }

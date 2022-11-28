@@ -8,8 +8,9 @@
 import Foundation
 import SocketIO
 
-public enum KeyExchangeStep: String, Codable {
+public enum KeyExchangeType: String, Codable {
     case none = "none"
+    case start = "key_handshake_start"
     case ack = "key_handshake_ACK"
     case syn = "key_handshake_SYN"
     case synack = "key_handshake_SYNACK"
@@ -18,12 +19,13 @@ public enum KeyExchangeStep: String, Codable {
         let container = try decoder.singleValueContainer()
         let status = try? container.decode(String.self)
         switch status {
-              case "none": self = .none
-              case "key_handshake_ACK": self = .ack
-              case "key_handshake_SYN": self = .syn
-              case "key_handshake_SYNACK": self = .synack
-              default:
-                 self = .none
+            case "none": self = .none
+            case "key_handshake_start": self = .start
+            case "key_handshake_ACK": self = .ack
+            case "key_handshake_SYN": self = .syn
+            case "key_handshake_SYNACK": self = .synack
+            default:
+                self = .none
           }
       }
 }
@@ -34,16 +36,11 @@ public enum KeyExchangeError: Error {
 }
 
 public struct KeyExchangeMessage: CodableSocketData {
-    public let type: KeyExchangeStep
-    public let publicKey: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case type
-        case publicKey = "pubkey"
-    }
+    public let type: KeyExchangeType
+    public let pubkey: String?
     
     public func socketRepresentation() -> SocketData {
-        ["type": type.rawValue, "pubkey": publicKey]
+        ["type": type.rawValue, "pubkey": pubkey]
     }
 }
 
@@ -55,58 +52,55 @@ public struct KeyExchangeMessage: CodableSocketData {
 
 public class KeyExchange {
     private let privateKey: String
-    public let publicKey: String
-    public var theirPublicKey: String?
+    public let pubkey: String
+    public private(set) var theirPublicKey: String?
     
     private let encyption: Crypto.Type
-    public private(set) var keysExchanged: Bool = false
+    var keysExchanged: Bool = false
     
     public init(encryption: Crypto.Type = ECIES.self) {
         self.encyption = encryption
         self.privateKey = encyption.generatePrivateKey()
-        self.publicKey = encyption.publicKey(from: privateKey)
+        self.pubkey = encyption.publicKey(from: privateKey)
     }
     
-    func nextKeyExchangeMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
-        
-        Logging.log("Keys exchange status: \(message.type)")
-        
+    func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
         switch message.type {
         case .syn:
-            if let publicKey = message.publicKey {
+            if let publicKey = message.pubkey {
                 setTheirPublicKey(publicKey)
             }
             
             return KeyExchangeMessage(
                 type: .synack,
-                publicKey: publicKey)
+                pubkey: pubkey)
             
         case .synack:
             
-            if let publicKey = message.publicKey {
+            if let publicKey = message.pubkey {
                 setTheirPublicKey(publicKey)
             }
             
             keysExchanged = true
-            Logging.log("Keys have been exchanged")
+
             return KeyExchangeMessage(
                 type: .ack,
-                publicKey: publicKey)
+                pubkey: pubkey)
             
         case .ack:
             keysExchanged = true
-            Logging.log("Keys exchange complete!")
             return nil
             
         default:
+            Logging.error("Unknown key exchange")
             return nil
         }
     }
     
-    public func keyExchangeMessage(with type: KeyExchangeStep) -> KeyExchangeMessage {
+    public func message(type: KeyExchangeType) -> KeyExchangeMessage {
         KeyExchangeMessage(
             type: type,
-            publicKey: publicKey
+            pubkey: pubkey
         )
     }
     
@@ -129,7 +123,9 @@ public class KeyExchange {
             throw KeyExchangeError.encodingError
         }
         
-        return encyption.encrypt(
+        Logging.log("Encrypting JSON: \(jsonString) with their key \(theirPublicKey)")
+        
+        return try encyption.encrypt(
             jsonString,
             publicKey: theirPublicKey
         )
@@ -140,7 +136,7 @@ public class KeyExchange {
             throw KeyExchangeError.keysNotExchanged
         }
         
-        return encyption.decrypt(
+        return try encyption.decrypt(
             message,
             privateKey: privateKey
         )

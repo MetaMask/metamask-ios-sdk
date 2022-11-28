@@ -62,8 +62,7 @@ struct ClientEvent {
 class ConnectionClient {
     static let shared = ConnectionClient()
     
-    // older url: "https://socket.codefi.network"
-    let connectionUrl = "http://127.0.0.1:4000"//"https://metamask-sdk-socket.metafi.codefi.network/"
+    let connectionUrl = "https://metamask-sdk-socket.metafi.codefi.network/"
     let socket: SocketIOClient
     private let socketManager: SocketManager
     
@@ -99,24 +98,6 @@ extension ConnectionClient {
 
 // MARK: Events
 extension ConnectionClient {
-    // Connection event callback
-//    func on(clientEvent: SocketClientEvent) -> AsyncStream<any Sequence> {
-//        AsyncStream { continuation in
-//            socket.on(clientEvent: clientEvent) { data, _ in
-//                continuation.yield(data)
-//            }
-//        }
-//    }
-    
-    // Custom event callback
-//    func on(_ event: String) -> AsyncStream<any Sequence> {
-//        AsyncStream { continuation in
-//            socket.on(event) { data, _ in
-//                continuation.yield(data)
-//            }
-//        }
-//    }
-    
     func on(clientEvent: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
         socket.on(clientEvent: clientEvent, callback: { data, _ in
             completion(data)
@@ -129,16 +110,7 @@ extension ConnectionClient {
         })
     }
     
-    // Custom events sending
     func emit(_ event: String, _ item: SocketData) {
         socket.emit(event, item)
     }
-    
-//    func emit(_ event: String, _ item: SocketData) async {
-//        await withCheckedContinuation { continuation in
-//            socket.emit(event, item, completion: {
-//                continuation.resume()
-//            })
-//        }
-//    }
 }
