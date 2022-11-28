@@ -65,6 +65,10 @@ private extension Connection {
         connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| Clients connected: \(data)")
+            NotificationCenter.default.post(
+                name: NSNotification.Name("connection"),
+                object: nil,
+                userInfo: ["value": "Clients Connected"])
             
             self.connected = true
             
@@ -77,13 +81,27 @@ private extension Connection {
         // MARK: Socket connected event
         connectionClient.on(clientEvent: .connect) { [weak self] data in
             guard let self = self else { return }
+            NotificationCenter.default.post(
+                name: NSNotification.Name("connection"),
+                object: nil,
+                userInfo: ["value": "Connected to Socket"])
             Logging.log("mmsdk| SDK connected: \(data)")
             
             self.connectionClient.emit(ClientEvent.joinChannel, channelId)
+
+            NotificationCenter.default.post(
+                name: NSNotification.Name("channel"),
+                object: nil,
+                userInfo: ["value": channelId])
             Logging.log("mmsdk| Joined channel: \(channelId)")
             
+            NotificationCenter.default.post(
+                name: NSNotification.Name("deeplink"),
+                object: nil,
+                userInfo: ["value": "\(self.qrCodeUrl)"])
+            
             if !self.connected {
-                self.deeplinkToMetaMask()
+                //self.deeplinkToMetaMask()
             }
         }
     }
@@ -95,6 +113,10 @@ private extension Connection {
                 let self = self,
                 let message = data.first as? [String: Any]
             else { return }
+            NotificationCenter.default.post(
+                name: NSNotification.Name("event"),
+                object: nil,
+                userInfo: ["value": "Received message: \(message)"])
 
             Logging.log("mmsdk| Received message: \(message)")
 
@@ -112,6 +134,10 @@ private extension Connection {
         connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| SDK disconnected: \(data)")
+            NotificationCenter.default.post(
+                name: NSNotification.Name("connection"),
+                object: nil,
+                userInfo: ["value": "Clients Disconnected"])
             
             if !self.connectionPaused {
                 self.connected = false
@@ -136,7 +162,9 @@ private extension Connection {
         }
 
         sendMessage(nextKeyExchangeMessage, encrypt: false)
-        sendOriginatorInfo()
+        if keyExchange.keysExchanged {
+            sendOriginatorInfo()
+        }
     }
     
     func handleMessage(_ message: [String: Any]) {
@@ -169,6 +197,10 @@ private extension Connection {
         
         do {
             json = try JSONSerialization.jsonObject(with: Data(decryptedText.utf8), options: []) as? [String: Any] ?? [:]
+            NotificationCenter.default.post(
+                name: NSNotification.Name("event"),
+                object: nil,
+                userInfo: ["value": "Received message: \(json)"])
         } catch {
             Logging.error(error)
             return
@@ -207,7 +239,7 @@ private extension Connection {
 }
 
 // MARK: Helper methods
-private extension Connection {
+public extension Connection {
     func deeplinkToMetaMask() {
         guard
             let urlString = qrCodeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -241,6 +273,11 @@ private extension Connection {
             Logging.error("mmsdk| Keys not exchanged")
             return
         }
+        
+        NotificationCenter.default.post(
+            name: NSNotification.Name("event"),
+            object: nil,
+            userInfo: ["value": "Sending message: \(message)"])
         
         if encrypt {
             do {

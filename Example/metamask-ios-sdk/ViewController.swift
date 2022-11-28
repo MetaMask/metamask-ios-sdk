@@ -12,11 +12,16 @@ import metamask_ios_sdk
 
 class ViewController: UIViewController {
     private let mm = MetaMaskSDK.shared
+    lazy var connectView = ConnectView(onConnect: mm.connect,
+                                       onDeeplink: mm.openMetaMask)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        mm.connect()
+        let childView = UIHostingController(rootView: connectView)
+        addChild(childView)
+        childView.view.frame = view.bounds
+        view.addSubview(childView.view)
+        childView.didMove(toParent: self)
     }
 
     override func didReceiveMemoryWarning() {

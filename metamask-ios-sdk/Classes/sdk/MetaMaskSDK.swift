@@ -16,6 +16,10 @@ public class MetaMaskSDK {
         connection.connect()
     }
     
+    public func openMetaMask() {
+        connection.deeplinkToMetaMask()
+    }
+    
     public func disconnect() {
         connection.disconnect()
     }
