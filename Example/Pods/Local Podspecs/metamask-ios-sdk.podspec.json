@@ -2,8 +2,9 @@
   "name": "metamask-ios-sdk",
   "version": "0.1.0",
   "summary": "A short description of metamask-ios-sdk.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/Mpendulo Ndlovu/metamask-ios-sdk",
+  "swift_versions": "5.0",
+  "description": "An SDK that enables native iOS apps to interact with the Ethereum blockchain via the MetaMask wallet.",
+  "homepage": "github.com/MetaMask/metamask-ios-sdk",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,11 +13,23 @@
     "Mpendulo Ndlovu": "mpendulo@elefantel.com"
   },
   "source": {
-    "git": "https://github.com/Mpendulo Ndlovu/metamask-ios-sdk.git",
+    "git": "https://github.com/MetaMask/metamask-ios-sdk.git",
     "tag": "0.1.0"
   },
   "platforms": {
-    "ios": "10.0"
+    "ios": "14.0"
   },
-  "source_files": "metamask-ios-sdk/Classes/**/*"
+  "source_files": "metamask-ios-sdk/Classes/**/*",
+  "dependencies": {
+    "Socket.IO-Client-Swift": [
+      "~> 16.0.1"
+    ]
+  },
+  "pod_target_xcconfig": {
+    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "arm64"
+  },
+  "user_target_xcconfig": {
+    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "arm64"
+  },
+  "swift_version": "5.0"
 }

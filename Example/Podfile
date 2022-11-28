@@ -1,13 +1,13 @@
 use_frameworks!
 
-platform :ios, '10.0'
+platform :ios, '14.0'
 
-target 'metamask-ios-sdk_Example' do
+target 'metamask-ios-sdk_Example' do  
+  pod 'Socket.IO-Client-Swift', '~> 16.0.1'
   pod 'metamask-ios-sdk', :path => '../'
-
+  
   target 'metamask-ios-sdk_Tests' do
     inherit! :search_paths
 
-    
   end
 end

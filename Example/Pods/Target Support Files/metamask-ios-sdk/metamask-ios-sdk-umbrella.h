@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "Ecies.h"
 
 FOUNDATION_EXPORT double metamask_ios_sdkVersionNumber;
 FOUNDATION_EXPORT const unsigned char metamask_ios_sdkVersionString[];
