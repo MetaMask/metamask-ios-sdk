@@ -524,6 +524,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6TKEXNX4L5;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = "metamask-ios-sdk/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

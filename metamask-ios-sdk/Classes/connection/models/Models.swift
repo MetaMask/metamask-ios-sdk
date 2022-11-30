@@ -8,13 +8,13 @@
 import SocketIO
 import Foundation
 
-typealias CodableSocketData = Codable & SocketData
+typealias CodableSocketData = CodableData
 
 struct OriginatorInfo: CodableSocketData {
     let title: String
     let url: String
     
-    func socketRepresentation() -> CodableSocketData {
+    func socketRepresentation() -> NetworkData {
         ["title": title, "url": url]
     }
 }
@@ -23,7 +23,7 @@ struct Message<T: CodableSocketData>: CodableSocketData {
     let id: String
     let message: T
     
-    func socketRepresentation() -> SocketData {
+    func socketRepresentation() -> NetworkData {
         [
             "id": id,
             "message": try? message.socketRepresentation()
@@ -46,7 +46,7 @@ struct RequestInfo: CodableSocketData {
     let type: String
     let originator: OriginatorInfo
     
-    func socketRepresentation() -> SocketData {
+    func socketRepresentation() -> NetworkData {
         ["type": type, "originator": originator.socketRepresentation()]
     }
 }

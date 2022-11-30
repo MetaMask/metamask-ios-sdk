@@ -9,6 +9,10 @@ import OSLog
 import SocketIO
 import Foundation
 
+public typealias NetworkData = SocketData
+public typealias RequestTask = Task<Any, Never>
+public protocol CodableData: Codable, SocketData {}
+
 public class Connection {
 
     private var keyExchange = KeyExchange()
@@ -17,11 +21,11 @@ public class Connection {
     private var connectionPaused: Bool = false
     private var channelId: String!
     
-    public var name: String {
-        "Metamask iOS SDK"
-    }
+    var url: String?
+    var name: String?
+    
     public var connected: Bool = false
-    public var onClientReady: (() -> Void)?
+    public var onClientsReady: ((RequestTask?) -> Void)?
     
     var qrCodeUrl: String {
         "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.pubkey
@@ -213,14 +217,14 @@ private extension Connection {
         } else if json["type"] as? String == "ready" {
             Logging.log("mmsdk| Connection is ready!")
             connectionPaused = false
-            onClientReady?()
+            onClientsReady?(nil)
         }
         
         if !connected {
             if json["type"] as? String == "wallet_info" {
                 Logging.log("mmsdk| Got wallet info!")
                 connected = true
-                onClientReady?()
+                onClientsReady?(nil)
                 connectionPaused = false
                 return
             }
@@ -255,10 +259,10 @@ public extension Connection {
 }
 
 // MARK: Message sending
-private extension Connection {
+extension Connection {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
-            title: name,
+            title: name ?? "",
             url: connectionClient.connectionUrl)
         
         let requestInfo = RequestInfo(
@@ -268,7 +272,7 @@ private extension Connection {
         sendMessage(requestInfo, encrypt: true)
     }
     
-    func sendMessage<T: Codable & SocketData>(_ message: T, encrypt: Bool) {
+    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
             Logging.error("mmsdk| Keys not exchanged")
             return
