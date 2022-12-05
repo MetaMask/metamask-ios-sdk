@@ -35,7 +35,7 @@ public enum KeyExchangeError: Error {
     case encodingError
 }
 
-public struct KeyExchangeMessage: CodableSocketData {
+public struct KeyExchangeMessage: CodableData {
     public let type: KeyExchangeType
     public let pubkey: String?
     

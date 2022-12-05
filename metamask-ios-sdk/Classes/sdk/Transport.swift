@@ -1,5 +1,5 @@
 //
-//  MetaMaskSDK.swift
+//  Transport.swift
 //  
 //
 //  Created by Mpendulo Ndlovu on 2022/11/01.
@@ -8,9 +8,9 @@
 import OSLog
 import Foundation
 
-public class MetaMaskSDK {
-    public static var shared = MetaMaskSDK()
-    private let connection = Connection(channelId: UUID().uuidString.lowercased())
+class Transport {
+    
+    private var connection = Connection(channelId: UUID().uuidString.lowercased())
     
     var url: String? {
         didSet {
@@ -24,25 +24,21 @@ public class MetaMaskSDK {
         }
     }
     
-    public var onClientsReady: ((RequestTask?) -> Void)? {
+    var onClientsReady: (() -> Void)? {
         didSet {
             connection.onClientsReady = onClientsReady
         }
     }
     
-    public var isConnected: Bool {
+    var isConnected: Bool {
         connection.connected
     }
     
-    public func connect() {
+    func connect() {
         connection.connect()
     }
     
-    public func openMetaMask() {
-        connection.deeplinkToMetaMask()
-    }
-    
-    public func disconnect() {
+    func disconnect() {
         connection.disconnect()
     }
     

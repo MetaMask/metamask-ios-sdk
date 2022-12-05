@@ -10,12 +10,23 @@ import Foundation
 public struct DappMetadata {
     public let name: String
     public let url: String
+    
+    public init(name: String, url: String) {
+        self.name = name
+        self.url = url
+    }
 }
 
 public struct EthereumRequest: CodableData {
     public var id: String?
     public let method: EthereumMethod
     public var params: [String]
+    
+    public init(id: String? = nil, method: EthereumMethod, params: [String]) {
+        self.id = id
+        self.method = method
+        self.params = params
+    }
     
     public func socketRepresentation() -> NetworkData {
         [
@@ -28,11 +39,11 @@ public struct EthereumRequest: CodableData {
 
 public struct SubmittedRequest {
     public let method: EthereumMethod
-    public var task: RequestTask?
 }
 
 public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethSign = "eth_sign"
+    case ethChainId = "eth_chainId"
     case personalSign = "personal_sign"
     case watchAsset = "wallet_watchAsset"
     case signTypedData = "eth_signTypedData"

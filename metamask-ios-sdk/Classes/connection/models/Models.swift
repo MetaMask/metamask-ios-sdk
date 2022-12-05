@@ -8,18 +8,20 @@
 import SocketIO
 import Foundation
 
-typealias CodableSocketData = CodableData
+public typealias NetworkData = SocketData
+public typealias RequestTask = Task<Any, Never>
+public typealias CodableData = Codable & SocketData
 
-struct OriginatorInfo: CodableSocketData {
-    let title: String
-    let url: String
+struct OriginatorInfo: CodableData {
+    let title: String?
+    let url: String?
     
     func socketRepresentation() -> NetworkData {
         ["title": title, "url": url]
     }
 }
 
-struct Message<T: CodableSocketData>: CodableSocketData {
+struct Message<T: CodableData>: CodableData {
     let id: String
     let message: T
     
@@ -36,13 +38,13 @@ struct Message<T: CodableSocketData>: CodableSocketData {
             let message = try JSONDecoder().decode(Message<T>.self, from: json)
             return message
         } catch {
-            Logging.error(error.localizedDescription)
+            Logging.error("Something went wrong: \(error.localizedDescription)")
         }
         return nil
     }
 }
 
-struct RequestInfo: CodableSocketData {
+struct RequestInfo: CodableData {
     let type: String
     let originator: OriginatorInfo
     

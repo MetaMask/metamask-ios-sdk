@@ -10,47 +10,42 @@ public enum EthereumError: String, Error {
     case notConnected = "Wait until MetaMask is connected"
 }
 
-public class Ethereum {
-    static var sdk: MetaMaskSDK!
-    public static var chainId: String?
-    public static var connected: Bool = false
-    public static var selectedAddress: String?
-    public static var dappMetaData: DappMetadata?
+public class Ethereum: ObservableObject {
+    public static let shared = Ethereum()
     
-    private static var onChainIdChanged: ((String?) -> Void)? = { id in
-        chainId = id
-    }
+    @Published public var chainId: String?
+    @Published public var connected: Bool = false
+    @Published public var selectedAddress: String?
     
-    private static var onAccountsChanged: (([String]) -> Void)? = { accounts in
-        selectedAddress = accounts.first
-    }
-    
-    private static var dappMetadata: DappMetadata?
-    private static var requests: [String: SubmittedRequest] = [:]
+    private var transport: Transport!
+    private var dappMetadata: DappMetadata!
+    private var submittedRequests: [String: SubmittedRequest] = [:]
 }
 
 // MARK: Session Management
 extension Ethereum {
     
-    public static func initialise() {
-        let request = EthereumRequest(
+    public func initialise() {
+        let providerRequest = EthereumRequest(
             id: nil,
             method: .getMetamaskProviderState,
             params: [])
-        makeRequest(request)
+        Logging.log("Initialising ethereum, request: \(providerRequest)")
+        request(providerRequest)
     }
     
-    @discardableResult public static func connect(_ metaData: DappMetadata) -> RequestTask? {
+    public func connect(_ metaData: DappMetadata) {
         dappMetadata = metaData
         
-        let request = EthereumRequest(
+        let accountsRequest = EthereumRequest(
             id: nil,
             method: .requestAccounts,
             params: [])
-        return makeRequest(request)
+        Logging.log("Connecting ethereum with request: \(accountsRequest)")
+        request(accountsRequest)
     }
     
-    public static func disconnect() {
+    public func disconnect() {
         connected = false
         chainId = nil
         selectedAddress = nil
@@ -59,25 +54,24 @@ extension Ethereum {
 
 // MARK: Deeplinking
 extension Ethereum {
-    public static func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
-        if method == .requestAccounts && selectedAddress == nil {
-            return true
-        } else if method == .requestAccounts {
-            return false
+    public func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
+        switch method {
+        case .requestAccounts:
+            return selectedAddress == nil ? true : false
+        default:
+            return EthereumMethod.allCases.contains(method)
         }
-        
-        return EthereumMethod.allCases.contains(method)
     }
 }
 
 // MARK: Request Sending
 extension Ethereum {
-    public static func sendRequest(_ request: EthereumRequest,
+    public func sendRequest(_ request: EthereumRequest,
                                    id: String,
                                    openDeeplink: Bool) {
         var request = request
         request.id = id
-        sdk.sendMessage(request, encrypt: true)
+        transport.sendMessage(request, encrypt: true)
             
         if
             openDeeplink,
@@ -88,7 +82,8 @@ extension Ethereum {
         }
     }
     
-    static func requestAccounts(task: RequestTask?) {
+    func requestAccounts() {
+        Logging.log("Requesting accounts...")
         connected = true
         initialise()
         
@@ -97,54 +92,54 @@ extension Ethereum {
             method: method,
             params: [])
         
-        let id = UUID().uuidString
-        let submittedRequest = SubmittedRequest(
-            method: method,
-            task: task)
+        let id = UUID().uuidString.lowercased()
+        let submittedRequest = SubmittedRequest(method: method)
         
-        requests[id] = submittedRequest
+        submittedRequests[id] = submittedRequest
+        Logging.log("Submitting ethereum request: \(request)")
         sendRequest(
             request,
             id: id,
             openDeeplink: false)
     }
     
-    @discardableResult public static func makeRequest(_ request: EthereumRequest) -> RequestTask?{
-        var task: RequestTask?
-        
-        if request.method == .requestAccounts && connected {
-            sdk = MetaMaskSDK()
-            sdk.url = dappMetaData?.url
-            sdk.name = dappMetaData?.name
-            sdk.connect()
-            sdk.onClientsReady = requestAccounts
+    public func request(_ request: EthereumRequest) {
+        if request.method == .requestAccounts && !connected {
+            transport = Transport()
+            transport.url = dappMetadata.url
+            transport.name = dappMetadata.name
+            transport.connect()
+            transport.onClientsReady = requestAccounts
         } else if !connected {
             Logging.error(EthereumError.notConnected)
-            return nil
         } else {
             let id = UUID().uuidString.lowercased()
-            let submittedRequest = SubmittedRequest(
-                method: request.method,
-                task: task)
-            requests[id] = submittedRequest
+            let submittedRequest = SubmittedRequest(method: request.method)
+            submittedRequests[id] = submittedRequest
             
             sendRequest(
                 request,
                 id: id,
                 openDeeplink: shouldOpenMetaMask(method: request.method))
         }
-        
-        return task
     }
 }
 
 // MARK: Request Receiving
 extension Ethereum {
-    public static func receiveRequest(id: String, data: [String: Any]) {
-        guard let request = requests[id] else { return }
+    func updateChainId(_ id: String?) {
+        chainId = id
+    }
+    
+    func updateAccount(_ account: String) {
+        selectedAddress = account
+    }
+    
+    public func receiveRequest(id: String, data: [String: Any]) {
+        guard let request = submittedRequests[id] else { return }
         
         if data["error"] != nil {
-            requests[id] = nil
+            submittedRequests[id] = nil
             return
         }
         
@@ -154,23 +149,31 @@ extension Ethereum {
         case .getMetamaskProviderState:
             let result: [String: Any] = data["result"] as? [String: Any] ?? [:]
             let accounts = result["accounts"] as? [String] ?? []
-            onAccountsChanged?(accounts)
             
-            let chainId = result["chainId"] as? String
-            onChainIdChanged?(chainId)
+            if let account = accounts.first {
+                updateAccount(account)
+            }
+            
+            if let chainId = result["chainId"] as? String {
+                updateChainId(chainId)
+            }
         case .requestAccounts:
-            let accounts: [String] = []
-//            onAccountsChanged?(result)
+            let result: [String] = data["result"] as? [String] ?? []
+            if let account = result.first {
+                updateAccount(account)
+            }
+        case .ethChainId:
+            if let result: String = data["result"] as? String {
+                updateChainId(result)
+            }
         default:
             break
         }
-        
-        //if requests[id]
-        onChainIdChanged?(id)
     }
     
-    public static func receiveEvent(_ event: [String: Any]) {
+    public func receiveEvent(_ event: [String: Any]) {
         Logging.log("Received ethereum event: \(event)")
+        
         guard
             let method = event["method"] as? String,
             let ethereumMethod = EthereumMethod(rawValue: method)
@@ -179,11 +182,14 @@ extension Ethereum {
         switch ethereumMethod {
         case .metaMaskAccountsChanged:
             let accounts: [String] = event["params"] as? [String] ?? []
-            onAccountsChanged?(accounts)
+            if let account = accounts.first {
+                updateAccount(account)
+            }
         case .metaMaskChainChanged:
             let params: [String: Any] = event["params"] as? [String: Any] ?? [:]
-            let chainId = params["chainId"] as? String ?? ""
-            onChainIdChanged?(chainId)
+            if let chainId = params["chainId"] as? String {
+                updateChainId(chainId)
+            }
         default:
             break
         }
