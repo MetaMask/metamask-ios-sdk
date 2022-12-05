@@ -35,11 +35,11 @@ public enum KeyExchangeError: Error {
     case encodingError
 }
 
-public struct KeyExchangeMessage: CodableSocketData {
+public struct KeyExchangeMessage: CodableData {
     public let type: KeyExchangeType
     public let pubkey: String?
     
-    public func socketRepresentation() -> SocketData {
+    public func socketRepresentation() -> NetworkData {
         ["type": type.rawValue, "pubkey": pubkey]
     }
 }
@@ -108,7 +108,7 @@ public class KeyExchange {
         theirPublicKey = publicKey
     }
     
-    public func encryptMessage<T: Codable & SocketData>(_ message: T) throws -> String {
+    public func encryptMessage<T: CodableData>(_ message: T) throws -> String {
         guard let theirPublicKey = theirPublicKey else {
             throw KeyExchangeError.keysNotExchanged
         }

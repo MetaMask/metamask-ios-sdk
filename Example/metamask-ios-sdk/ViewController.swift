@@ -8,12 +8,9 @@
 
 import UIKit
 import SwiftUI
-import metamask_ios_sdk
 
 class ViewController: UIViewController {
-    private let mm = MetaMaskSDK.shared
-    lazy var connectView = ConnectView(onConnect: mm.connect,
-                                       onDeeplink: mm.openMetaMask)
+    let connectView = ConnectView()
 
     override func viewDidLoad() {
         super.viewDidLoad()

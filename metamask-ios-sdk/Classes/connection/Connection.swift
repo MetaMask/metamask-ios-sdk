@@ -9,7 +9,7 @@ import OSLog
 import SocketIO
 import Foundation
 
-public class Connection {
+class Connection {
 
     private var keyExchange = KeyExchange()
     private let connectionClient = ConnectionClient.shared
@@ -17,13 +17,13 @@ public class Connection {
     private var connectionPaused: Bool = false
     private var channelId: String!
     
-    public var name: String {
-        "Metamask iOS SDK"
-    }
-    public var connected: Bool = false
-    public var onClientReady: (() -> Void)?
+    var url: String?
+    var name: String?
     
-    var qrCodeUrl: String {
+    var connected: Bool = false
+    var onClientsReady: (() -> Void)?
+    
+    var deeplinkUrl: String {
         "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.pubkey
     }
     
@@ -35,7 +35,7 @@ public class Connection {
         handleDisconnection()
     }
     
-    public func connect(on channelId: String? = nil) {
+    func connect(on channelId: String? = nil) {
         if let channel = channelId {
             keyExchange = KeyExchange()
             handleReceiveMessages(on: channel)
@@ -44,7 +44,7 @@ public class Connection {
         connectionClient.connect()
     }
     
-    public func disconnect() {
+    func disconnect() {
         channelId = ""
         connected = false
         keyExchange.keysExchanged = false
@@ -95,13 +95,8 @@ private extension Connection {
                 userInfo: ["value": channelId])
             Logging.log("mmsdk| Joined channel: \(channelId)")
             
-            NotificationCenter.default.post(
-                name: NSNotification.Name("deeplink"),
-                object: nil,
-                userInfo: ["value": "\(self.qrCodeUrl)"])
-            
             if !self.connected {
-                //self.deeplinkToMetaMask()
+                self.deeplinkToMetaMask()
             }
         }
     }
@@ -124,6 +119,7 @@ private extension Connection {
                 self.handleReceiveKeyExchange(message)
             } else {
                 // Decrypt message
+                Logging.log("mmsdk| About to decrypt message: \(message)")
                 self.handleMessage(message)
             }
         }
@@ -143,7 +139,7 @@ private extension Connection {
                 self.connected = false
                 self.keyExchange.keysExchanged = false
                 self.channelId = ""
-                // Ethereum.disconnect()
+                Ethereum.shared.disconnect()
             }
         }
     }
@@ -200,7 +196,9 @@ private extension Connection {
             NotificationCenter.default.post(
                 name: NSNotification.Name("event"),
                 object: nil,
-                userInfo: ["value": "Received message: \(json)"])
+                userInfo: ["value": "Received decrypted message: \(json)"])
+            
+            Logging.log("mmsdk| Received decrypted message: \(json)")
         } catch {
             Logging.error(error)
             return
@@ -213,36 +211,36 @@ private extension Connection {
         } else if json["type"] as? String == "ready" {
             Logging.log("mmsdk| Connection is ready!")
             connectionPaused = false
-            onClientReady?()
+            onClientsReady?()
         }
         
-        if !connected {
-            if json["type"] as? String == "wallet_info" {
-                Logging.log("mmsdk| Got wallet info!")
-                connected = true
-                onClientReady?()
-                connectionPaused = false
-                return
-            }
+        if json["type"] as? String == "wallet_info" {
+            Logging.log("mmsdk| Got wallet info!")
+            connected = true
+            onClientsReady?()
+            connectionPaused = false
+            return
         }
         
         if let data = json["data"] as? [String: Any] {
             if let id = data["id"] as? String {
                 Logging.log("mmsdk| Received ethereum request with id: \(id)")
-                //Ethereum.receiveRequest(id, data)
+                Ethereum.shared.receiveRequest(
+                    id: id,
+                    data: data)
             } else {
                 Logging.log("mmsdk| Received ethereum event: \(data)")
-                //Ethereum.receiveEvent(data)
+                Ethereum.shared.receiveEvent(data)
             }
         }
     }
 }
 
 // MARK: Helper methods
-public extension Connection {
+extension Connection {
     func deeplinkToMetaMask() {
         guard
-            let urlString = qrCodeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
         
@@ -255,11 +253,11 @@ public extension Connection {
 }
 
 // MARK: Message sending
-private extension Connection {
+extension Connection {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: name,
-            url: connectionClient.connectionUrl)
+            url: url)
         
         let requestInfo = RequestInfo(
             type: "originator_info",
@@ -268,7 +266,7 @@ private extension Connection {
         sendMessage(requestInfo, encrypt: true)
     }
     
-    func sendMessage<T: Codable & SocketData>(_ message: T, encrypt: Bool) {
+    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
             Logging.error("mmsdk| Keys not exchanged")
             return
@@ -278,15 +276,24 @@ private extension Connection {
             name: NSNotification.Name("event"),
             object: nil,
             userInfo: ["value": "Sending message: \(message)"])
+
         
         if encrypt {
             do {
-                let encryptedMessage = try keyExchange.encryptMessage(message)
-                let message = Message(
+                let encryptedMessage: String = try keyExchange.encryptMessage(message)
+                let message: Message<String> = Message(
                     id: channelId,
                     message: encryptedMessage)
                 
-                connectionClient.emit(ClientEvent.message, message)
+                if connectionPaused {
+                    Logging.log("Will send once wallet is open again")
+                    onClientsReady = { [weak self] in
+                        Logging.log("Sending now")
+                        self?.connectionClient.emit(ClientEvent.message, message)
+                    }
+                } else {
+                    connectionClient.emit(ClientEvent.message, message)
+                }
             } catch {
                 Logging.error(error)
             }

@@ -7,32 +7,28 @@
 //
 
 import SwiftUI
-
-import SwiftUI
+import metamask_ios_sdk
 
 extension Notification.Name {
     static let Event = Notification.Name("event")
     static let Channel = Notification.Name("channel")
-    static let Deeplink = Notification.Name("deeplink")
     static let Connection = Notification.Name("connection")
 }
 
 struct ConnectView: View {
-    @State var title: String = "Connect"
-    @State var status: String = "Offline"
-    @State var connected: Bool = false
-    @State var url: String?
-    @State var channel: String?
-    @State var event: String?
+    @ObservedObject var ethereum = Ethereum.shared
+    private let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
+    
+    @State private var connected: Bool = false
+    @State private var title: String = "Connect"
+    @State private var status: String = "Offline"
+    
+    @State private var url: String?
+    @State private var event: String?
+    @State private var channel: String?
+    @State private var showProgressView = false
     
     var onConnect: (() -> Void)?
-    var onDeeplink: (() -> Void)?
-    
-    init(onConnect: (() -> Void)?,
-         onDeeplink: (() -> Void)?) {
-        self.onConnect = onConnect
-        self.onDeeplink = onDeeplink
-    }
     
     var body: some View {
         NavigationView {
@@ -43,6 +39,7 @@ struct ConnectView: View {
                     Text(status)
                         .font(.caption)
                 }
+                
                 if let channel = channel {
                     VStack {
                         Text("Channel")
@@ -50,6 +47,20 @@ struct ConnectView: View {
                         Text(channel)
                             .font(.caption)
                     }
+                }
+                
+                VStack {
+                    Text("Chain ID")
+                        .bold()
+                    Text(ethereum.chainId ?? "-")
+                        .font(.caption)
+                }
+                
+                VStack {
+                    Text("Selected Address")
+                        .bold()
+                    Text(ethereum.selectedAddress ?? "-")
+                        .font(.caption)
                 }
                 
                 if let url = url {
@@ -68,16 +79,15 @@ struct ConnectView: View {
                     }
                 }
                 
+                if showProgressView && ethereum.chainId == nil {
+                    ProgressView()
+                }
+                
                 Spacer()
                 
-                if connected {
-                    Button("Open MetaMask") {
-                        onDeeplink?()
-                    }
-                } else {
-                    Button("Connect SDK") {
-                        onConnect?()
-                    }
+                Button("Connect to MetaMask") {
+                    showProgressView = true
+                    ethereum.connect(dappMetaData)
                 }
             }
             .font(.body)
@@ -91,17 +101,13 @@ struct ConnectView: View {
             .onReceive(NotificationCenter.default.publisher(for: .Event)) { notification in
                 event = notification.userInfo?["value"] as? String
             }
-            .onReceive(NotificationCenter.default.publisher(for: .Deeplink)) { notification in
-                url = notification.userInfo?["value"] as? String
-                connected = true
-            }
-            .navigationTitle("MetaMask iOS SDK")
+            .navigationTitle("Example Dapp")
         }
     }
 }
 
 struct ConnectView_Previews: PreviewProvider {
     static var previews: some View {
-        ConnectView(onConnect: nil, onDeeplink: nil)
+        ConnectView(onConnect: nil)
     }
 }
