@@ -15,7 +15,8 @@ public class Ethereum: ObservableObject {
     
     @Published public var chainId: String?
     @Published public var connected: Bool = false
-    @Published public var selectedAddress: String?
+    @Published public var selectedAddress: String = ""
+    @Published public var response: String = ""
     
     private var transport: Transport!
     private var dappMetadata: DappMetadata!
@@ -28,8 +29,7 @@ extension Ethereum {
     public func initialise() {
         let providerRequest = EthereumRequest(
             id: nil,
-            method: .getMetamaskProviderState,
-            params: [])
+            method: .getMetamaskProviderState)
         Logging.log("Initialising ethereum, request: \(providerRequest)")
         request(providerRequest)
     }
@@ -39,8 +39,7 @@ extension Ethereum {
         
         let accountsRequest = EthereumRequest(
             id: nil,
-            method: .requestAccounts,
-            params: [])
+            method: .requestAccounts)
         Logging.log("Connecting ethereum with request: \(accountsRequest)")
         request(accountsRequest)
     }
@@ -48,7 +47,7 @@ extension Ethereum {
     public func disconnect() {
         connected = false
         chainId = nil
-        selectedAddress = nil
+        selectedAddress = ""
     }
 }
 
@@ -57,7 +56,7 @@ extension Ethereum {
     public func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
         switch method {
         case .requestAccounts:
-            return selectedAddress == nil ? true : false
+            return selectedAddress.isEmpty ? true : false
         default:
             return EthereumMethod.allCases.contains(method)
         }
@@ -66,9 +65,9 @@ extension Ethereum {
 
 // MARK: Request Sending
 extension Ethereum {
-    public func sendRequest(_ request: EthereumRequest,
-                                   id: String,
-                                   openDeeplink: Bool) {
+    public func sendRequest<T: CodableData>(_ request: EthereumRequest<T>,
+                                            id: String,
+                                            openDeeplink: Bool) {
         var request = request
         request.id = id
         transport.sendMessage(request, encrypt: true)
@@ -88,7 +87,7 @@ extension Ethereum {
         initialise()
         
         let method: EthereumMethod = .requestAccounts
-        let request = EthereumRequest(
+        let request = EthereumRequest<String>(
             method: method,
             params: [])
         
@@ -103,7 +102,7 @@ extension Ethereum {
             openDeeplink: false)
     }
     
-    public func request(_ request: EthereumRequest) {
+    public func request<T: CodableData>(_ request: EthereumRequest<T>) {
         if request.method == .requestAccounts && !connected {
             transport = Transport()
             transport.url = dappMetadata.url
@@ -135,7 +134,9 @@ extension Ethereum {
         selectedAddress = account
     }
     
-    public func receiveRequest(id: String, data: [String: Any]) {
+    public func receiveResponse(id: String, data: [String: Any]) {
+        Logging.log("mmsdk| Received ethereum response: \(data)")
+        
         guard let request = submittedRequests[id] else { return }
         
         if data["error"] != nil {
@@ -165,6 +166,16 @@ extension Ethereum {
         case .ethChainId:
             if let result: String = data["result"] as? String {
                 updateChainId(result)
+            }
+        case .signTypedDataV4:
+            if let result: String = data["result"] as? String {
+                response = result
+                print("Getting signature response: \(data)")
+            }
+        case .sendTransaction:
+            if let result: String = data["result"] as? String {
+                response = result
+                print("Getting transaction result: \(result)")
             }
         default:
             break

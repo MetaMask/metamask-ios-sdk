@@ -69,6 +69,7 @@
 		CD5BCD68EED682C7CD85797597E84223 /* metamask-ios-sdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F548C6AFA9D466D03C05FE7FC627419 /* metamask-ios-sdk-dummy.m */; };
 		CF9D1CD16CE03675DF085D06963E1213 /* SocketEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F765C08A535E9B27EECB0BB9F90283 /* SocketEngine.swift */; };
 		D1CE9F7D2937638800FEEAAA /* Ecies.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C11D8C1DE57E593E90B351747C31F324 /* Ecies.a */; };
+		D1F6CD40293E34EB006C33E9 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F6CD3F293E34EB006C33E9 /* Transaction.swift */; };
 		D6DE6740960DD43B75B79176E558FC92 /* SocketEngineSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558D4B9816AE80AA84C79E6D7F08A603 /* SocketEngineSpec.swift */; };
 		DB569FE3BFD80005DBDAAD6FC95BB238 /* Socket.IO-Client-Swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F8A22F172EF2F054F3BA755EAB82A7 /* Socket.IO-Client-Swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC79D737822865A21CA8F3B41BECD175 /* SocketEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C7D44C53561EFEC769224569935FFCB /* SocketEventHandler.swift */; };
@@ -220,6 +221,7 @@
 		CC1C93A70765107E35E9D2F0F8E23834 /* Framer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Framer.swift; path = Sources/Framer/Framer.swift; sourceTree = "<group>"; };
 		CE75E1A9DE668B3013ED5AC8CACF2168 /* Pods-metamask-ios-sdk_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-metamask-ios-sdk_Example-dummy.m"; sourceTree = "<group>"; };
 		CFA8B7E46D03F95E2B612E5BBD0DDBA4 /* metamask-ios-sdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "metamask-ios-sdk-umbrella.h"; sourceTree = "<group>"; };
+		D1F6CD3F293E34EB006C33E9 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		D3FD3976E462766046D9A4277ABBBF85 /* Models.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		D4A7D807324D2CBB73D1AE117584D660 /* Pods-metamask-ios-sdk_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-metamask-ios-sdk_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 		CFEF4B46DA20DC1E2B5CE398C247036F /* ethereum */ = {
 			isa = PBXGroup;
 			children = (
+				D1F6CD3F293E34EB006C33E9 /* Transaction.swift */,
 				09E2934C3AF384DFEA4A38D591369289 /* Ethereum.swift */,
 				E6E677B5068F915CB8B028EAF95B1DC7 /* EthereumRequest.swift */,
 			);
@@ -850,6 +853,7 @@
 				7E29E3F99B84E5DDA86AD6EE9C8AF52D /* Ecies.a in Sources */,
 				087B232BBD800688AD623FDBE0953A2A /* Ethereum.swift in Sources */,
 				087B232BBD800688AD623FDBE0953A2A /* Ethereum.swift in Sources */,
+				D1F6CD40293E34EB006C33E9 /* Transaction.swift in Sources */,
 				4E4E9E2F34DDB62986CBEE5FFC04ADBC /* EthereumRequest.swift in Sources */,
 				4E4E9E2F34DDB62986CBEE5FFC04ADBC /* EthereumRequest.swift in Sources */,
 				3BFD6B354A6A3DBE2EC241BD1C671EE7 /* KeyExchange.swift in Sources */,

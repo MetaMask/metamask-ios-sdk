@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 public struct DappMetadata {
     public let name: String
     public let url: String
@@ -17,12 +18,12 @@ public struct DappMetadata {
     }
 }
 
-public struct EthereumRequest: CodableData {
+public struct EthereumRequest<T: CodableData>: CodableData {
     public var id: String?
     public let method: EthereumMethod
-    public var params: [String]
+    public var params: [T]
     
-    public init(id: String? = nil, method: EthereumMethod, params: [String]) {
+    public init(id: String? = nil, method: EthereumMethod, params: [T] = [""]) {
         self.id = id
         self.method = method
         self.params = params
