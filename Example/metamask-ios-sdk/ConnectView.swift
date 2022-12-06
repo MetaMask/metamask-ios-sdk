@@ -20,94 +20,110 @@ struct ConnectView: View {
     private let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
     
     @State private var connected: Bool = false
-    @State private var title: String = "Connect"
     @State private var status: String = "Offline"
     
-    @State private var url: String?
-    @State private var event: String?
     @State private var channel: String?
     @State private var showProgressView = false
     
-    var onConnect: (() -> Void)?
-    
     var body: some View {
         NavigationView {
-            VStack(spacing: 16) {
-                VStack {
-                    Text("Status")
-                        .bold()
-                    Text(status)
-                        .font(.caption)
-                }
-                
-                if let channel = channel {
-                    VStack {
-                        Text("Channel")
-                            .bold()
-                        Text(channel)
-                            .font(.caption)
+            List {
+                Section {
+                    Group {
+                        HStack {
+                            Text("Status")
+                                .bold()
+                            Spacer()
+                            Text(status)
+                                .font(.caption)
+                        }
+                        
+                        if let channel = channel {
+                            HStack {
+                                Text("Channel")
+                                    .bold()
+                                Spacer()
+                                Text(channel)
+                                    .font(.caption)
+                            }
+                        }
+                        
+                        HStack {
+                            Text("Chain ID")
+                                .bold()
+                            Spacer()
+                            Text(ethereum.chainId ?? "-")
+                                .font(.caption)
+                        }
+                        
+                        HStack {
+                            Text("Selected Address")
+                                .bold()
+                            Spacer()
+                            Text(ethereum.selectedAddress)
+                                .font(.caption)
+                        }
                     }
                 }
                 
-                VStack {
-                    Text("Chain ID")
-                        .bold()
-                    Text(ethereum.chainId ?? "-")
-                        .font(.caption)
-                }
-                
-                VStack {
-                    Text("Selected Address")
-                        .bold()
-                    Text(ethereum.selectedAddress ?? "-")
-                        .font(.caption)
-                }
-                
-                if let url = url {
-                    Text("URL")
-                        .bold()
-                    Text(url)
-                        .font(.caption)
-                }
-                
-                if let event = event {
-                    VStack {
-                        Text("Event")
-                            .bold()
-                        Text(event)
-                            .font(.caption)
+                if !ethereum.selectedAddress.isEmpty {
+                    Section {
+                        Group {
+                            NavigationLink("Sign Transaction") {
+                                SignView()
+                            }
+                            
+                            NavigationLink("Send Transaction") {
+                                TransactionView()
+                            }
+                        }
                     }
                 }
                 
-                if showProgressView && ethereum.chainId == nil {
-                    ProgressView()
-                }
-                
-                Spacer()
-                
-                Button("Connect to MetaMask") {
-                    showProgressView = true
-                    ethereum.connect(dappMetaData)
+                if ethereum.selectedAddress.isEmpty {
+                    Section(footer: Text("This will open the MetaMask app. Once you have signed in, return to complete the process.")) {
+                        ZStack {
+                            Button {
+                                showProgressView = true
+                                ethereum.connect(dappMetaData)
+                            } label: {
+                                Text("Connect to MetaMask")
+                                    .frame(maxWidth: .infinity, maxHeight: 32)
+                            }
+                            .font(.title3)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 10)
+                            .background(Color.blue.grayscale(0.5))
+                            .cornerRadius(20)
+                            .padding(.horizontal, 16)
+                            
+                            if showProgressView && ethereum.chainId == nil {
+                                ProgressView()
+                                    .scaleEffect(2.0, anchor: .center)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                            }
+                        }
+                    }
                 }
             }
             .font(.body)
-            .padding()
             .onReceive(NotificationCenter.default.publisher(for: .Connection)) { notification in
                 status = notification.userInfo?["value"] as? String ?? "Offline"
             }
             .onReceive(NotificationCenter.default.publisher(for: .Channel)) { notification in
                 channel = notification.userInfo?["value"] as? String
             }
-            .onReceive(NotificationCenter.default.publisher(for: .Event)) { notification in
-                event = notification.userInfo?["value"] as? String
+            .navigationTitle("Dub Dapp")
+            .onAppear {
+                Ethereum.shared.response = ""
             }
-            .navigationTitle("Example Dapp")
         }
+        .accentColor(.black)
     }
 }
 
 struct ConnectView_Previews: PreviewProvider {
     static var previews: some View {
-        ConnectView(onConnect: nil)
+        ConnectView()
     }
 }

@@ -224,8 +224,7 @@ private extension Connection {
         
         if let data = json["data"] as? [String: Any] {
             if let id = data["id"] as? String {
-                Logging.log("mmsdk| Received ethereum request with id: \(id)")
-                Ethereum.shared.receiveRequest(
+                Ethereum.shared.receiveResponse(
                     id: id,
                     data: data)
             } else {
@@ -276,7 +275,6 @@ extension Connection {
             name: NSNotification.Name("event"),
             object: nil,
             userInfo: ["value": "Sending message: \(message)"])
-
         
         if encrypt {
             do {
