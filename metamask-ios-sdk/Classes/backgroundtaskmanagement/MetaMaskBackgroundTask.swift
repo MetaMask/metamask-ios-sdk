@@ -1,7 +1,6 @@
 import UIKit
 
 public class MetaMaskBackgroundTask {
-    
     static var task: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
     
     public static func start() {

@@ -166,6 +166,7 @@ private extension Connection {
     func handleMessage(_ message: [String: Any]) {
         if connectionPaused {
             if
+                let message = message["message"] as? [String: Any],
                 let type = message["type"] as? String,
                 let keyExchangeType = KeyExchangeType(rawValue: type),
                 keyExchangeType == .start {
@@ -207,22 +208,16 @@ private extension Connection {
         if json["type"] as? String == "pause" {
             Logging.log("mmsdk| Connection has been paused")
             connectionPaused = true
-            return
         } else if json["type"] as? String == "ready" {
             Logging.log("mmsdk| Connection is ready!")
             connectionPaused = false
             onClientsReady?()
-        }
-        
-        if json["type"] as? String == "wallet_info" {
+        } else if json["type"] as? String == "wallet_info" {
             Logging.log("mmsdk| Got wallet info!")
             connected = true
             onClientsReady?()
             connectionPaused = false
-            return
-        }
-        
-        if let data = json["data"] as? [String: Any] {
+        } else if let data = json["data"] as? [String: Any] {
             if let id = data["id"] as? String {
                 Ethereum.shared.receiveResponse(
                     id: id,
