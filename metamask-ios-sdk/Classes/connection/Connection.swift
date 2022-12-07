@@ -163,10 +163,6 @@ private extension Connection {
         }
     }
     
-    func handlePausedConnection() {
-        
-    }
-    
     func handleMessage(_ message: [String: Any]) {
         if connectionPaused {
             if
