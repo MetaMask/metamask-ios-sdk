@@ -81,7 +81,7 @@ struct ConnectView: View {
                 }
                 
                 if ethereum.selectedAddress.isEmpty {
-                    Section(footer: Text("This will open the MetaMask app. Once you have signed in, return to complete the process.")) {
+                    Section(footer: Text("This will open the MetaMask app. Please sign in and accept the connection prompt.")) {
                         ZStack {
                             Button {
                                 showProgressView = true
@@ -97,7 +97,7 @@ struct ConnectView: View {
                             .cornerRadius(20)
                             .padding(.horizontal, 16)
                             
-                            if showProgressView && ethereum.chainId == nil {
+                            if showProgressView && !ethereum.connected {
                                 ProgressView()
                                     .scaleEffect(2.0, anchor: .center)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
