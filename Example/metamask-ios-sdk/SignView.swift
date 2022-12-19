@@ -24,6 +24,7 @@ struct SignView: View {
                         .background(Color.white)
                         .foregroundColor(.black)
                         .frame(height: geometry.size.height / 2)
+                        .modifier(TextCurvature())
                 }
                 
                 Section {
@@ -31,7 +32,8 @@ struct SignView: View {
                     TextEditor(text: $ethereum.response)
                         .background(Color.white)
                         .foregroundColor(.black)
-                        .padding(.horizontal)
+                        .frame(minHeight: 60)
+                        .modifier(TextCurvature())
                 }
                 
                 Section {
@@ -45,7 +47,7 @@ struct SignView: View {
                     .foregroundColor(.white)
                     .padding(.vertical, 10)
                     .background(Color.blue.grayscale(0.5))
-                    .modifier(ContinuousCurvature())
+                    .modifier(ButtonCurvature())
                 }
             }
         }

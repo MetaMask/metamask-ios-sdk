@@ -13,33 +13,36 @@ struct TransactionView: View {
     
     @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
     @State private var amount = "0x0"
+    @State var from = "0x88dc6ae8b7c86cf5df9b5ac60766cb9a491ce3bc"
     
     var body: some View {
         Form {
             Section {
                 Text("From")
-                    .foregroundColor(.black)
-                TextEditor(text: $ethereum.selectedAddress)
+                TextEditor(text: $from)
                     .background(Color.white)
                     .foregroundColor(.black)
-                    .padding(.horizontal)
-                    .frame(minHeight: 40)
+                    .frame(minHeight: 60)
+                    .modifier(TextCurvature())
             }
             
             Section {
                 Text("To")
-                Text(to)
+                TextEditor(text: $to)
                     .background(Color.white)
                     .foregroundColor(.black)
-                    .padding(.horizontal)
+                    .frame(minHeight: 60)
+                    .modifier(TextCurvature())
+                
             }
             
             Section {
                 Text("Amount")
-                Text(amount)
+                TextEditor(text: $amount)
                     .background(Color.white)
                     .foregroundColor(.black)
-                    .padding(.horizontal)
+                    .frame(minHeight: 60)
+                    .modifier(TextCurvature())
             }
             
             Section {
@@ -47,7 +50,8 @@ struct TransactionView: View {
                 TextEditor(text: $ethereum.response)
                     .background(Color.white)
                     .foregroundColor(.black)
-                    .padding(.horizontal)
+                    .frame(minHeight: 60)
+                    .modifier(TextCurvature())
             }
             
             Section {
@@ -62,9 +66,10 @@ struct TransactionView: View {
                 .padding(.vertical, 10)
                 .padding(.horizontal)
                 .background(Color.blue.grayscale(0.5))
-                .modifier(ContinuousCurvature())
+                .modifier(ButtonCurvature())
             }
         }
+        .background(Color.blue.grayscale(0.5))
     }
     
     func sendTransaction() {
