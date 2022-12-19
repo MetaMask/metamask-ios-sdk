@@ -27,7 +27,6 @@ An SDK that enables native iOS apps to interact with the Ethereum blockchain via
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Mpendulo Ndlovu' => 'mpendulo@elefantel.com' }
   s.source           = { :git => 'https://github.com/MetaMask/metamask-ios-sdk.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '14.0'
 
@@ -36,9 +35,6 @@ An SDK that enables native iOS apps to interact with the Ethereum blockchain via
   # s.resource_bundles = {
   #   'metamask-ios-sdk' => ['metamask-ios-sdk/Assets/*.png']
   # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
   s.vendored_frameworks = 'metamask-ios-sdk/Frameworks/Ecies.xcframework'
   s.dependency 'Socket.IO-Client-Swift', '~> 16.0.1'
 end

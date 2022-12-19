@@ -3,7 +3,6 @@
 //  metamask-ios-sdk_Example
 //
 //  Created by Mpendulo Ndlovu on 2022/12/19.
-//  Copyright © 2022 CocoaPods. All rights reserved.
 //
 
 import SwiftUI
