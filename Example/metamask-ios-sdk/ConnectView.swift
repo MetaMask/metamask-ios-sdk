@@ -93,7 +93,7 @@ struct ConnectView: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 10)
                             .background(Color.blue.grayscale(0.5))
-                            .modifier(ContinuousCurvature())
+                            .modifier(ButtonCurvature())
                             
                             if showProgressView && !ethereum.connected {
                                 ProgressView()
@@ -116,7 +116,6 @@ struct ConnectView: View {
                 Ethereum.shared.response = ""
             }
         }
-        .accentColor(.black)
     }
 }
 
