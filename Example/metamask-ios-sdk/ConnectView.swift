@@ -3,7 +3,6 @@
 //  metamask-ios-sdk_Example
 //
 //  Created by Mpendulo Ndlovu on 2022/11/24.
-//  Copyright © 2022 CocoaPods. All rights reserved.
 //
 
 import SwiftUI
@@ -94,8 +93,7 @@ struct ConnectView: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 10)
                             .background(Color.blue.grayscale(0.5))
-                            .cornerRadius(20)
-                            .padding(.horizontal, 16)
+                            .modifier(ContinuousCurvature())
                             
                             if showProgressView && !ethereum.connected {
                                 ProgressView()

@@ -3,7 +3,6 @@
 //  metamask-ios-sdk
 //
 //  Created by Mpendulo Ndlovu on 11/14/2022.
-//  Copyright (c) 2022 Mpendulo Ndlovu. All rights reserved.
 //
 
 import UIKit

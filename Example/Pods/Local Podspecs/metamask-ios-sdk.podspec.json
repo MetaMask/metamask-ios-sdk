@@ -20,16 +20,11 @@
     "ios": "14.0"
   },
   "source_files": "metamask-ios-sdk/Classes/**/*",
+  "vendored_frameworks": "metamask-ios-sdk/Frameworks/Ecies.xcframework",
   "dependencies": {
     "Socket.IO-Client-Swift": [
       "~> 16.0.1"
     ]
-  },
-  "pod_target_xcconfig": {
-    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "arm64"
-  },
-  "user_target_xcconfig": {
-    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "arm64"
   },
   "swift_version": "5.0"
 }

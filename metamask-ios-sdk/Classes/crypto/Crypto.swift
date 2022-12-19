@@ -1,6 +1,6 @@
 import Foundation
+import Ecies
 
-/// Encryption module using ECIES encryption standard
 public protocol Crypto {
     /// Generates keypair and returns the asymmetric private key
     /// - Returns: Asymmetric private key
@@ -32,15 +32,15 @@ enum CryptoError: Error {
 }
 
 /// Encryption module using ECIES encryption standard
-public enum ECIES: Crypto {
+public enum Ecies: Crypto {
     public static func generatePrivateKey() -> String {
-        String(cString: GeneratePrivateKey())
+        String(cString: ecies_generate_secret_key())
     }
     
     public static func publicKey(from privateKey: String) -> String {
         let privateKey: NSString = privateKey as NSString
         let privateKeyBytes = UnsafeMutablePointer(mutating: privateKey.utf8String)
-        return String(cString: GetPublicKey(privateKeyBytes))
+        return String(cString: ecies_public_key_from(privateKeyBytes))
     }
     
     public static func encrypt(_ message: String, publicKey: String) throws -> String {
@@ -48,10 +48,8 @@ public enum ECIES: Crypto {
         let publicKey: NSString = publicKey as NSString
         let messageBytes = UnsafeMutablePointer(mutating: message.utf8String)
         let publicKeyBytes = UnsafeMutablePointer(mutating: publicKey.utf8String)
-        guard let encryptedText = Encrypt(
-            publicKeyBytes,
-            messageBytes)
-        else {
+
+        guard let encryptedText = ecies_encrypt(publicKeyBytes, messageBytes) else {
             throw CryptoError.encryptionFailure
         }
         return String(cString: encryptedText)
@@ -62,10 +60,7 @@ public enum ECIES: Crypto {
         let privateKey: NSString = privateKey as NSString
         let messageBytes = UnsafeMutablePointer(mutating: message.utf8String)
         let privateKeyBytes = UnsafeMutablePointer(mutating: privateKey.utf8String)
-        guard let decryptedText = Decrypt(
-            privateKeyBytes,
-            messageBytes)
-        else {
+        guard let decryptedText = ecies_decrypt(privateKeyBytes, messageBytes) else {
             throw CryptoError.decryptionFailure
         }
         return String(cString: decryptedText)

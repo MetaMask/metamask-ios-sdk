@@ -58,7 +58,7 @@ public class KeyExchange {
     private let encyption: Crypto.Type
     var keysExchanged: Bool = false
     
-    public init(encryption: Crypto.Type = ECIES.self) {
+    public init(encryption: Crypto.Type = Ecies.self) {
         self.encyption = encryption
         self.privateKey = encyption.generatePrivateKey()
         self.pubkey = encyption.publicKey(from: privateKey)

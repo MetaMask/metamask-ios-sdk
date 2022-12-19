@@ -3,7 +3,6 @@
 //  metamask-ios-sdk_Example
 //
 //  Created by Mpendulo Ndlovu on 2022/12/06.
-//  Copyright © 2022 CocoaPods. All rights reserved.
 //
 
 import SwiftUI
@@ -17,48 +16,39 @@ struct SignView: View {
     var sign: ((String) -> Void)?
     
     var body: some View {
-        VStack {
-            VStack(spacing: 16) {
-                Spacer()
-                
-                VStack(spacing: 2) {
+        GeometryReader { geometry in
+            Form {
+                Section {
                     Text("Input")
                     TextEditor(text: $textValue)
-                        .padding()
                         .background(Color.white)
-                        .cornerRadius(20)
                         .foregroundColor(.black)
-                        .padding(.horizontal)
+                        .frame(height: geometry.size.height / 2)
                 }
                 
-                VStack(spacing: 2) {
+                Section {
                     Text("Output")
                     TextEditor(text: $ethereum.response)
-                        .padding()
                         .background(Color.white)
-                        .cornerRadius(20)
                         .foregroundColor(.black)
                         .padding(.horizontal)
-                        .disabled(true)
                 }
                 
-                Button {
-                    signInput()
-                } label: {
-                    Text("Sign Text")
-                        .frame(maxWidth: .infinity, maxHeight: 38)
+                Section {
+                    Button {
+                        signInput()
+                    } label: {
+                        Text("Sign Text")
+                            .frame(maxWidth: .infinity, maxHeight: 32)
+                    }
+                    .font(.title3)
+                    .foregroundColor(.white)
+                    .padding(.vertical, 10)
+                    .background(Color.blue.grayscale(0.5))
+                    .modifier(ContinuousCurvature())
                 }
-                .font(.title3)
-                .foregroundColor(.white)
-                .padding(.vertical, 10)
-                .background(Color.blue.grayscale(0.5))
-                .cornerRadius(20)
-                .padding(.horizontal, 16)
             }
-            .padding(EdgeInsets(top: 42, leading: 0, bottom: 32, trailing: 0))
         }
-        .background(Color.orange.grayscale(0.9))
-        .ignoresSafeArea()
     }
     
     func signInput() {
