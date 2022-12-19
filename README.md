@@ -19,11 +19,3 @@ it, simply add the following line to your Podfile:
 ```ruby
 pod 'metamask-ios-sdk'
 ```
-
-## Author
-
-Mpendulo Ndlovu, mpendulo@elefantel.com
-
-## License
-
-metamask-ios-sdk is available under the MIT license. See the LICENSE file for more info.
