@@ -94,8 +94,7 @@ struct ConnectView: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 10)
                             .background(Color.blue.grayscale(0.5))
-                            .cornerRadius(20)
-                            .padding(.horizontal, 16)
+                            .modifier(ContinuousCurvature())
                             
                             if showProgressView && !ethereum.connected {
                                 ProgressView()
