@@ -123,8 +123,6 @@ public class KeyExchange {
             throw KeyExchangeError.encodingError
         }
         
-        Logging.log("Encrypting JSON: \(jsonString) with their key \(theirPublicKey)")
-        
         return try encyption.encrypt(
             jsonString,
             publicKey: theirPublicKey
