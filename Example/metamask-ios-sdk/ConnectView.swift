@@ -2,8 +2,6 @@
 //  ConnectView.swift
 //  metamask-ios-sdk_Example
 //
-//  Created by Mpendulo Ndlovu on 2022/11/24.
-//
 
 import SwiftUI
 import Combine
@@ -11,7 +9,6 @@ import metamask_ios_sdk
 
 extension Notification.Name {
     static let Event = Notification.Name("event")
-    static let Channel = Notification.Name("channel")
     static let Connection = Notification.Name("connection")
 }
 
@@ -24,7 +21,9 @@ struct ConnectView: View {
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
     
-    @State private var channel: String?
+    @State private var errorMessage = ""
+    @State private var showError = false
+    
     @State private var showProgressView = false
     
     var body: some View {
@@ -34,24 +33,16 @@ struct ConnectView: View {
                     Group {
                         HStack {
                             Text("Status")
+                                .font(.callout)
                                 .bold()
                             Spacer()
                             Text(status)
                                 .font(.caption)
                         }
                         
-                        if let channel = channel {
-                            HStack {
-                                Text("Channel")
-                                    .bold()
-                                Spacer()
-                                Text(channel)
-                                    .font(.caption)
-                            }
-                        }
-                        
                         HStack {
                             Text("Chain ID")
+                                .font(.callout)
                                 .bold()
                             Spacer()
                             Text(ethereum.chainId ?? "")
@@ -60,6 +51,7 @@ struct ConnectView: View {
                         
                         HStack {
                             Text("Account")
+                                .font(.callout)
                                 .bold()
                             Spacer()
                             Text(ethereum.selectedAddress)
@@ -87,10 +79,18 @@ struct ConnectView: View {
                         ZStack {
                             Button {
                                 showProgressView = true
-                                ethereum.connect(dappMetaData)?.sink { result in
+                                
+                                ethereum.connect(dappMetaData)?.sink(receiveCompletion: { completion in
+                                    switch completion {
+                                    case .failure(let error):
+                                        errorMessage = error.localizedDescription
+                                        showError = true
+                                        print("Connection error: \(errorMessage)")
+                                    default: break
+                                    }
+                                }, receiveValue: { result in
                                     print("Connection result: \(result)")
-                                }
-                                .store(in: &cancellables)
+                                }).store(in: &cancellables)
                             } label: {
                                 Text("Connect to MetaMask")
                                     .frame(maxWidth: .infinity, maxHeight: 32)
@@ -107,15 +107,18 @@ struct ConnectView: View {
                                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
                             }
                         }
+                        .alert(isPresented: $showError) {
+                            Alert(
+                                title: Text("Authorization Error"),
+                                message: Text(errorMessage)
+                            )
+                        }
                     }
                 }
             }
             .font(.body)
             .onReceive(NotificationCenter.default.publisher(for: .Connection)) { notification in
                 status = notification.userInfo?["value"] as? String ?? "Offline"
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .Channel)) { notification in
-                channel = notification.userInfo?["value"] as? String
             }
             .navigationTitle("Dub Dapp")
         }

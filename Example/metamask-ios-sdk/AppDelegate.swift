@@ -2,8 +2,6 @@
 //  AppDelegate.swift
 //  metamask-ios-sdk
 //
-//  Created by Mpendulo Ndlovu on 11/14/2022.
-//
 
 import UIKit
 import metamask_ios_sdk

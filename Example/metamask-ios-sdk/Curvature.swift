@@ -2,8 +2,6 @@
 //  Curvature.swift
 //  metamask-ios-sdk_Example
 //
-//  Created by Mpendulo Ndlovu on 2022/12/19.
-//
 
 import SwiftUI
 

@@ -1,8 +1,5 @@
 //
 //  QRCodeGenerator.swift
-//  
-//
-//  Created by Mpendulo Ndlovu on 2022/11/10.
 //
 
 import SwiftUI

@@ -1,9 +1,6 @@
 //
 //  Connection.swift
 //  
-//
-//  Created by Mpendulo Ndlovu on 2022/11/01.
-//
 
 import SocketIO
 import Foundation
@@ -39,7 +36,7 @@ struct Message<T: CodableData>: CodableData {
             let message = try JSONDecoder().decode(Message<T>.self, from: json)
             return message
         } catch {
-            Logging.error("Something went wrong: \(error.localizedDescription)")
+            Logging.error("mmsdk| Something went wrong: \(error.localizedDescription)")
         }
         return nil
     }

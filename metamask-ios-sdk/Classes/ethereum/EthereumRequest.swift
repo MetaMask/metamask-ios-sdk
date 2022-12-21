@@ -1,9 +1,6 @@
 //
 //  EthereumRequest.swift
 //
-//
-//  Created by Mpendulo Ndlovu on 2022/11/29.
-//
 
 import Foundation
 import Combine
@@ -40,14 +37,20 @@ public struct EthereumRequest<T: CodableData>: CodableData {
 
 struct SubmittedRequest {
     let method: EthereumMethod
-    private let requestSubject = PassthroughSubject<String, Never>()
+    private let requestSubject = PassthroughSubject<String, EthereumError>()
     
-    var publisher: AnyPublisher<String, Never>? {
-        requestSubject.eraseToAnyPublisher()
+    var publisher: EthereumPublisher? {
+        requestSubject
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
     }
     
     func send(_ value: String) {
         requestSubject.send(value)
+    }
+    
+    func error(_ err: EthereumError) {
+        requestSubject.send(completion: .failure(err))
     }
 }
 

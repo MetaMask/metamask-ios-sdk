@@ -2,8 +2,6 @@
 //  TransactionView.swift
 //  metamask-ios-sdk_Example
 //
-//  Created by Mpendulo Ndlovu on 2022/12/06.
-//
 
 import SwiftUI
 import Combine
@@ -14,6 +12,8 @@ struct TransactionView: View {
     
     @State private var amount = "0x0"
     @State var result: String = ""
+    @State private var errorMessage = ""
+    @State private var showError = false
     @State private var cancellables: Set<AnyCancellable> = []
     @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
     
@@ -21,38 +21,38 @@ struct TransactionView: View {
         Form {
             Section {
                 Text("From")
+                    .font(.callout)
                 TextEditor(text: $ethereum.selectedAddress)
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .frame(minHeight: 60)
+                    .modifier(TextCaption())
+                    .frame(minHeight: 32)
                     .modifier(TextCurvature())
             }
             
             Section {
                 Text("To")
+                    .font(.callout)
                 TextEditor(text: $to)
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .frame(minHeight: 60)
+                    .modifier(TextCaption())
+                    .frame(minHeight: 32)
                     .modifier(TextCurvature())
                 
             }
             
             Section {
                 Text("Amount")
+                    .font(.callout)
                 TextEditor(text: $amount)
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .frame(minHeight: 60)
+                    .modifier(TextCaption())
+                    .frame(minHeight: 32)
                     .modifier(TextCurvature())
             }
             
             Section {
                 Text("Result")
+                    .font(.callout)
                 TextEditor(text: $result)
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .frame(minHeight: 60)
+                    .modifier(TextCaption())
+                    .frame(minHeight: 40)
                     .modifier(TextCurvature())
             }
             
@@ -62,6 +62,12 @@ struct TransactionView: View {
                 } label: {
                     Text("Send Transaction")
                         .frame(maxWidth: .infinity, maxHeight: 32)
+                }
+                .alert(isPresented: $showError) {
+                    Alert(
+                        title: Text("Authorization Error"),
+                        message: Text(errorMessage)
+                    )
                 }
                 .font(.title3)
                 .foregroundColor(.white)
@@ -84,10 +90,17 @@ struct TransactionView: View {
             method: .sendTransaction,
             params: [transaction])
         
-        ethereum.request(transactionRequest)?.sink { value in
+        ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
+            switch completion {
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+                showError = true
+                print("Transaction error: \(errorMessage)")
+            default: break
+            }
+        }, receiveValue: { value in
             self.result = value
-        }
-        .store(in: &cancellables)
+        }).store(in: &cancellables)
     }
 }
 
