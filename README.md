@@ -23,11 +23,24 @@ let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
 ethereum.connect(dappMetaData)
 ```
 ### 4. You can now call any ethereum provider method
+We use Combine to publish ethereum events, so you need to have a cancellables set. You can also declare an ethereum object if you prefer.
+```
+@ObservedObject var ethereum: Ethereum = Ethereum.shared
+@State private var cancellables: Set<AnyCancellable> = []
+```
 #### 4.1 Get `eth_chainId`
-let chainIdRequest = EthereumRequest(method: .ethChainId)
-ethereum.request(chainIdRequest)
+```
+@State var chainID: String?
 
-#### 4.2 Send Transaction
+let chainIdRequest = EthereumRequest(method: .ethChainId)
+
+ethereum.request(chainIdRequest).sink { chainId in
+  self.chainID = chainId
+}
+.store(in: &cancellables)  
+```
+
+#### 4.2 Send transaction
 ```
 // Create a transaction
 let transaction = Transaction(
@@ -35,26 +48,61 @@ let transaction = Transaction(
     from: ethereum.selectedAddress,
     value: "0x...")
     
-// Create transaction request
+// Create a request
 let transactionRequest = EthereumRequest(
     method: .sendTransaction,
     params: [transaction])
 
-// Make send transaction request
-ethereum.request(transactionRequest)    
+// Send a transaction request
+ethereum.request(transactionRequest)?.sink { result in
+    print(result)
+}
+.store(in: &cancellables)    
 ```
+
+#### 4.2 Custom requests
+To create your own requests, you can use a primitive key-pair data type dictionary object or use a struct that conforms to `CodableData` i.e implementing the `func socketRepresentation() -> NetworkData` requirement, so that the type can be represented as a socket packet.
+```
+let params: [String: String] = [
+    "to": "0x...",
+    "from": "ethereum.selectedAddress",
+    "value": "0x..."
+  ]
+  
+let request = EthereumRequest(
+    method: .sendTransaction,
+    params: [params])
+
+ethereum.request(request)
+```
+OR
+```
+public struct MyStruct: CodableData {
+    public var to: String
+    public let from: String
+    public var value: String
+    
+    public init(to: String, from: String, value: String) {
+        self.to = to
+        self.from = from
+        self.value = value
+    }
+    
+    public func socketRepresentation() -> NetworkData {
+        [
+            "to": to,
+            "from": from,
+            "value": value
+        ]
+    }
+}
+// Then use struct object as shown in 4.2 above
+```
+
 
 ## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests.
+To run the example project, clone this repository, change directory to `metamask-ios-sdk/Example`, and then run `pod install` from the Example directory to install the SDK as a dependency on the project, and then open the `metamask-ios-sdk.xcworkspace`
 
 ## Requirements
-
-## Installation
-
-metamask-ios-sdk is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod 'metamask-ios-sdk'
-```
+This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0.

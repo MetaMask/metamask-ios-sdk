@@ -12,6 +12,7 @@ public typealias NetworkData = SocketData
 public typealias RequestTask = Task<Any, Never>
 public typealias CodableData = Codable & SocketData
 
+
 struct OriginatorInfo: CodableData {
     let title: String?
     let url: String?

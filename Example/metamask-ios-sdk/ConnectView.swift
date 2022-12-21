@@ -17,7 +17,7 @@ extension Notification.Name {
 
 struct ConnectView: View {
     @ObservedObject var ethereum = Ethereum.shared
-    @State private var cancellables = [AnyCancellable]()
+    @State private var cancellables: Set<AnyCancellable> = []
     
     private let dappMetaData = DappMetadata(name: "Dub Dapp", url: "dubdapp.com")
     

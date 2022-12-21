@@ -14,7 +14,7 @@ struct TransactionView: View {
     
     @State private var amount = "0x0"
     @State var result: String = ""
-    @State private var cancellables = [AnyCancellable]()
+    @State private var cancellables: Set<AnyCancellable> = []
     @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
     
     var body: some View {
@@ -79,6 +79,7 @@ struct TransactionView: View {
             to: to,
             from: ethereum.selectedAddress,
             value: "0x0")
+        
         let transactionRequest = EthereumRequest(
             method: .sendTransaction,
             params: [transaction])
