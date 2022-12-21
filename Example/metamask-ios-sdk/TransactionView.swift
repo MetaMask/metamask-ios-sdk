@@ -6,20 +6,22 @@
 //
 
 import SwiftUI
+import Combine
 import metamask_ios_sdk
 
 struct TransactionView: View {
     @ObservedObject var ethereum: Ethereum = Ethereum.shared
     
-    @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
     @State private var amount = "0x0"
-    @State var from = "0x88dc6ae8b7c86cf5df9b5ac60766cb9a491ce3bc"
+    @State var result: String = ""
+    @State private var cancellables = [AnyCancellable]()
+    @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
     
     var body: some View {
         Form {
             Section {
                 Text("From")
-                TextEditor(text: $from)
+                TextEditor(text: $ethereum.selectedAddress)
                     .background(Color.white)
                     .foregroundColor(.black)
                     .frame(minHeight: 60)
@@ -47,7 +49,7 @@ struct TransactionView: View {
             
             Section {
                 Text("Result")
-                TextEditor(text: $ethereum.response)
+                TextEditor(text: $result)
                     .background(Color.white)
                     .foregroundColor(.black)
                     .frame(minHeight: 60)
@@ -81,7 +83,10 @@ struct TransactionView: View {
             method: .sendTransaction,
             params: [transaction])
         
-        ethereum.request(transactionRequest)
+        ethereum.request(transactionRequest)?.sink { value in
+            self.result = value
+        }
+        .store(in: &cancellables)
     }
 }
 

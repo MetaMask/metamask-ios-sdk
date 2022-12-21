@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 import metamask_ios_sdk
 
 extension Notification.Name {
@@ -16,7 +17,9 @@ extension Notification.Name {
 
 struct ConnectView: View {
     @ObservedObject var ethereum = Ethereum.shared
-    private let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
+    @State private var cancellables = [AnyCancellable]()
+    
+    private let dappMetaData = DappMetadata(name: "Dub Dapp", url: "dubdapp.com")
     
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
@@ -51,12 +54,12 @@ struct ConnectView: View {
                             Text("Chain ID")
                                 .bold()
                             Spacer()
-                            Text(ethereum.chainId ?? "-")
+                            Text(ethereum.chainId ?? "")
                                 .font(.caption)
                         }
                         
                         HStack {
-                            Text("Selected Address")
+                            Text("Account")
                                 .bold()
                             Spacer()
                             Text(ethereum.selectedAddress)
@@ -84,7 +87,10 @@ struct ConnectView: View {
                         ZStack {
                             Button {
                                 showProgressView = true
-                                ethereum.connect(dappMetaData)
+                                ethereum.connect(dappMetaData)?.sink { result in
+                                    print("Connection result: \(result)")
+                                }
+                                .store(in: &cancellables)
                             } label: {
                                 Text("Connect to MetaMask")
                                     .frame(maxWidth: .infinity, maxHeight: 32)
@@ -112,9 +118,6 @@ struct ConnectView: View {
                 channel = notification.userInfo?["value"] as? String
             }
             .navigationTitle("Dub Dapp")
-            .onAppear {
-                Ethereum.shared.response = ""
-            }
         }
     }
 }

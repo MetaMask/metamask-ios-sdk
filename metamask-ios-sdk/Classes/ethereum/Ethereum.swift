@@ -5,9 +5,18 @@
 //  Created by Mpendulo Ndlovu on 2022/11/29.
 //
 import Foundation
+import Combine
 
-public enum EthereumError: String, Error {
-    case notConnected = "Wait until MetaMask is connected"
+public enum EthereumError: Error {
+    case notConnected
+    case custom(String)
+    
+    var message: String {
+        switch self {
+        case .notConnected: return "Wait until MetaMask is connected"
+        case .custom(let error): return error
+        }
+    }
 }
 
 public class Ethereum: ObservableObject {
@@ -16,32 +25,33 @@ public class Ethereum: ObservableObject {
     @Published public var chainId: String?
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
-    @Published public var response: String = ""
     
-    private var transport: Transport!
+    private var sdk = MMSDK()
     private var dappMetadata: DappMetadata!
     private var submittedRequests: [String: SubmittedRequest] = [:]
 }
 
 // MARK: Session Management
 extension Ethereum {
-    
-    public func initialise() {
+    @discardableResult
+    private func initialise() -> AnyPublisher<String, Never>? {
         let providerRequest = EthereumRequest(
             id: nil,
             method: .getMetamaskProviderState)
-        Logging.log("Initialising ethereum, request: \(providerRequest)")
-        request(providerRequest)
+        
+        return request(providerRequest)
     }
     
-    public func connect(_ metaData: DappMetadata) {
+    @discardableResult
+    public func connect(_ metaData: DappMetadata) -> AnyPublisher<String, Never>? {
         dappMetadata = metaData
         
         let accountsRequest = EthereumRequest(
             id: nil,
             method: .requestAccounts)
-        Logging.log("Connecting ethereum with request: \(accountsRequest)")
-        request(accountsRequest)
+        Logging.log("mmsdk| Connecting dapp \(dappMetadata.name) to ethereum")
+        
+        return request(accountsRequest)
     }
     
     public func disconnect() {
@@ -53,7 +63,7 @@ extension Ethereum {
 
 // MARK: Deeplinking
 extension Ethereum {
-    public func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
+    func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
         switch method {
         case .requestAccounts:
             return selectedAddress.isEmpty ? true : false
@@ -65,12 +75,14 @@ extension Ethereum {
 
 // MARK: Request Sending
 extension Ethereum {
-    public func sendRequest<T: CodableData>(_ request: EthereumRequest<T>,
+    func sendRequest<T: CodableData>(_ request: EthereumRequest<T>,
                                             id: String,
                                             openDeeplink: Bool) {
+        Logging.log("mmsdk| Sending request \(request.method) \(request.params)")
+        
         var request = request
         request.id = id
-        transport.sendMessage(request, encrypt: true)
+        sdk.sendMessage(request, encrypt: true)
             
         if
             openDeeplink,
@@ -81,8 +93,8 @@ extension Ethereum {
         }
     }
     
-    func requestAccounts() {
-        Logging.log("Requesting accounts...")
+    func requestAccounts(_ publisher: inout AnyPublisher<String, Never>?)  {
+        Logging.log("mmsdk| Requesting accounts")
         connected = true
         initialise()
         
@@ -95,52 +107,59 @@ extension Ethereum {
         let submittedRequest = SubmittedRequest(method: method)
         
         submittedRequests[id] = submittedRequest
-        Logging.log("Submitting ethereum request: \(request)")
+        publisher = submittedRequests[id]?.publisher
+        
         sendRequest(
             request,
             id: id,
             openDeeplink: false)
     }
     
-    public func request<T: CodableData>(_ request: EthereumRequest<T>) {
+    @discardableResult
+    public func request<T: CodableData>(_ request: EthereumRequest<T>) -> AnyPublisher<String, Never>? {
+        var publisher: AnyPublisher<String, Never>?
+        
         if request.method == .requestAccounts && !connected {
-            transport = Transport()
-            transport.url = dappMetadata.url
-            transport.name = dappMetadata.name
-            transport.connect()
-            transport.onClientsReady = requestAccounts
+            sdk.dappUrl = dappMetadata.url
+            sdk.dappName = dappMetadata.name
+            sdk.connect()
+            sdk.onClientsReady = { [weak self] in
+                self?.requestAccounts(&publisher)
+            }
         } else if !connected {
             Logging.error(EthereumError.notConnected)
         } else {
             let id = UUID().uuidString.lowercased()
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
+            publisher = submittedRequests[id]?.publisher
             
             sendRequest(
                 request,
                 id: id,
                 openDeeplink: shouldOpenMetaMask(method: request.method))
         }
+        
+        return publisher
     }
 }
 
 // MARK: Request Receiving
 extension Ethereum {
-    func updateChainId(_ id: String?) {
+    private func updateChainId(_ id: String?) {
         chainId = id
     }
     
-    func updateAccount(_ account: String) {
+    private func updateAccount(_ account: String) {
         selectedAddress = account
     }
     
-    public func receiveResponse(id: String, data: [String: Any]) {
+    func receiveResponse(id: String, data: [String: Any]) {
         Logging.log("mmsdk| Received ethereum response: \(data)")
         
         guard let request = submittedRequests[id] else { return }
         
         if data["error"] != nil {
-            submittedRequests[id] = nil
             return
         }
         
@@ -153,37 +172,50 @@ extension Ethereum {
             
             if let account = accounts.first {
                 updateAccount(account)
+                _ = submittedRequests[id]?.send(account)
             }
             
             if let chainId = result["chainId"] as? String {
                 updateChainId(chainId)
+                _ = submittedRequests[id]?.send(chainId)
             }
         case .requestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
+                Logging.log("mmsdk| Request accounts result: \(account)")
                 updateAccount(account)
+                submittedRequests[id]?.send(account)
+            } else {
+                Logging.error("mmsdk| Sign signature v4 failure: \(data)")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
                 updateChainId(result)
+                Logging.log("mmsdk| Eth chain_id changed: \(result)")
+                submittedRequests[id]?.send(result)
             }
         case .signTypedDataV4:
             if let result: String = data["result"] as? String {
-                response = result
-                print("Getting signature response: \(data)")
+                Logging.log("mmsdk| Sign signature v4 result: \(result)")
+                submittedRequests[id]?.send(result)
+            } else {
+                Logging.error("mmsdk| Sign signature v4 failure: \(data)")
             }
         case .sendTransaction:
             if let result: String = data["result"] as? String {
-                response = result
-                print("Getting transaction result: \(result)")
+                Logging.log("mmsdk| Send transaction result: \(result)")
+                submittedRequests[id]?.send(result)
+            } else {
+                Logging.error("mmsdk| Send transaction failure: \(data)")
             }
         default:
+            Logging.log("mmsdk| Unhandled result: \(data)")
             break
         }
     }
     
-    public func receiveEvent(_ event: [String: Any]) {
-        Logging.log("Received ethereum event: \(event)")
+    func receiveEvent(_ event: [String: Any]) {
+        Logging.log("mmsdk| Received ethereum event: \(event)")
         
         guard
             let method = event["method"] as? String,
