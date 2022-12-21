@@ -1,8 +1,5 @@
 //
 //  KeyExchange.swift
-//  
-//
-//  Created by Mpendulo Ndlovu on 2022/11/01.
 //
 
 import Foundation
@@ -92,7 +89,7 @@ public class KeyExchange {
             return nil
             
         default:
-            Logging.error("Unknown key exchange")
+            Logging.error("mmsdk| Unknown key exchange")
             return nil
         }
     }

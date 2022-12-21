@@ -1,8 +1,5 @@
 //
 //  NetworkClient.swift
-//  
-//
-//  Created by Mpendulo Ndlovu on 2022/11/07.
 //
 
 import OSLog

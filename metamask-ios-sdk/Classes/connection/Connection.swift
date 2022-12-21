@@ -1,8 +1,5 @@
 //
 //  Connection.swift
-//  
-//
-//  Created by Mpendulo Ndlovu on 2022/11/01.
 //
 
 import OSLog
@@ -76,8 +73,6 @@ private extension Connection {
             
             self.connected = true
             
-            Logging.log("mmsdk| Initiating key exchange")
-            
             let keyExchangeSync = self.keyExchange.message(type: .syn)
             self.sendMessage(keyExchangeSync, encrypt: false)
         }
@@ -95,14 +90,6 @@ private extension Connection {
             Logging.log("mmsdk| SDK connected: \(data)")
             
             self.connectionClient.emit(ClientEvent.joinChannel, channelId)
-
-            // for debug purposes only
-            NotificationCenter.default.post(
-                name: NSNotification.Name("channel"),
-                object: nil,
-                userInfo: ["value": channelId])
-            
-            Logging.log("mmsdk| Joined channel: \(channelId)")
             
             if !self.connected {
                 self.deeplinkToMetaMask()
@@ -117,12 +104,6 @@ private extension Connection {
                 let self = self,
                 let message = data.first as? [String: Any]
             else { return }
-            
-            // for debug purposes only
-            NotificationCenter.default.post(
-                name: NSNotification.Name("event"),
-                object: nil,
-                userInfo: ["value": "Received message: \(message)"])
 
             if !self.keyExchange.keysExchanged {
                 self.handleReceiveKeyExchange(message)
@@ -159,7 +140,6 @@ private extension Connection {
 private extension Connection {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         guard let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message) else {
-            Logging.log("mmsdk| Couldn't construct key exchange from data")
             return
         }
         
@@ -200,43 +180,32 @@ private extension Connection {
             return
         }
         
-        let json: [String: Any]
-        
         do {
-            json = try JSONSerialization.jsonObject(with: Data(decryptedText.utf8), options: []) as? [String: Any] ?? [:]
+            let json: [String: Any] = try JSONSerialization.jsonObject(with: Data(decryptedText.utf8), options: []) as? [String: Any] ?? [:]
             
-            // for debug purposes only
-            NotificationCenter.default.post(
-                name: NSNotification.Name("event"),
-                object: nil,
-                userInfo: ["value": "Received decrypted message: \(json)"])
-            
-            Logging.log("mmsdk| Received message: \(json)")
+            if json["type"] as? String == "pause" {
+                Logging.log("mmsdk| Connection has been paused")
+                connectionPaused = true
+            } else if json["type"] as? String == "ready" {
+                Logging.log("mmsdk| Connection is ready")
+                connectionPaused = false
+                onClientsReady?()
+            } else if json["type"] as? String == "wallet_info" {
+                Logging.log("mmsdk| Received wallet info")
+                connected = true
+                onClientsReady?()
+                connectionPaused = false
+            } else if let data = json["data"] as? [String: Any] {
+                if let id = data["id"] as? String {
+                    Ethereum.shared.receiveResponse(
+                        id: id,
+                        data: data)
+                } else {
+                    Ethereum.shared.receiveEvent(data)
+                }
+            }
         } catch {
             Logging.error(error)
-            return
-        }
-        
-        if json["type"] as? String == "pause" {
-            Logging.log("mmsdk| Connection has been paused")
-            connectionPaused = true
-        } else if json["type"] as? String == "ready" {
-            Logging.log("mmsdk| Connection is ready!")
-            connectionPaused = false
-            onClientsReady?()
-        } else if json["type"] as? String == "wallet_info" {
-            Logging.log("mmsdk| Got wallet info!")
-            connected = true
-            onClientsReady?()
-            connectionPaused = false
-        } else if let data = json["data"] as? [String: Any] {
-            if let id = data["id"] as? String {
-                Ethereum.shared.receiveResponse(
-                    id: id,
-                    data: data)
-            } else {
-                Ethereum.shared.receiveEvent(data)
-            }
         }
     }
 }
@@ -248,8 +217,6 @@ extension Connection {
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
-        
-        Logging.log("mmsdk| Deeplinking to MetaMask. \nURL: \(urlString)")
         
         DispatchQueue.main.async {
             UIApplication.shared.open(url)
@@ -273,15 +240,8 @@ extension Connection {
     
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
-            Logging.error("mmsdk| Keys not exchanged")
             return
         }
-        
-        // for debug purposes only
-        NotificationCenter.default.post(
-            name: NSNotification.Name("event"),
-            object: nil,
-            userInfo: ["value": "Sending message: \(message)"])
         
         if encrypt {
             do {
@@ -291,9 +251,9 @@ extension Connection {
                     message: encryptedMessage)
                 
                 if connectionPaused {
-                    Logging.log("Will send once wallet is open again")
+                    Logging.log("mmsdk| Will send once wallet is open again")
                     onClientsReady = { [weak self] in
-                        Logging.log("Sending now")
+                        Logging.log("mmsdk| Sending now")
                         self?.connectionClient.emit(ClientEvent.message, message)
                     }
                 } else {

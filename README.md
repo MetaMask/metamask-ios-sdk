@@ -9,6 +9,14 @@ Add MetaMask iOS SDK as a cocoapods dependency to your project
 ```
   pod 'metamask-ios-sdk'
 ```
+#### Note
+Please note that the SDK currently supports the following architectures 
+- `aarch64-apple-ios` (iOS devices) and 
+- `x86_64-apple-ios` (Intel Mac-based simulators)
+
+We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators) because of an architecture support limitation we have on the cryto module we use. 
+
+However, you should be able run iton an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to /Applications, right click on Xcode -> Get Info -> check the option "Open using Rosetta". This effectively runs Xcode in Intel mode.
 ### 2. Import the SDK
 ```
 import metamask_ios_sdk
@@ -34,9 +42,15 @@ We use Combine to publish ethereum events, so you need to have a cancellables se
 
 let chainIdRequest = EthereumRequest(method: .ethChainId)
 
-ethereum.request(chainIdRequest).sink { chainId in
-  self.chainID = chainId
-}
+ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
+    switch completion {
+    case .failure(let error):
+        print("\(error.localizedDescription)")
+    default: break
+    }
+}, receiveValue: { chainId in
+    self.chainID = chainId
+})
 .store(in: &cancellables)  
 ```
 
@@ -54,10 +68,16 @@ let transactionRequest = EthereumRequest(
     params: [transaction])
 
 // Send a transaction request
-ethereum.request(transactionRequest)?.sink { result in
+ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { completion in
+    switch completion {
+    case .failure(let error):
+        print("\(error.localizedDescription)")
+    default: break
+    }
+}, receiveValue: { result in
     print(result)
-}
-.store(in: &cancellables)    
+})
+.store(in: &cancellables)  
 ```
 
 #### 4.2 Custom requests
