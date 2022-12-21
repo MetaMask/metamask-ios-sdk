@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import Combine
 
 public struct DappMetadata {
     public let name: String
@@ -38,8 +38,17 @@ public struct EthereumRequest<T: CodableData>: CodableData {
     }
 }
 
-public struct SubmittedRequest {
-    public let method: EthereumMethod
+struct SubmittedRequest {
+    let method: EthereumMethod
+    private let requestSubject = PassthroughSubject<String, Never>()
+    
+    var publisher: AnyPublisher<String, Never>? {
+        requestSubject.eraseToAnyPublisher()
+    }
+    
+    func send(_ value: String) {
+        requestSubject.send(value)
+    }
 }
 
 public enum EthereumMethod: String, CaseIterable, CodableData {

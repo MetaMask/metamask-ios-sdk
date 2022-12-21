@@ -8,6 +8,7 @@
 import OSLog
 import SocketIO
 import Foundation
+import Combine
 
 class Connection {
 
@@ -22,6 +23,7 @@ class Connection {
     
     var connected: Bool = false
     var onClientsReady: (() -> Void)?
+    var onClientsDisconnected: (() -> Void)?
     
     var deeplinkUrl: String {
         "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.pubkey
@@ -58,13 +60,15 @@ private extension Connection {
         
         // MARK: Connection error event
         connectionClient.on(clientEvent: .error) { data in
-            Logging.log("mmsdk| Client connection error: \(data)")
+            Logging.error("mmsdk| Client connection error: \(data)")
         }
         
         // MARK: Clients connected event
         connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| Clients connected: \(data)")
+            
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
@@ -81,18 +85,23 @@ private extension Connection {
         // MARK: Socket connected event
         connectionClient.on(clientEvent: .connect) { [weak self] data in
             guard let self = self else { return }
+            
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
                 userInfo: ["value": "Connected to Socket"])
+            
             Logging.log("mmsdk| SDK connected: \(data)")
             
             self.connectionClient.emit(ClientEvent.joinChannel, channelId)
 
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("channel"),
                 object: nil,
                 userInfo: ["value": channelId])
+            
             Logging.log("mmsdk| Joined channel: \(channelId)")
             
             if !self.connected {
@@ -108,18 +117,17 @@ private extension Connection {
                 let self = self,
                 let message = data.first as? [String: Any]
             else { return }
+            
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("event"),
                 object: nil,
                 userInfo: ["value": "Received message: \(message)"])
 
-            Logging.log("mmsdk| Received message: \(message)")
-
             if !self.keyExchange.keysExchanged {
                 self.handleReceiveKeyExchange(message)
             } else {
                 // Decrypt message
-                Logging.log("mmsdk| About to decrypt message: \(message)")
                 self.handleMessage(message)
             }
         }
@@ -130,6 +138,8 @@ private extension Connection {
         connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| SDK disconnected: \(data)")
+            
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
@@ -194,12 +204,14 @@ private extension Connection {
         
         do {
             json = try JSONSerialization.jsonObject(with: Data(decryptedText.utf8), options: []) as? [String: Any] ?? [:]
+            
+            // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("event"),
                 object: nil,
                 userInfo: ["value": "Received decrypted message: \(json)"])
             
-            Logging.log("mmsdk| Received decrypted message: \(json)")
+            Logging.log("mmsdk| Received message: \(json)")
         } catch {
             Logging.error(error)
             return
@@ -223,7 +235,6 @@ private extension Connection {
                     id: id,
                     data: data)
             } else {
-                Logging.log("mmsdk| Received ethereum event: \(data)")
                 Ethereum.shared.receiveEvent(data)
             }
         }
@@ -266,6 +277,7 @@ extension Connection {
             return
         }
         
+        // for debug purposes only
         NotificationCenter.default.post(
             name: NSNotification.Name("event"),
             object: nil,

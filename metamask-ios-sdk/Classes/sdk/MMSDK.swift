@@ -1,5 +1,5 @@
 //
-//  Transport.swift
+//  MMSDK.swift
 //  
 //
 //  Created by Mpendulo Ndlovu on 2022/11/01.
@@ -7,20 +7,21 @@
 
 import OSLog
 import Foundation
+import Combine
 
-class Transport {
+class MMSDK {
     
     private var connection = Connection(channelId: UUID().uuidString.lowercased())
     
-    var url: String? {
+    var dappUrl: String? {
         didSet {
-            connection.url = url
+            connection.url = dappUrl
         }
     }
     
-    var name: String? {
+    var dappName: String? {
         didSet {
-            connection.name = name
+            connection.name = dappName
         }
     }
     

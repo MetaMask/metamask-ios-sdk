@@ -1,9 +1,48 @@
-# metamask-ios-sdk
+# MetaMask iOS SDK
+MetaMask iOS SDK is a library that enables developers to run decentralised applications (Dapps) as native iOS applications.
 
-[![CI Status](https://img.shields.io/travis/Mpendulo Ndlovu/metamask-ios-sdk.svg?style=flat)](https://travis-ci.org/Mpendulo Ndlovu/metamask-ios-sdk)
-[![Version](https://img.shields.io/cocoapods/v/metamask-ios-sdk.svg?style=flat)](https://cocoapods.org/pods/metamask-ios-sdk)
-[![License](https://img.shields.io/cocoapods/l/metamask-ios-sdk.svg?style=flat)](https://cocoapods.org/pods/metamask-ios-sdk)
-[![Platform](https://img.shields.io/cocoapods/p/metamask-ios-sdk.svg?style=flat)](https://cocoapods.org/pods/metamask-ios-sdk)
+## How it works
+You can import the MetaMask iOS SDK into your iOS application to enable users to easily connect with their MetaMask Mobile wallet.
+
+### 1. Install
+Add MetaMask iOS SDK as a cocoapods dependency to your project 
+```
+  pod 'metamask-ios-sdk'
+```
+### 2. Import the SDK
+```
+import metamask_ios_sdk
+```
+
+### 3. Connect your Dapp
+```
+@ObservedObject var ethereum = Ethereum.shared
+let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
+
+// This is the same as calling "eth_requestAccounts"
+ethereum.connect(dappMetaData)
+```
+### 4. You can now call any ethereum provider method
+#### 4.1 Get `eth_chainId`
+let chainIdRequest = EthereumRequest(method: .ethChainId)
+ethereum.request(chainIdRequest)
+
+#### 4.2 Send Transaction
+```
+// Create a transaction
+let transaction = Transaction(
+    to: "0x...",
+    from: ethereum.selectedAddress,
+    value: "0x...")
+    
+// Create transaction request
+let transactionRequest = EthereumRequest(
+    method: .sendTransaction,
+    params: [transaction])
+
+// Make send transaction request
+ethereum.request(transactionRequest)    
+```
 
 ## Example
 
