@@ -59,12 +59,11 @@ struct ClientEvent {
 class ConnectionClient {
     static let shared = ConnectionClient()
     
-    let connectionUrl = "https://metamask-sdk-socket.metafi.codefi.network/"
     let socket: SocketIOClient
     private let socketManager: SocketManager
     
     private init() {
-        let url = URL(string: connectionUrl)!
+        let url = URL(string: Endpoint.SOCKET_IO_SERVER)!
         let options: SocketIOClientOption = .extraHeaders(
             [
                 "User-Agent": "SocketIOClient"

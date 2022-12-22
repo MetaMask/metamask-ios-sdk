@@ -6,9 +6,22 @@ import OSLog
 import Foundation
 import Combine
 
-class MMSDK {
+public class MMSDK {
+    private let connection: Connection
     
-    private var connection = Connection(channelId: UUID().uuidString.lowercased())
+    /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
+    /// - Parameter debug: Flag indicating whether the SDK may track events or not
+    public convenience init(debug: Bool = true) {
+        self.init(
+            channelId: UUID().uuidString.lowercased(),
+            tracker: debug ? Analytics.debug : Analytics.release)
+    }
+    
+    init(channelId: String, tracker: Tracking) {
+        self.connection = Connection(
+            channelId: channelId,
+            tracker: tracker)
+    }
     
     var dappUrl: String? {
         didSet {
