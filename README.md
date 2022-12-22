@@ -14,9 +14,7 @@ Please note that the SDK currently supports the following architectures
 - `aarch64-apple-ios` (iOS devices) and 
 - `x86_64-apple-ios` (Intel Mac-based simulators)
 
-We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators) because of an architecture support limitation we have on the cryto module we use. 
-
-However, you should be able run iton an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to /Applications, right click on Xcode -> Get Info -> check the option "Open using Rosetta". This effectively runs Xcode in Intel mode.
+We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators). However, you should be able run iton an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to /Applications, right click on Xcode -> Get Info -> check the option "Open using Rosetta". This effectively runs Xcode in Intel mode.
 ### 2. Import the SDK
 ```
 import metamask_ios_sdk
@@ -31,7 +29,7 @@ let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
 ethereum.connect(dappMetaData)
 ```
 ### 4. You can now call any ethereum provider method
-We use Combine to publish ethereum events, so you need to have a cancellables set. You can also declare an ethereum object if you prefer.
+We use Combine to publish ethereum events, so you'll need an `AnyCancellable` storage.
 ```
 @ObservedObject var ethereum: Ethereum = Ethereum.shared
 @State private var cancellables: Set<AnyCancellable> = []
