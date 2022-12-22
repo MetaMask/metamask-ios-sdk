@@ -9,6 +9,7 @@ import Combine
 
 class Connection {
 
+    private let tracker: Tracking
     private var keyExchange = KeyExchange()
     private let connectionClient = ConnectionClient.shared
     
@@ -26,8 +27,9 @@ class Connection {
         "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.pubkey
     }
     
-    init(channelId: String) {
+    init(channelId: String, tracker: Tracking) {
         self.channelId = channelId
+        self.tracker = tracker
         
         handleReceiveMessages(on: channelId)
         handleConnection(on: channelId)
@@ -35,6 +37,19 @@ class Connection {
     }
     
     func connect(on channelId: String? = nil) {
+        Task {
+            await self.tracker.trackEvent(
+                .connectionRequest,
+                parameters: [
+                    "id": self.channelId ?? "",
+                    "commLayer": "socket",
+                    "sdkVersion": "0.1.0",
+                    "url": url ?? "",
+                    "title": name ?? "",
+                    "platform": "iOS"
+                ])
+        }
+        
         if let channel = channelId {
             keyExchange = KeyExchange()
             handleReceiveMessages(on: channel)
@@ -64,6 +79,14 @@ private extension Connection {
         connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| Clients connected: \(data)")
+            
+            Task {
+                await self.tracker.trackEvent(
+                    .connected,
+                    parameters: [
+                        "id": channelId,
+                    ])
+            }
             
             // for debug purposes only
             NotificationCenter.default.post(
@@ -119,6 +142,14 @@ private extension Connection {
         connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| SDK disconnected: \(data)")
+            
+            Task {
+                await self.tracker.trackEvent(
+                    .disconnected,
+                    parameters: [
+                        "id": self.channelId ?? "",
+                    ])
+            }
             
             // for debug purposes only
             NotificationCenter.default.post(

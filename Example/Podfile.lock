@@ -19,7 +19,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  metamask-ios-sdk: 6a47d6c6778a7613d416779bacafd1819e0f1ad2
+  metamask-ios-sdk: 86e7d173c619ef1bda3dac509cf425a77a699b67
   Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
 

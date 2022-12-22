@@ -5,10 +5,6 @@
   "swift_versions": "5.0",
   "description": "An SDK that enables native iOS apps to interact with the Ethereum blockchain via the MetaMask wallet.",
   "homepage": "github.com/MetaMask/metamask-ios-sdk",
-  "license": {
-    "type": "MIT",
-    "file": "LICENSE"
-  },
   "authors": {
     "Mpendulo Ndlovu": "mpendulo@elefantel.com"
   },

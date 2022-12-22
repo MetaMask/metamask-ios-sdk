@@ -5,27 +5,18 @@
 import Foundation
 import Combine
 
-public enum EthereumError: Error {
-    case notConnected
-    case requestError(String)
-    
-    public var localizedDescription: String {
-        switch self {
-        case .notConnected: return "Wait until MetaMask is connected"
-        case .requestError(let error): return error
-        }
-    }
-}
-
 public typealias EthereumPublisher = AnyPublisher<String, EthereumError>
+
 public class Ethereum: ObservableObject {
     public static let shared = Ethereum()
+    
+    private let AUTHORIZATION_ERROR_CODE = 4001
+    private let CONNECTION_ID = "connection-id"
     
     @Published public var chainId: String?
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
     
-    private var connectionId = "connection-id"
     private var sdk = MMSDK()
     private var dappMetadata: DappMetadata!
     private var submittedRequests: [String: SubmittedRequest] = [:]
@@ -97,7 +88,7 @@ extension Ethereum {
         
         sendRequest(
             EthereumRequest(method: .requestAccounts),
-            id: connectionId,
+            id: CONNECTION_ID,
             openDeeplink: false)
     }
     
@@ -111,8 +102,9 @@ extension Ethereum {
             sdk.connect()
 
             let submittedRequest = SubmittedRequest(method: .requestAccounts)
-            submittedRequests[connectionId] = submittedRequest
-            publisher = submittedRequests[connectionId]?.publisher
+            submittedRequests[CONNECTION_ID] = submittedRequest
+            publisher = submittedRequests[CONNECTION_ID]?.publisher
+            
             sdk.onClientsReady = requestAccounts
         } else if !connected {
             Logging.error(EthereumError.notConnected)
@@ -150,8 +142,8 @@ extension Ethereum {
             
             if let message = error["message"] as? String {
                 submittedRequests[id]?.error(EthereumError.requestError(message))
-            } else if code == 4001 {
-                submittedRequests[id]?.error(EthereumError.requestError("User rejected the request."))
+            } else if code == AUTHORIZATION_ERROR_CODE {
+                submittedRequests[id]?.error(EthereumError.requestError("User rejected the request"))
             } else {
                 submittedRequests[id]?.error(EthereumError.requestError("Request failed with error code \(code)"))
             }
@@ -220,6 +212,7 @@ extension Ethereum {
             }
         case .metaMaskChainChanged:
             let params: [String: Any] = event["params"] as? [String: Any] ?? [:]
+            
             if let chainId = params["chainId"] as? String {
                 updateChainId(chainId)
             }
