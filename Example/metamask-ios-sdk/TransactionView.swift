@@ -60,7 +60,7 @@ struct TransactionView: View {
                 Button {
                     sendTransaction()
                 } label: {
-                    Text("Send Transaction")
+                    Text("Send")
                         .frame(maxWidth: .infinity, maxHeight: 32)
                 }
                 .alert(isPresented: $showError) {

@@ -63,11 +63,11 @@ struct ConnectView: View {
                 if !ethereum.selectedAddress.isEmpty {
                     Section {
                         Group {
-                            NavigationLink("Sign Transaction") {
+                            NavigationLink("Sign") {
                                 SignView()
                             }
                             
-                            NavigationLink("Send Transaction") {
+                            NavigationLink("Transact") {
                                 TransactionView()
                             }
                         }
