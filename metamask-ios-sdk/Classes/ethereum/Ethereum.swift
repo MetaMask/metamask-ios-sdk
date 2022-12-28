@@ -8,17 +8,15 @@ import Combine
 public typealias EthereumPublisher = AnyPublisher<String, EthereumError>
 
 public class Ethereum: ObservableObject {
-    public static let shared = Ethereum()
     
     private let AUTHORIZATION_ERROR_CODE = 4001
     private let CONNECTION_ID = "connection-id"
     
+    weak var delegate: SDKDelegate?
     @Published public var chainId: String?
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
     
-    private var sdk = MMSDK()
-    private var dappMetadata: DappMetadata!
     private var submittedRequests: [String: SubmittedRequest] = [:]
 }
 
@@ -34,13 +32,12 @@ extension Ethereum {
     }
     
     @discardableResult
-    public func connect(_ metaData: DappMetadata) -> EthereumPublisher? {
-        dappMetadata = metaData
+    public func connect(_ dapp: Dapp) -> EthereumPublisher? {
+        delegate?.dapp = dapp
         
         let accountsRequest = EthereumRequest(
             id: nil,
             method: .requestAccounts)
-        Logging.log("mmsdk| Connecting dapp \(dappMetadata.name) to ethereum")
         
         return request(accountsRequest)
     }
@@ -71,7 +68,7 @@ extension Ethereum {
                                      openDeeplink: Bool) {
         var request = request
         request.id = id
-        sdk.sendMessage(request, encrypt: true)
+        delegate?.sendMessage(request, encrypt: true)
             
         if
             openDeeplink,
@@ -97,15 +94,13 @@ extension Ethereum {
         var publisher: EthereumPublisher?
         
         if request.method == .requestAccounts && !connected {
-            sdk.dappUrl = dappMetadata.url
-            sdk.dappName = dappMetadata.name
-            sdk.connect()
+            delegate?.connect()
 
             let submittedRequest = SubmittedRequest(method: .requestAccounts)
             submittedRequests[CONNECTION_ID] = submittedRequest
             publisher = submittedRequests[CONNECTION_ID]?.publisher
             
-            sdk.onClientsReady = requestAccounts
+            delegate?.onClientsReady = requestAccounts
         } else if !connected {
             Logging.error(EthereumError.notConnected)
         } else {
@@ -183,13 +178,13 @@ extension Ethereum {
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
-                Logging.error("mmsdk| Sign signature v4 failure")
+                Logging.error("mmsdk| Signature v4 failure")
             }
         case .sendTransaction:
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
-                Logging.error("mmsdk| Send transaction failure")
+                Logging.error("mmsdk| Transaction failure")
             }
         default:
             Logging.log("mmsdk| Unhandled result")

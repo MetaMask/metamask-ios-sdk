@@ -2,58 +2,72 @@
 //  MMSDK.swift
 //
 
-import OSLog
-import Foundation
+import SwiftUI
 import Combine
 
-public class MMSDK {
-    private let connection: Connection
+protocol SDKDelegate: AnyObject {
+    var dapp: Dapp? { get set }
+    var onClientsReady: (() -> Void)? { get set }
+    
+    func connect()
+    func disconnect()
+    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
+}
+
+public class MMSDK: SDKDelegate {
+    public static let shared = MMSDK()
     
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
-    /// - Parameter debug: Flag indicating whether the SDK may track events or not
-    public convenience init(debug: Bool = true) {
-        self.init(
-            channelId: UUID().uuidString.lowercased(),
-            tracker: debug ? Analytics.debug : Analytics.release)
-    }
-    
-    init(channelId: String, tracker: Tracking) {
-        self.connection = Connection(
-            channelId: channelId,
-            tracker: tracker)
-    }
-    
-    var dappUrl: String? {
+    var enableDebug: Bool = true {
         didSet {
-            connection.url = dappUrl
+            client.enableTracking(enableDebug)
         }
     }
     
-    var dappName: String? {
+    @ObservedObject public var ethereum = Ethereum()
+    
+    private var client: CommunicationClient!
+    
+    var isConnected: Bool {
+        client.isConnected
+    }
+    
+    var dapp: Dapp? {
         didSet {
-            connection.name = dappName
+            client.dapp = dapp
         }
     }
     
     var onClientsReady: (() -> Void)? {
         didSet {
-            connection.onClientsReady = onClientsReady
+            client.onClientsReady = onClientsReady
         }
     }
     
-    var isConnected: Bool {
-        connection.connected
+    private init(tracker: Tracking = Analytics(debug: true)) {
+        self.client = SocketClient(tracker: tracker)
+        
+        ethereum.delegate = self
+        setupClientCommunication()
     }
     
+    func setupClientCommunication() {
+        client.receiveEvent = ethereum.receiveEvent
+        client.tearDownConnection = ethereum.disconnect
+        client.receiveResponse = ethereum.receiveResponse
+    }
+}
+
+extension MMSDK {
     func connect() {
-        connection.connect()
+        client.connect()
     }
     
     func disconnect() {
-        connection.disconnect()
+        client.disconnect()
     }
     
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
-        connection.sendMessage(message, encrypt: encrypt)
+        client.sendMessage(message, encrypt: encrypt)
     }
 }

@@ -4,15 +4,21 @@
 
 import Foundation
 
-public protocol Tracking {
+protocol Tracking {
+    var enableDebug: Bool { get set }
     func trackEvent(_ event: Event, parameters: [String: Any]) async
 }
 
-public class Analytics: Tracking {
+class Analytics: Tracking {
     private let network: Network
-    private let debug: Bool
+    private var debug: Bool!
     
-    public convenience init(debug: Bool = true) {
+    var enableDebug: Bool {
+        get { debug }
+        set { debug = newValue }
+    }
+    
+    convenience init(debug: Bool) {
         self.init(network: Network(), debug: debug)
     }
     
@@ -21,20 +27,15 @@ public class Analytics: Tracking {
         self.network = network
     }
     
-    public func trackEvent(_ event: Event, parameters: [String: Any]) async {
+    func trackEvent(_ event: Event, parameters: [String: Any]) async {
         if !debug { return }
         
         var params = parameters
-        params["event"] = event.rawValue
+        params["event"] = event.name
         do {
             try await network.post(params, endpoint: .analytics)
         } catch {
-            Logging.error(error.localizedDescription)
+            Logging.error("mmsdk| Error: \(error.localizedDescription)")
         }
     }
-}
-
-public extension Analytics {
-    static let debug: Tracking = Analytics(debug: true)
-    static let release: Tracking = Analytics(debug: false)
 }

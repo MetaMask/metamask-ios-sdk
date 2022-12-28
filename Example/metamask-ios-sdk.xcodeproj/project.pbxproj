@@ -235,8 +235,9 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 6TKEXNX4L5;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -521,8 +522,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6TKEXNX4L5;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "metamask-ios-sdk/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -543,8 +544,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6TKEXNX4L5;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "metamask-ios-sdk/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

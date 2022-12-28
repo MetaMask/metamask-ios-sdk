@@ -32,6 +32,7 @@ class Network: Networking {
         
         let (data, _) = try await URLSession.shared.data(for: request)
         
+        // (TODO): remove debugging
         let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
         print("JSON response: \(json)")
     }
