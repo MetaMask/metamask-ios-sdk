@@ -1,5 +1,5 @@
 //
-//  Connection.swift
+//  SocketClient.swift
 //
 
 import OSLog
@@ -7,86 +7,95 @@ import SocketIO
 import Foundation
 import Combine
 
-class Connection {
+protocol CommunicationClient: AnyObject {
+    var clientName: String { get }
+    var dapp: Dapp? { get set }
+    var isConnected: Bool { get set }
+    
+    var onClientsReady: (() -> Void)? { get set }
+    var tearDownConnection: (() -> Void)? { get set }
+    var receiveEvent: (([String: Any]) -> Void)? { get set }
+    var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
+    
+    func connect()
+    func disconnect()
+    func enableTracking(_ enable: Bool)
+    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
+}
 
-    private let tracker: Tracking
+class SocketClient: CommunicationClient {
+    var dapp: Dapp?
+    private var tracker: Tracking
     private var keyExchange = KeyExchange()
-    private let connectionClient = ConnectionClient.shared
+    private let channel = SocketChannel()
     
+    private var channelId: String = UUID().uuidString.lowercased()
     private var connectionPaused: Bool = false
-    private var channelId: String!
     
-    var url: String?
-    var name: String?
-    
-    var connected: Bool = false
-    var onClientsReady: (() -> Void)?
-    var onClientsDisconnected: (() -> Void)?
-    
-    var deeplinkUrl: String {
-        "https://metamask.app.link/connect?channelId=" + channelId + "&comm=socket" + "&pubkey=" + keyExchange.pubkey
+    var clientName: String {
+        "socket"
     }
     
-    init(channelId: String, tracker: Tracking) {
-        self.channelId = channelId
+    var isConnected: Bool = false
+    var onClientsReady: (() -> Void)?
+    var tearDownConnection: (() -> Void)?
+    var onClientsDisconnected: (() -> Void)?
+    
+    var receiveEvent: (([String: Any]) -> Void)?
+    var receiveResponse: ((String, [String: Any]) -> Void)?
+    
+    var deeplinkUrl: String {
+        "https://metamask.app.link/connect?channelId="
+        + channelId
+        + "&comm=socket"
+        + "&pubkey="
+        + keyExchange.pubkey
+    }
+    
+    init(tracker: Tracking) {
         self.tracker = tracker
-        
-        handleReceiveMessages(on: channelId)
-        handleConnection(on: channelId)
+        setupClient()
+    }
+    
+    private func setupClient() {
+        handleReceiveMessages()
+        handleConnection()
         handleDisconnection()
     }
     
-    func connect(on channelId: String? = nil) {
-        Task {
-            await self.tracker.trackEvent(
-                .connectionRequest,
-                parameters: [
-                    "id": self.channelId ?? "",
-                    "commLayer": "socket",
-                    "sdkVersion": "0.1.0",
-                    "url": url ?? "",
-                    "title": name ?? "",
-                    "platform": "iOS"
-                ])
-        }
-        
-        if let channel = channelId {
-            keyExchange = KeyExchange()
-            handleReceiveMessages(on: channel)
-            handleConnection(on: channel)
-        }
-        connectionClient.connect()
+    private func resetClient() {
+        isConnected = false
+        keyExchange.restart()
+        tearDownConnection?()
+    }
+    
+    func connect() {
+        trackEvent(.connectionRequest)
+        channel.connect()
     }
     
     func disconnect() {
-        channelId = ""
-        connected = false
-        keyExchange.keysExchanged = false
-        connectionClient.disconnect()
+        isConnected = false
+        channel.disconnect()
     }
 }
 
 // MARK: Event handling
-private extension Connection {
-    func handleConnection(on channelId: String) {
+private extension SocketClient {
+    func handleConnection() {
+        let channelId = channelId
         
         // MARK: Connection error event
-        connectionClient.on(clientEvent: .error) { data in
+        channel.on(clientEvent: .error) { data in
             Logging.error("mmsdk| Client connection error: \(data)")
         }
         
         // MARK: Clients connected event
-        connectionClient.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| Clients connected: \(data)")
             
-            Task {
-                await self.tracker.trackEvent(
-                    .connected,
-                    parameters: [
-                        "id": channelId,
-                    ])
-            }
+            self.trackEvent(.connected)
             
             // for debug purposes only
             NotificationCenter.default.post(
@@ -94,14 +103,14 @@ private extension Connection {
                 object: nil,
                 userInfo: ["value": "Clients Connected"])
             
-            self.connected = true
-            
-            let keyExchangeSync = self.keyExchange.message(type: .syn)
-            self.sendMessage(keyExchangeSync, encrypt: false)
+            if !self.keyExchange.keysExchanged {
+                let keyExchangeSync = self.keyExchange.message(type: .syn)
+                self.sendMessage(keyExchangeSync, encrypt: false)
+            }
         }
         
         // MARK: Socket connected event
-        connectionClient.on(clientEvent: .connect) { [weak self] data in
+        channel.on(clientEvent: .connect) { [weak self] data in
             guard let self = self else { return }
             
             // for debug purposes only
@@ -110,25 +119,26 @@ private extension Connection {
                 object: nil,
                 userInfo: ["value": "Connected to Socket"])
             
-            Logging.log("mmsdk| SDK connected: \(data)")
+            Logging.log("mmsdk| SDK connected to socket")
             
-            self.connectionClient.emit(ClientEvent.joinChannel, channelId)
+            self.channel.emit(ClientEvent.joinChannel, channelId)
             
-            if !self.connected {
+            if !self.isConnected {
                 self.deeplinkToMetaMask()
             }
         }
     }
     
-    func handleReceiveMessages(on channelId: String) {
-        // MARK: New message received
-        connectionClient.on(ClientEvent.message(on: channelId)) { [weak self] data in
+    // MARK: New message event
+    func handleReceiveMessages() {
+        channel.on(ClientEvent.message(on: channelId)) { [weak self] data in
             guard
                 let self = self,
                 let message = data.first as? [String: Any]
             else { return }
 
             if !self.keyExchange.keysExchanged {
+                // Exchange keys
                 self.handleReceiveKeyExchange(message)
             } else {
                 // Decrypt message
@@ -137,19 +147,13 @@ private extension Connection {
         }
     }
     
+    // MARK: Socket disconnected event
     func handleDisconnection() {
-        // MARK: Socket disconnected event
-        connectionClient.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
+        channel.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
-            Logging.log("mmsdk| SDK disconnected: \(data)")
+            Logging.log("mmsdk| SDK disconnected")
             
-            Task {
-                await self.tracker.trackEvent(
-                    .disconnected,
-                    parameters: [
-                        "id": self.channelId ?? "",
-                    ])
-            }
+            self.trackEvent(.disconnected)
             
             // for debug purposes only
             NotificationCenter.default.post(
@@ -158,47 +162,37 @@ private extension Connection {
                 userInfo: ["value": "Clients Disconnected"])
             
             if !self.connectionPaused {
-                self.connected = false
-                self.keyExchange.keysExchanged = false
-                self.channelId = ""
-                Ethereum.shared.disconnect()
+                self.resetClient()
             }
         }
     }
 }
 
 // MARK: Message handling
-private extension Connection {
+private extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
-        guard let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message) else {
-            return
-        }
-        
-        guard let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) else {
-            return
-        }
+        guard
+            let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
+            let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
+        else { return }
 
         sendMessage(nextKeyExchangeMessage, encrypt: false)
+        
         if keyExchange.keysExchanged {
             sendOriginatorInfo()
         }
     }
     
     func handleMessage(_ message: [String: Any]) {
-        if connectionPaused {
-            if
-                let message = message["message"] as? [String: Any],
-                let type = message["type"] as? String,
-                let keyExchangeType = KeyExchangeType(rawValue: type),
-                keyExchangeType == .start {
-                keyExchange.keysExchanged = false
-                connectionPaused = false
-                connected = false
-                
-                let keyExchangeSync = keyExchange.message(type: .syn)
-                sendMessage(keyExchangeSync, encrypt: false)
-                return
-            }
+        if
+            connectionPaused,
+            let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
+            let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
+            
+            keyExchange.restart()
+            isConnected = false
+            sendMessage(nextKeyExchangeMessage, encrypt: false)
+            return
         }
         
         guard let message = Message<String>.message(from: message) else { return }
@@ -207,42 +201,44 @@ private extension Connection {
         do {
             decryptedText = try keyExchange.decryptMessage(message.message)
         } catch {
-            Logging.error(error)
+            Logging.error("mmsdk| Error: \(error.localizedDescription)")
             return
         }
         
         do {
-            let json: [String: Any] = try JSONSerialization.jsonObject(with: Data(decryptedText.utf8), options: []) as? [String: Any] ?? [:]
+            let json: [String: Any] = try JSONSerialization.jsonObject(
+                with: Data(decryptedText.utf8),
+                options: [])
+            as? [String: Any] ?? [:]
             
             if json["type"] as? String == "pause" {
                 Logging.log("mmsdk| Connection has been paused")
                 connectionPaused = true
             } else if json["type"] as? String == "ready" {
                 Logging.log("mmsdk| Connection is ready")
+                trackEvent(.connected)
                 connectionPaused = false
                 onClientsReady?()
             } else if json["type"] as? String == "wallet_info" {
                 Logging.log("mmsdk| Received wallet info")
-                connected = true
+                isConnected = true
                 onClientsReady?()
                 connectionPaused = false
             } else if let data = json["data"] as? [String: Any] {
                 if let id = data["id"] as? String {
-                    Ethereum.shared.receiveResponse(
-                        id: id,
-                        data: data)
+                    receiveResponse?(id, data)
                 } else {
-                    Ethereum.shared.receiveEvent(data)
+                    receiveEvent?(data)
                 }
             }
         } catch {
-            Logging.error(error)
+            Logging.error("mmsdk| Error: \(error.localizedDescription)")
         }
     }
 }
 
 // MARK: Helper methods
-extension Connection {
+extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -256,11 +252,11 @@ extension Connection {
 }
 
 // MARK: Message sending
-extension Connection {
+extension SocketClient {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
-            title: name,
-            url: url)
+            title: dapp?.name,
+            url: dapp?.url)
         
         let requestInfo = RequestInfo(
             type: "originator_info",
@@ -285,20 +281,52 @@ extension Connection {
                     Logging.log("mmsdk| Will send once wallet is open again")
                     onClientsReady = { [weak self] in
                         Logging.log("mmsdk| Sending now")
-                        self?.connectionClient.emit(ClientEvent.message, message)
+                        self?.channel.emit(ClientEvent.message, message)
                     }
                 } else {
-                    connectionClient.emit(ClientEvent.message, message)
+                    channel.emit(ClientEvent.message, message)
                 }
             } catch {
-                Logging.error(error)
+                Logging.error("mmsdk| Error: \(error.localizedDescription)")
             }
         } else {
             let message = Message(
                 id: channelId,
                 message: message)
             
-            connectionClient.emit(ClientEvent.message, message)
+            channel.emit(ClientEvent.message, message)
         }
+    }
+}
+
+// MARK: Analytics
+extension SocketClient {
+    func trackEvent(_ event: Event) {
+        let id = channelId
+        var parameters: [String: Any] = ["id": id]
+        
+        switch event {
+        case .connected, .disconnected:
+            break
+        case .connectionRequest:
+            let additionalParams: [String: Any] = [
+                "commLayer": "socket",
+                "sdkVersion": SDKInfo.version,
+                "url": dapp?.url ?? "",
+                "title": dapp?.name ?? "",
+                "platform": UIDevice.current.systemName
+            ]
+            parameters.merge(additionalParams) { (current, _) in current }
+        }
+        
+        Task { [parameters] in
+            await self.tracker.trackEvent(
+                event,
+                parameters: parameters)
+        }
+    }
+    
+    func enableTracking(_ enable: Bool) {
+        tracker.enableDebug = enable
     }
 }

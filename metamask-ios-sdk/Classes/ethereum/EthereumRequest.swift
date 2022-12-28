@@ -5,16 +5,6 @@
 import Foundation
 import Combine
 
-public struct DappMetadata {
-    public let name: String
-    public let url: String
-    
-    public init(name: String, url: String) {
-        self.name = name
-        self.url = url
-    }
-}
-
 public struct EthereumRequest<T: CodableData>: CodableData {
     public var id: String?
     public let method: EthereumMethod

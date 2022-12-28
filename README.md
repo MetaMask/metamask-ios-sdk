@@ -22,19 +22,27 @@ import metamask_ios_sdk
 
 ### 3. Connect your Dapp
 ```
-@ObservedObject var ethereum = Ethereum.shared
+@ObservedObject var ethereum = MMSDK.shared.ethereum
+
+// We log three events: connection request, connected, disconnected, otherwise no tracking. 
+// This helps us to monitor any SDK connection issues. 
+//  
+
 let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
 
 // This is the same as calling "eth_requestAccounts"
 ethereum.connect(dappMetaData)
 ```
+
+We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Otherwise no tracking. This helps us to monitor any SDK connection issues. If you wish to disable this, you can do so by setting `MMSDK.shared.enableDebug = false`.
+
+
 ### 4. You can now call any ethereum provider method
 We use Combine to publish ethereum events, so you'll need an `AnyCancellable` storage.
 ```
-@ObservedObject var ethereum: Ethereum = Ethereum.shared
 @State private var cancellables: Set<AnyCancellable> = []
 ```
-#### 4.1 Get `eth_chainId`
+#### Example 1: Get `eth_chainId`
 ```
 @State var chainID: String?
 
@@ -52,7 +60,7 @@ ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
 .store(in: &cancellables)  
 ```
 
-#### 4.2 Send transaction
+#### Example 2: Send transaction
 ```
 // Create a transaction
 let transaction = Transaction(
@@ -78,7 +86,7 @@ ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { co
 .store(in: &cancellables)  
 ```
 
-#### 4.2 Custom requests
+#### Example 3: Custom requests
 To create your own requests, you can use a primitive key-pair data type dictionary object or use a struct that conforms to `CodableData` i.e implementing the `func socketRepresentation() -> NetworkData` requirement, so that the type can be represented as a socket packet.
 ```
 let params: [String: String] = [
@@ -95,7 +103,7 @@ ethereum.request(request)
 ```
 OR
 ```
-public struct MyStruct: CodableData {
+public struct SendTransaction: CodableData {
     public var to: String
     public let from: String
     public var value: String
@@ -114,12 +122,18 @@ public struct MyStruct: CodableData {
         ]
     }
 }
-// Then use struct object as shown in 4.2 above
 ```
+Then use struct object as shown in [Example 2](#example-2-send-transaction) above
 
+## Examples
+We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests. There are three illustrated examples:
 
-## Example
-We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests.
+a) `ConnectView.swift` - How to connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
+
+b) `TransactionView.swift` - How to send a transaction
+
+c) `SignView.swift` - How to sign a transaction
+
 To run the example project, clone this repository, change directory to `metamask-ios-sdk/Example`, and then run `pod install` from the Example directory to install the SDK as a dependency on the project, and then open the `metamask-ios-sdk.xcworkspace`
 
 ## Requirements

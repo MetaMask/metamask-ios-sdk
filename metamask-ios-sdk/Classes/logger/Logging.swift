@@ -1,5 +1,5 @@
 //
-//  MetaMaskSDK.swift
+//  Logging.swift
 //
 
 import OSLog

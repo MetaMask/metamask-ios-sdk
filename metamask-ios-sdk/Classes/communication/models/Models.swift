@@ -15,7 +15,7 @@ struct OriginatorInfo: CodableData {
     let url: String?
     
     func socketRepresentation() -> NetworkData {
-        ["title": title, "url": url]
+        ["title": title ?? "", "url": url ?? ""]
     }
 }
 
@@ -36,7 +36,7 @@ struct Message<T: CodableData>: CodableData {
             let message = try JSONDecoder().decode(Message<T>.self, from: json)
             return message
         } catch {
-            Logging.error("mmsdk| Something went wrong: \(error.localizedDescription)")
+            Logging.error("mmsdk| Message \(message) could not be decoded: \(error.localizedDescription)")
         }
         return nil
     }

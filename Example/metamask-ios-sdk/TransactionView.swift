@@ -8,7 +8,7 @@ import Combine
 import metamask_ios_sdk
 
 struct TransactionView: View {
-    @ObservedObject var ethereum: Ethereum = Ethereum.shared
+    @ObservedObject var ethereum: Ethereum = MMSDK.shared.ethereum
     
     @State private var amount = "0x0"
     @State var result: String = ""
@@ -21,7 +21,7 @@ struct TransactionView: View {
         Form {
             Section {
                 Text("From")
-                    .font(.callout)
+                    .modifier(TextCallout())
                 TextEditor(text: $ethereum.selectedAddress)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
@@ -30,7 +30,7 @@ struct TransactionView: View {
             
             Section {
                 Text("To")
-                    .font(.callout)
+                    .modifier(TextCallout())
                 TextEditor(text: $to)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
@@ -40,7 +40,7 @@ struct TransactionView: View {
             
             Section {
                 Text("Amount")
-                    .font(.callout)
+                    .modifier(TextCallout())
                 TextEditor(text: $amount)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
@@ -49,7 +49,7 @@ struct TransactionView: View {
             
             Section {
                 Text("Result")
-                    .font(.callout)
+                    .modifier(TextCallout())
                 TextEditor(text: $result)
                     .modifier(TextCaption())
                     .frame(minHeight: 40)
@@ -61,6 +61,7 @@ struct TransactionView: View {
                     sendTransaction()
                 } label: {
                     Text("Send")
+                        .modifier(TextButton())
                         .frame(maxWidth: .infinity, maxHeight: 32)
                 }
                 .alert(isPresented: $showError) {

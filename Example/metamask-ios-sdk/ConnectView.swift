@@ -13,10 +13,10 @@ extension Notification.Name {
 }
 
 struct ConnectView: View {
-    @ObservedObject var ethereum = Ethereum.shared
+    @ObservedObject var ethereum = MMSDK.shared.ethereum
     @State private var cancellables: Set<AnyCancellable> = []
     
-    private let dappMetaData = DappMetadata(name: "Dub Dapp", url: "dubdapp.com")
+    private let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
     
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
@@ -33,29 +33,29 @@ struct ConnectView: View {
                     Group {
                         HStack {
                             Text("Status")
-                                .font(.callout)
                                 .bold()
+                                .modifier(TextCallout())
                             Spacer()
                             Text(status)
-                                .font(.caption)
+                                .modifier(TextCaption())
                         }
                         
                         HStack {
                             Text("Chain ID")
-                                .font(.callout)
                                 .bold()
+                                .modifier(TextCallout())
                             Spacer()
                             Text(ethereum.chainId ?? "")
-                                .font(.caption)
+                                .modifier(TextCaption())
                         }
                         
                         HStack {
                             Text("Account")
-                                .font(.callout)
                                 .bold()
+                                .modifier(TextCallout())
                             Spacer()
                             Text(ethereum.selectedAddress)
-                                .font(.caption)
+                                .modifier(TextCallout())
                         }
                     }
                 }
@@ -75,12 +75,12 @@ struct ConnectView: View {
                 }
                 
                 if ethereum.selectedAddress.isEmpty {
-                    Section(footer: Text("This will open the MetaMask app. Please sign in and accept the connection prompt.")) {
+                    Section(footer: Text("This will open the MetaMask app. Please sign in and accept the connection prompt.").modifier(TextCallout())) {
                         ZStack {
                             Button {
                                 showProgressView = true
                                 
-                                ethereum.connect(dappMetaData)?.sink(receiveCompletion: { completion in
+                                ethereum.connect(dapp)?.sink(receiveCompletion: { completion in
                                     switch completion {
                                     case .failure(let error):
                                         errorMessage = error.localizedDescription
@@ -95,7 +95,7 @@ struct ConnectView: View {
                                 Text("Connect to MetaMask")
                                     .frame(maxWidth: .infinity, maxHeight: 32)
                             }
-                            .font(.title3)
+                            .modifier(TextButton())
                             .foregroundColor(.white)
                             .padding(.vertical, 10)
                             .background(Color.blue.grayscale(0.5))
@@ -103,7 +103,7 @@ struct ConnectView: View {
                             
                             if showProgressView && !ethereum.connected {
                                 ProgressView()
-                                    .scaleEffect(2.0, anchor: .center)
+                                    .scaleEffect(1.5, anchor: .center)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
                             }
                         }

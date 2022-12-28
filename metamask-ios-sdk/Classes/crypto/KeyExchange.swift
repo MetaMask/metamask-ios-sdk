@@ -6,7 +6,6 @@ import Foundation
 import SocketIO
 
 public enum KeyExchangeType: String, Codable {
-    case none = "none"
     case start = "key_handshake_start"
     case ack = "key_handshake_ACK"
     case syn = "key_handshake_SYN"
@@ -16,13 +15,12 @@ public enum KeyExchangeType: String, Codable {
         let container = try decoder.singleValueContainer()
         let status = try? container.decode(String.self)
         switch status {
-            case "none": self = .none
             case "key_handshake_start": self = .start
             case "key_handshake_ACK": self = .ack
             case "key_handshake_SYN": self = .syn
             case "key_handshake_SYNACK": self = .synack
             default:
-                self = .none
+                self = .ack
           }
       }
 }
@@ -49,6 +47,7 @@ public struct KeyExchangeMessage: CodableData {
 
 public class KeyExchange {
     private let privateKey: String
+    
     public let pubkey: String
     public private(set) var theirPublicKey: String?
     
@@ -61,36 +60,34 @@ public class KeyExchange {
         self.pubkey = encyption.publicKey(from: privateKey)
     }
     
+    func restart() {
+        keysExchanged = false
+    }
+    
     func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
-        switch message.type {
-        case .syn:
-            if let publicKey = message.pubkey {
-                setTheirPublicKey(publicKey)
-            }
-            
-            return KeyExchangeMessage(
-                type: .synack,
-                pubkey: pubkey)
-            
-        case .synack:
-            
-            if let publicKey = message.pubkey {
-                setTheirPublicKey(publicKey)
-            }
-            
+        if message.type == .synack || message.type == .ack {
             keysExchanged = true
-
-            return KeyExchangeMessage(
-                type: .ack,
-                pubkey: pubkey)
-            
-        case .ack:
-            keysExchanged = true
+        }
+        
+        if let publicKey = message.pubkey {
+            setTheirPublicKey(publicKey)
+        }
+        
+        guard let nextStep = nextStep(message.type) else {
             return nil
-            
-        default:
-            Logging.error("mmsdk| Unknown key exchange")
-            return nil
+        }
+        
+        return KeyExchangeMessage(
+            type: nextStep,
+            pubkey: pubkey)
+    }
+    
+    func nextStep(_ step: KeyExchangeType) -> KeyExchangeType? {
+        switch step {
+        case .start: return .syn
+        case .syn: return .synack
+        case .synack: return .ack
+        case .ack: return nil
         }
     }
     
