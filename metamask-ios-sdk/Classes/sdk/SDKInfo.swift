@@ -5,7 +5,7 @@
 import Foundation
 
 struct SDKInfo {
-    /// Bundle with access to the SDK's bundle directory
+    /// Bundle SDK's plist
     static var sdkBundle: [String: Any] {
         Bundle(for: MMSDK.self).infoDictionary ?? [:]
     }
