@@ -5,16 +5,30 @@ MetaMask iOS SDK is a library that enables developers to run decentralised appli
 You can import the MetaMask iOS SDK into your iOS application to enable users to easily connect with their MetaMask Mobile wallet.
 
 ### 1. Install
-Add MetaMask iOS SDK as a cocoapods dependency to your project 
+
+#### Cocoapods
+To add MetaMask iOS SDK as a cocoapods dependency to your project, add this entry in your Podfile: 
 ```
   pod 'metamask-ios-sdk'
+```
+And then run:
+```
+pod install
+```
+#### Swift Package Manager
+To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `File -> Swift Packages -> Add Package Dependency`.
+
+And then enter this repository's url, i.e https://github.com/MetaMask/metamask-ios-sdk. Now you can import the SDK:
+```
+import metamask_ios_sdk
 ```
 #### Note
 Please note that the SDK currently supports the following architectures 
 - `aarch64-apple-ios` (iOS devices) and 
 - `x86_64-apple-ios` (Intel Mac-based simulators)
 
-We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators). However, you should be able run iton an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to /Applications, right click on Xcode -> Get Info -> check the option "Open using Rosetta". This effectively runs Xcode in Intel mode.
+We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators). However, you should be able run it on an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to the location `/Applications/`, right click on `Xcode -> Get Info -> check the option "Open using Rosetta"`. This effectively runs Xcode in Intel mode.
+
 ### 2. Import the SDK
 ```
 import metamask_ios_sdk
@@ -90,9 +104,9 @@ ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { co
 To create your own requests, you can use a primitive key-pair data type dictionary object or use a struct that conforms to `CodableData` i.e implementing the `func socketRepresentation() -> NetworkData` requirement, so that the type can be represented as a socket packet.
 ```
 let params: [String: String] = [
-    "to": "0x...",
-    "from": "ethereum.selectedAddress",
-    "value": "0x..."
+    "to": "0x...", // receiver address
+    "from": ethereum.selectedAddress, // or any sender address
+    "value": "0x..." // amount
   ]
   
 let request = EthereumRequest(

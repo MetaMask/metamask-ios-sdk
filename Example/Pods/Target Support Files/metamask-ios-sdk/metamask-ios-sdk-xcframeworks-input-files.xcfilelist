@@ -1,2 +1,2 @@
 ${PODS_ROOT}/Target Support Files/metamask-ios-sdk/metamask-ios-sdk-xcframeworks.sh
-${PODS_ROOT}/../../metamask-ios-sdk/Frameworks/Ecies.xcframework
+${PODS_ROOT}/../../Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework

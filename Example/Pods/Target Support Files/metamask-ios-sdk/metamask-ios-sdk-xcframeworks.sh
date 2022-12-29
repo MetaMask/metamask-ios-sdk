@@ -117,5 +117,5 @@ install_xcframework() {
   echo "Copied $source to $destination"
 }
 
-install_xcframework "${PODS_ROOT}/../../metamask-ios-sdk/Frameworks/Ecies.xcframework" "metamask-ios-sdk" "library" "ios-arm64" "ios-x86_64-simulator"
+install_xcframework "${PODS_ROOT}/../../Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework" "metamask-ios-sdk" "library" "ios-arm64" "ios-x86_64-simulator"
 

@@ -29,11 +29,11 @@ An SDK that enables native iOS apps to interact with the Ethereum blockchain via
 
   s.ios.deployment_target = '14.0'
 
-  s.source_files = 'metamask-ios-sdk/Classes/**/*'
+  s.source_files = 'Sources/metamask-ios-sdk/Classes/**/*'
   
   # s.resource_bundles = {
   #   'metamask-ios-sdk' => ['metamask-ios-sdk/Assets/*.png']
   # }
-  s.vendored_frameworks = 'metamask-ios-sdk/Frameworks/Ecies.xcframework'
+  s.vendored_frameworks = 'Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework'
   s.dependency 'Socket.IO-Client-Swift', '~> 16.0.1'
 end

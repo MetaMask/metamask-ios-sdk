@@ -100,7 +100,7 @@ struct TransactionView: View {
             default: break
             }
         }, receiveValue: { value in
-            self.result = value
+            self.result = value as? String ?? ""
         }).store(in: &cancellables)
     }
 }

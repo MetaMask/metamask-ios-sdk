@@ -14,11 +14,11 @@ protocol SDKDelegate: AnyObject {
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
 
-public class MMSDK: SDKDelegate {
+public class MMSDK: ObservableObject, SDKDelegate {
     public static let shared = MMSDK()
     
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
-    var enableDebug: Bool = true {
+    public var enableDebug: Bool = true {
         didSet {
             client.enableTracking(enableDebug)
         }
@@ -28,7 +28,7 @@ public class MMSDK: SDKDelegate {
     
     private var client: CommunicationClient!
     
-    var isConnected: Bool {
+    public var isConnected: Bool {
         client.isConnected
     }
     
@@ -51,7 +51,7 @@ public class MMSDK: SDKDelegate {
         setupClientCommunication()
     }
     
-    func setupClientCommunication() {
+    private func setupClientCommunication() {
         client.receiveEvent = ethereum.receiveEvent
         client.tearDownConnection = ethereum.disconnect
         client.receiveResponse = ethereum.receiveResponse

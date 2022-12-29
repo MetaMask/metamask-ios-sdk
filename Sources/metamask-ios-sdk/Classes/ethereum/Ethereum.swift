@@ -2,10 +2,11 @@
 //  Ethereum.swift
 //
 
+import UIKit
 import Foundation
 import Combine
 
-public typealias EthereumPublisher = AnyPublisher<String, EthereumError>
+public typealias EthereumPublisher = AnyPublisher<Any, EthereumError>
 
 public class Ethereum: ObservableObject {
     
@@ -187,6 +188,9 @@ extension Ethereum {
                 Logging.error("mmsdk| Transaction failure")
             }
         default:
+            if let result = data["result"] {
+                submittedRequests[id]?.send(result)
+            }
             Logging.log("mmsdk| Unhandled result")
             break
         }
