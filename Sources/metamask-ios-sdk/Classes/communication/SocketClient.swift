@@ -4,6 +4,7 @@
 
 import OSLog
 import SocketIO
+import UIKit
 import Foundation
 import Combine
 

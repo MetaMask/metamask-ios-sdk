@@ -15,8 +15,8 @@
   "platforms": {
     "ios": "14.0"
   },
-  "source_files": "metamask-ios-sdk/Classes/**/*",
-  "vendored_frameworks": "metamask-ios-sdk/Frameworks/Ecies.xcframework",
+  "source_files": "Sources/metamask-ios-sdk/Classes/**/*",
+  "vendored_frameworks": "Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework",
   "dependencies": {
     "Socket.IO-Client-Swift": [
       "~> 16.0.1"
