@@ -3,94 +3,101 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		004474D31A23D1574BDBBF7F8C00A579 /* NativeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5347F447C287A91FE055647653B15DB /* NativeEngine.swift */; };
 		004A1A668BB92405B3EA1D277402A5ED /* SocketIOClientConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23916F1A73DAD818C5B798C73B33A9E1 /* SocketIOClientConfiguration.swift */; };
-		013944009CC8E003760DBCE2F02A2181 /* SocketChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AFEDDBECDA0460BB24A6F3AA6FFC6D /* SocketChannel.swift */; };
 		02A3417DFB94E961BC3AC47916C9B565 /* FoundationSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719641A4C2A14A1D1D90C7AF2B37D1AD /* FoundationSecurity.swift */; };
 		05C42FD048315323FEABBEE16F17CFCD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		071E941EF0605F363BF90EB2E26D5ECB /* SocketStringReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA34940E93CFF53668DD8D334E462AE /* SocketStringReader.swift */; };
 		074DAE8E2265C4840942B8FACE139B0A /* StringHTTPHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 223ABD2AE0CC9658257E1826A06DCFDF /* StringHTTPHandler.swift */; };
-		0A72B15CEAE21EB16113C635A647F242 /* EthereumError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149FD3AEB1EC34D7CF19C474C46C76EE /* EthereumError.swift */; };
+		07A73A6B904CBD7426CE24446FC30824 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5E912BA68910A2A891829CE2367553 /* Endpoint.swift */; };
+		0C63829CA0CEE73016D99B0241DB0FBB /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30FF3039A055F11F61B7920154C490 /* Analytics.swift */; };
 		0F30B4FC130580DC09573B504BBEECCA /* SocketEnginePacketType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D2FC8F3C1805D8FE2EDCAD7355814C /* SocketEnginePacketType.swift */; };
 		12ACD66F208984E4EA3FDB47D936C2B7 /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FD1057175B07629BB3C64ABA3EBA7D /* Security.swift */; };
-		13C8C6795025884C59CFC08A5D1F3024 /* MMSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52517D180A816C0C2273E017F79687F /* MMSDK.swift */; };
-		14FE16C508015CBA78D84DE20AE4D6B0 /* EthereumRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F215DDA00065003952D13B1C430A0FA /* EthereumRequest.swift */; };
 		1500ED8B5D4951C9A6F6FD4CB54334A3 /* Pods-metamask-ios-sdk_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 28CFF92C93D59CEC052852B8D96A4487 /* Pods-metamask-ios-sdk_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1C3DD0733DD1A3A50A8B91B4C8874868 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908F15808C9D516B76A6F9AA78FA59E3 /* Endpoint.swift */; };
+		15AAD3A55963C79883C68ECE1D4DDF49 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29B1A5D6CFA3945C98570DB8A525778 /* Network.swift */; };
 		1D7B11F8911799EF87016EE740681770 /* Starscream-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3CDE51EBD7CA096939AF660F0B71F9 /* Starscream-dummy.m */; };
+		1D9845C39DD69DB95795440121C98136 /* metamask-ios-sdk-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = EB86654C833DFACA92493673D505F7EE /* metamask-ios-sdk-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		24D769148AC8D0359446733FF11A03F8 /* Socket.IO-Client-Swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6823321B9E8B30DF51870BDB19D6B354 /* Socket.IO-Client-Swift-dummy.m */; };
-		2C16F2CFE74D43E21BD3C03B2D3BA7AC /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7671D3CCB9970C54F3ABE49674D5B284 /* Transaction.swift */; };
-		2FC03B0EE082F37F80AC08EFAA4670B8 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA5E4FA46CE12CEA6CA9E0E290BBCF2 /* Event.swift */; };
-		30512907EE70E22FCAF872BE522F3C0D /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4190A00CE9ACC7F681AE00723B3CA892 /* Network.swift */; };
-		3479C093CF4D7CF5352308A534083F28 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
+		258FB817F27AC6BEE04E481371D4D3CA /* ClientEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A02AE73824BAB0EEC110098311A25660 /* ClientEvent.swift */; };
+		2F19D6D466C005F4F1569D3755C0208D /* Dapp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9981F6E08D480F1ADDDB46140D11566 /* Dapp.swift */; };
 		3482E88E1358A410D9B93FF8EC546286 /* HTTPHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3873AD984F67F3152C7660ADC564BCD /* HTTPHandler.swift */; };
 		389871BAC564F6E24076308772F14596 /* SocketIOClientOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E69E6C4A5EB43C470B1F7BE1FDD0E4 /* SocketIOClientOption.swift */; };
 		3942B129ADDD316CB2CBF92D586F6D6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
-		3AB3EDEC4B53175EE94AD7FD35882D82 /* ClientEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A33D71F753E2455CF96FD047754FB7 /* ClientEvent.swift */; };
 		3E2F556C2423154B2578D99BDBCE1547 /* SocketTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174031608C01C69A306AD1CB9FD969B2 /* SocketTypes.swift */; };
 		4205797CA18331C1B91E48D6AC7D2208 /* Framer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1C93A70765107E35E9D2F0F8E23834 /* Framer.swift */; };
 		449931CF1E1345706EBAEEA77D4A4F7C /* FrameCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B241DECEC6444333182F856699A92025 /* FrameCollector.swift */; };
 		4548446071D3D05940CD8AA9FE450745 /* Pods-metamask-ios-sdk_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 570C5C43DB3658E30610C95C052DC026 /* Pods-metamask-ios-sdk_Tests-dummy.m */; };
 		4DD7BF64B0FE8A83B17CEE70C7E61E77 /* Pods-metamask-ios-sdk_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 4E41E697BF985E3EC382E606B3CC4FD7 /* Pods-metamask-ios-sdk_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		53A578BDE789A35FD81B0B0D9EBB2643 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6C6694B773941C7741407C7BA6B17C /* Models.swift */; };
+		5046073C1C3B7706F473ECFA411F8081 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFDBA320340D576981945395AE9B54D /* Event.swift */; };
 		56CD74B9785D045CB4C8247219ACF9E7 /* SocketAnyEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A517BF007B168A938BEF0406126930 /* SocketAnyEvent.swift */; };
 		57BD152F0AFD16AEE307348EA71EEBEE /* SocketIOClientSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E5F2F9DFD21BC61D2268DDF73B6AA9 /* SocketIOClientSpec.swift */; };
 		5B207CC97C8FCC3F29760071348BB568 /* WSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A450BE6711E25C06122704E4CFCF4D2B /* WSEngine.swift */; };
 		5C9CA112544138E306CF32A92FD351C7 /* SocketAckEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640E8FF222FEFD4F1CC040C4C31651D7 /* SocketAckEmitter.swift */; };
+		61D74BAC39932202936E80D2F3755E67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
+		669BE7DE3D221212DE3C9D5A44A66341 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FFD51A208FB5113A66F13131C96BB9E /* Models.swift */; };
 		670733AC4E5E831AC60FB61F3435E58E /* SocketEngineClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9372873CD78809A07A87609379368F /* SocketEngineClient.swift */; };
 		67B40BD9D663156D42F51EF150626C52 /* WSCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEC1A0A01ED1173EB1CCD49CC82D761 /* WSCompression.swift */; };
 		6C87DDF7F315343D9FB72B8CB15A33E0 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88482AA60ABA82E5084F43B08BA279CA /* Transport.swift */; };
-		6D8834ABCE03AED23C2419794BF195D4 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5FCA44F635290B610C7DDA87D9D600 /* NetworkError.swift */; };
-		71A4ED9A1ECCB62F6CCB49955AEF8199 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424DF2BACB229A499768E39C6393D77C /* SocketClient.swift */; };
+		7025C0A0CE32579258753422EA611B6C /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B4625895CE1ACE352724AA358E0369 /* QRCodeView.swift */; };
+		72E4B58C19F395A9D0A764BF201324AC /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB0EEC453AE44C03C7E50660622963A1 /* QRCodeGenerator.swift */; };
+		732CB8D2570606F4CD53BC43E77E8E74 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8070A32A7B159B9456730C6E0209E647 /* SocketClient.swift */; };
 		772E0FE7C934A273C469BC1F54A728C4 /* Pods-metamask-ios-sdk_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = CE75E1A9DE668B3013ED5AC8CACF2168 /* Pods-metamask-ios-sdk_Example-dummy.m */; };
-		78B1561EA958BE5FC3C6FE839D818779 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A525E8AFFDAACFC0B4131DBB820AB8 /* Analytics.swift */; };
+		778C6F3CE5A459EB1A5F751FD0C90963 /* MMSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51496AC4ADA3513AA7952E4C35194A40 /* MMSDK.swift */; };
 		78CDF3C08101D85FA300665CF51ABECA /* FoundationHTTPServerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FACA4E8BB3D12D967DDFB7788BA6380B /* FoundationHTTPServerHandler.swift */; };
 		7A142B4434E700DC6521A16A1C300E27 /* Starscream-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 5EF246BB470919F67C9CB1B75858D525 /* Starscream-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7DB0CB809FA243D0AB9A34968B316129 /* metamask-ios-sdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FB19242A7F633A607951075631632291 /* metamask-ios-sdk-dummy.m */; };
 		817610ECDF2308060D30B320CE73F7D8 /* SocketPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDB6161C5B82A4CAF2D3D0E1DBFEDED /* SocketPacket.swift */; };
 		877BEF18619073C865E8C231FDA007CE /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD1C225D3C3AEFCF251AACD023B713 /* Engine.swift */; };
+		8A0B0FCE15EDF8E723D7ECC899499D74 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33AB77206C91460FC605B9177EF7A010 /* Crypto.swift */; };
 		8CF47CF4EB276B0C83EA9AD73442A507 /* SocketParsable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B78CBA588301E017BA3C630F5CFE9D /* SocketParsable.swift */; };
 		8D7B5136A04667362D374CAC8627AC17 /* TCPTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7693A9FA4EFF4EB03CF2766AA064F97C /* TCPTransport.swift */; };
-		943273FAE687F0AFE7924BCBAA7473E5 /* SDKInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C992B2CD6AEA3BAD6836A0ED51A0DEE4 /* SDKInfo.swift */; };
+		90E6BAA21562F55A193BA6BB1735618C /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6193239AAE18EAAA4542A974A9CAD84 /* NetworkError.swift */; };
 		9A2372CE53F11D9F2538A556E359DEAE /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6BC5ACC27F76D306AA21E0FEE896982 /* Server.swift */; };
-		9AB249A4EB333FB588071A7DC602EBB6 /* metamask-ios-sdk-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B99407BFA1FCED876DE4EF601454577 /* metamask-ios-sdk-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9D8ED63BD8B81028E3D5FD8CA93079B9 /* SocketEngineWebsocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8C57B624103A1DCD126DA0689E4CD7 /* SocketEngineWebsocket.swift */; };
-		9DE901AD06D69D0FF75DD468D42568A6 /* KeyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A00A31ED332AED006FB411CF6A3F3F /* KeyExchange.swift */; };
-		A9CC43A408E406A4708880BFB499F771 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F038A1816D0EA3E6D223995C8B8EE203 /* Logging.swift */; };
-		AA6A69CB60913D7A891CD48F81CD0E97 /* Dapp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A6CB5DF684C2BF98FF9691483BEE8F /* Dapp.swift */; };
+		A1580B79406B72E465F6784833CA6BD1 /* EthereumRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98DE3DDE2BAD074F4AAC18CBD870EDB3 /* EthereumRequest.swift */; };
+		AEB04CC3C7FC86A97398584023391EC4 /* SocketChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6FC92CFB5AE1C38585A4A20505F3 /* SocketChannel.swift */; };
 		AF8A799321B9F28D8C728712C4990679 /* SocketIOClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F845321F72231A73D8D6314BCD9AD997 /* SocketIOClient.swift */; };
+		AFC789A252CF9434476E6C52D1ACDEB8 /* Ethereum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F9AEB3C08446739DE9A25D05EC715C0 /* Ethereum.swift */; };
+		B420C84091D4DCFD6C34029A8BE0D10F /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D361DB57E6E305CAC5787F4CCFBFC70E /* Transaction.swift */; };
 		BB7922E39F07826E535846F3B839E9C1 /* FoundationTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E9E6077EF416D2CE533CE922805971 /* FoundationTransport.swift */; };
-		BBF42C944894B8FE8DDAB69C03888E40 /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D5965A8CB181117E38B8E2FE1503C10 /* BackgroundTaskManager.swift */; };
 		BF7020644FFFF078CF9785A01A55363F /* SocketExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 445F3AF58FC177DF6802158E98E83E02 /* SocketExtensions.swift */; };
 		C1E6A06FBB341E783EE55402D4EC5AAE /* SocketAckManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F775F417ED8F21D28A39C1EF6B291157 /* SocketAckManager.swift */; };
-		C2F222BCC876776BE6A3E094409F54E8 /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91F7A276709195DF6B81EC48C779B44 /* QRCodeView.swift */; };
 		C5D9F6F9A18E6930E76601318341645E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		C69583CAF2BAA8182B00CBF2BBAF18BE /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B51752051B744D59BB8BB088C899038 /* Data+Extensions.swift */; };
 		CB31D13920C1AF516DBDBDB8750904D8 /* SocketRawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6D884EC314CD82C67CFF12E455F835 /* SocketRawView.swift */; };
 		CB64C399B524AE35BCF97B30A7FF6D1F /* WebSocketServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8160A9B4F56AD38BD833FD93586C8803 /* WebSocketServer.swift */; };
+		CBEF48278B0830A2950E4404B9D255C4 /* KeyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67401B746E12F59E6E10934C26E55E3E /* KeyExchange.swift */; };
 		CC28CAE1DC88510A6D75BA7F86A6A9FB /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC7F65FF8C05C8C2CE5B588FAB7150 /* WebSocket.swift */; };
 		CF9D1CD16CE03675DF085D06963E1213 /* SocketEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F765C08A535E9B27EECB0BB9F90283 /* SocketEngine.swift */; };
 		D457CFD85E8D680F396CAB4E35A08083 /* FoundationHTTPHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75ACCB3475C350031789FCCF1A0756DC /* FoundationHTTPHandler.swift */; };
+		D4AE1F1470839EFCE0EB08682035F8E1 /* EthereumError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A756FFAAA100BB49BB846381302163A8 /* EthereumError.swift */; };
 		D58F0204E773DBAB83C725DDB282DB63 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27C694F1038C1FABFF961A253D0894D /* Compression.swift */; };
 		D6DE6740960DD43B75B79176E558FC92 /* SocketEngineSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558D4B9816AE80AA84C79E6D7F08A603 /* SocketEngineSpec.swift */; };
-		D734E9062AD86B49CEEA75E259ED3B46 /* metamask-ios-sdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D1C402EE3F5758D012E60810D0657184 /* metamask-ios-sdk-dummy.m */; };
-		D7A64B3E96DC4EEF12E6907581277AAF /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9215675DAE7B77744E173084CAD3939C /* Crypto.swift */; };
 		DB569FE3BFD80005DBDAAD6FC95BB238 /* Socket.IO-Client-Swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 38F8A22F172EF2F054F3BA755EAB82A7 /* Socket.IO-Client-Swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC79D737822865A21CA8F3B41BECD175 /* SocketEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C7D44C53561EFEC769224569935FFCB /* SocketEventHandler.swift */; };
-		E41AD839AC02FE9518DBD4B5B5594B23 /* Ethereum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73517172C9AA48B9F562C4C7B967C3E8 /* Ethereum.swift */; };
+		DEAC310C81D3759B19BB51E614AF5290 /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5A671E19347229F6B8053A15779CED /* BackgroundTaskManager.swift */; };
 		EAE52C13F93B0C35309D1BA284D90F7F /* SocketIOStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE29B23683950FA591C894A48C5A625 /* SocketIOStatus.swift */; };
 		EF108FDDFCE92069F18E898899B486AE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		EF755F39742ED8B1C61C11CB45E1B7CC /* SocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9B9F18E2743C2B7EB0401F6836985 /* SocketManager.swift */; };
-		F1B6177CE7A9DEB3C59A6F853DB9E5E1 /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D397E3D868BDF7331ECD9C20A860893 /* QRCodeGenerator.swift */; };
+		F25C9C235D0D943AAC6A024E692A84AC /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 151D911B678362D2D0AF4A716022E6B9 /* Logging.swift */; };
+		F2A2B406397EA317A9E66BE11F0E5F12 /* SDKInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA3ACD5F4DDB2740F5B40BD284FBC98 /* SDKInfo.swift */; };
 		F4BD2148FD9A76AC317239583EA6222C /* SocketLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E7D06134502D59CF27465E101A83B8 /* SocketLogger.swift */; };
 		F7610C87D81EC40DEAB7BBC6894E1946 /* SocketManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376B49D0890762A590C7FA15A861539C /* SocketManagerSpec.swift */; };
 		FE3E4FA1C40B90573AEAD69AF357D430 /* SocketEnginePollable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F35CA0DCAE571AEC3F74B6CCC5CB66 /* SocketEnginePollable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		21D95778F986907AEDF13EED0B91D4D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A44D85440C5D58BC5C4D70A539C5EEF0;
+			remoteInfo = "Socket.IO-Client-Swift";
+		};
 		518949C64500D3FBA90D2BA38BED553F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
@@ -119,13 +126,6 @@
 			remoteGlobalIDString = 9B78EE4AF6AE03E79D88886319853FF7;
 			remoteInfo = Starscream;
 		};
-		C80A4938775130B1D083E9B91266E188 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A44D85440C5D58BC5C4D70A539C5EEF0;
-			remoteInfo = "Socket.IO-Client-Swift";
-		};
 		E22A565B8786A77BEBF0130903EC2275 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
@@ -137,119 +137,120 @@
 
 /* Begin PBXFileReference section */
 		02B78CBA588301E017BA3C630F5CFE9D /* SocketParsable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketParsable.swift; path = Source/SocketIO/Parse/SocketParsable.swift; sourceTree = "<group>"; };
-		0326634346A07A0D52FC9A0536F0C65F /* metamask-ios-sdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "metamask-ios-sdk.release.xcconfig"; sourceTree = "<group>"; };
 		03D2FC8F3C1805D8FE2EDCAD7355814C /* SocketEnginePacketType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEnginePacketType.swift; path = Source/SocketIO/Engine/SocketEnginePacketType.swift; sourceTree = "<group>"; };
-		05A00A31ED332AED006FB411CF6A3F3F /* KeyExchange.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyExchange.swift; sourceTree = "<group>"; };
 		07E5F2F9DFD21BC61D2268DDF73B6AA9 /* SocketIOClientSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOClientSpec.swift; path = Source/SocketIO/Client/SocketIOClientSpec.swift; sourceTree = "<group>"; };
 		0D9372873CD78809A07A87609379368F /* SocketEngineClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngineClient.swift; path = Source/SocketIO/Engine/SocketEngineClient.swift; sourceTree = "<group>"; };
-		149FD3AEB1EC34D7CF19C474C46C76EE /* EthereumError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EthereumError.swift; sourceTree = "<group>"; };
+		151D911B678362D2D0AF4A716022E6B9 /* Logging.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		15E7D06134502D59CF27465E101A83B8 /* SocketLogger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketLogger.swift; path = Source/SocketIO/Util/SocketLogger.swift; sourceTree = "<group>"; };
 		16A517BF007B168A938BEF0406126930 /* SocketAnyEvent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketAnyEvent.swift; path = Source/SocketIO/Client/SocketAnyEvent.swift; sourceTree = "<group>"; };
 		174031608C01C69A306AD1CB9FD969B2 /* SocketTypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketTypes.swift; path = Source/SocketIO/Util/SocketTypes.swift; sourceTree = "<group>"; };
-		1B5FCA44F635290B610C7DDA87D9D600 /* NetworkError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
-		1B99407BFA1FCED876DE4EF601454577 /* metamask-ios-sdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "metamask-ios-sdk-umbrella.h"; sourceTree = "<group>"; };
 		1C7A50F5899AA821AA86B7D62543883D /* Pods-metamask-ios-sdk_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		1C7D44C53561EFEC769224569935FFCB /* SocketEventHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEventHandler.swift; path = Source/SocketIO/Client/SocketEventHandler.swift; sourceTree = "<group>"; };
+		1FFD51A208FB5113A66F13131C96BB9E /* Models.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		208CCECF4E5727F5CA9D9ABB75D06507 /* metamask-ios-sdk-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "metamask-ios-sdk-xcframeworks.sh"; sourceTree = "<group>"; };
 		223ABD2AE0CC9658257E1826A06DCFDF /* StringHTTPHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StringHTTPHandler.swift; path = Sources/Framer/StringHTTPHandler.swift; sourceTree = "<group>"; };
 		23916F1A73DAD818C5B798C73B33A9E1 /* SocketIOClientConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOClientConfiguration.swift; path = Source/SocketIO/Client/SocketIOClientConfiguration.swift; sourceTree = "<group>"; };
-		24A525E8AFFDAACFC0B4131DBB820AB8 /* Analytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		26D80243CA7473C042047E01E6EB4E60 /* Socket.IO-Client-Swift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Socket.IO-Client-Swift.modulemap"; sourceTree = "<group>"; };
 		26F765C08A535E9B27EECB0BB9F90283 /* SocketEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngine.swift; path = Source/SocketIO/Engine/SocketEngine.swift; sourceTree = "<group>"; };
+		273B4D71DCBD3A024FBCD6C87CD10C67 /* LICENSE.md */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.md; sourceTree = "<group>"; };
 		27E69E6C4A5EB43C470B1F7BE1FDD0E4 /* SocketIOClientOption.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOClientOption.swift; path = Source/SocketIO/Client/SocketIOClientOption.swift; sourceTree = "<group>"; };
 		28CFF92C93D59CEC052852B8D96A4487 /* Pods-metamask-ios-sdk_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-metamask-ios-sdk_Example-umbrella.h"; sourceTree = "<group>"; };
 		28D797DAEDAC81915860E23C15A838CE /* metamask-ios-sdk */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "metamask-ios-sdk"; path = metamask_ios_sdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BD3AFD89454F40D5A5B5ABF9653B744 /* Socket.IO-Client-Swift-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Socket.IO-Client-Swift-Info.plist"; sourceTree = "<group>"; };
-		2D5965A8CB181117E38B8E2FE1503C10 /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		2DDB6161C5B82A4CAF2D3D0E1DBFEDED /* SocketPacket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketPacket.swift; path = Source/SocketIO/Parse/SocketPacket.swift; sourceTree = "<group>"; };
 		2E8C57B624103A1DCD126DA0689E4CD7 /* SocketEngineWebsocket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngineWebsocket.swift; path = Source/SocketIO/Engine/SocketEngineWebsocket.swift; sourceTree = "<group>"; };
+		33AB77206C91460FC605B9177EF7A010 /* Crypto.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		357B71E439EAA20E7E977A117ABCFA2E /* metamask-ios-sdk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "metamask-ios-sdk-prefix.pch"; sourceTree = "<group>"; };
 		360115CFF4E2D5C7FD9D654925DC9E9F /* Pods-metamask-ios-sdk_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-metamask-ios-sdk_Example-frameworks.sh"; sourceTree = "<group>"; };
 		376B49D0890762A590C7FA15A861539C /* SocketManagerSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketManagerSpec.swift; path = Source/SocketIO/Manager/SocketManagerSpec.swift; sourceTree = "<group>"; };
 		38F8A22F172EF2F054F3BA755EAB82A7 /* Socket.IO-Client-Swift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Socket.IO-Client-Swift-umbrella.h"; sourceTree = "<group>"; };
-		3A3C07E57194CF505198F95951676137 /* metamask-ios-sdk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "metamask-ios-sdk-prefix.pch"; sourceTree = "<group>"; };
-		4190A00CE9ACC7F681AE00723B3CA892 /* Network.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
-		424DF2BACB229A499768E39C6393D77C /* SocketClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SocketClient.swift; sourceTree = "<group>"; };
+		3BA3ACD5F4DDB2740F5B40BD284FBC98 /* SDKInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SDKInfo.swift; sourceTree = "<group>"; };
+		3D30FF3039A055F11F61B7920154C490 /* Analytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		445F3AF58FC177DF6802158E98E83E02 /* SocketExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketExtensions.swift; path = Source/SocketIO/Util/SocketExtensions.swift; sourceTree = "<group>"; };
 		45621EFD357F9B4DF1FCD2AA6DCA10F0 /* Starscream-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Starscream-Info.plist"; sourceTree = "<group>"; };
 		4DA34940E93CFF53668DD8D334E462AE /* SocketStringReader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketStringReader.swift; path = Source/SocketIO/Util/SocketStringReader.swift; sourceTree = "<group>"; };
 		4E41E697BF985E3EC382E606B3CC4FD7 /* Pods-metamask-ios-sdk_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-metamask-ios-sdk_Tests-umbrella.h"; sourceTree = "<group>"; };
 		50C0B0879B7086918A819F704BF40B4B /* Socket.IO-Client-Swift */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Socket.IO-Client-Swift"; path = SocketIO.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		546BCB962CAC917F218DE5261F6AFC88 /* LICENSE.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
+		51496AC4ADA3513AA7952E4C35194A40 /* MMSDK.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MMSDK.swift; sourceTree = "<group>"; };
 		558D4B9816AE80AA84C79E6D7F08A603 /* SocketEngineSpec.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEngineSpec.swift; path = Source/SocketIO/Engine/SocketEngineSpec.swift; sourceTree = "<group>"; };
 		570C5C43DB3658E30610C95C052DC026 /* Pods-metamask-ios-sdk_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-metamask-ios-sdk_Tests-dummy.m"; sourceTree = "<group>"; };
 		57DC864BC63EA48DF2DB1B36ECD184C9 /* Pods-metamask-ios-sdk_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Example.release.xcconfig"; sourceTree = "<group>"; };
 		5B51752051B744D59BB8BB088C899038 /* Data+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Data+Extensions.swift"; path = "Sources/DataBytes/Data+Extensions.swift"; sourceTree = "<group>"; };
 		5BCC7F65FF8C05C8C2CE5B588FAB7150 /* WebSocket.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WebSocket.swift; path = Sources/Starscream/WebSocket.swift; sourceTree = "<group>"; };
-		5CA5E4FA46CE12CEA6CA9E0E290BBCF2 /* Event.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		5D397E3D868BDF7331ECD9C20A860893 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
+		5CBF6FC92CFB5AE1C38585A4A20505F3 /* SocketChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SocketChannel.swift; sourceTree = "<group>"; };
+		5E4010488C26F6520BD9B637CE56B9BF /* Ecies.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = Ecies.xcframework; path = "Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework"; sourceTree = "<group>"; };
 		5EF246BB470919F67C9CB1B75858D525 /* Starscream-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Starscream-umbrella.h"; sourceTree = "<group>"; };
-		60A33D71F753E2455CF96FD047754FB7 /* ClientEvent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClientEvent.swift; sourceTree = "<group>"; };
 		63C0748AD6080BD4BA27D3A593814E15 /* Pods-metamask-ios-sdk_Tests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-metamask-ios-sdk_Tests"; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		640E8FF222FEFD4F1CC040C4C31651D7 /* SocketAckEmitter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketAckEmitter.swift; path = Source/SocketIO/Ack/SocketAckEmitter.swift; sourceTree = "<group>"; };
-		67AFEDDBECDA0460BB24A6F3AA6FFC6D /* SocketChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SocketChannel.swift; sourceTree = "<group>"; };
+		67401B746E12F59E6E10934C26E55E3E /* KeyExchange.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyExchange.swift; sourceTree = "<group>"; };
 		6823321B9E8B30DF51870BDB19D6B354 /* Socket.IO-Client-Swift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Socket.IO-Client-Swift-dummy.m"; sourceTree = "<group>"; };
+		68683612CB3FBA699FB09D5076B7F05F /* metamask-ios-sdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "metamask-ios-sdk.modulemap"; sourceTree = "<group>"; };
 		6B2BA1FF0D5FAB5654FD2009FE5C5876 /* Pods-metamask-ios-sdk_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-metamask-ios-sdk_Example.modulemap"; sourceTree = "<group>"; };
 		6DE29B23683950FA591C894A48C5A625 /* SocketIOStatus.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOStatus.swift; path = Source/SocketIO/Client/SocketIOStatus.swift; sourceTree = "<group>"; };
-		6F215DDA00065003952D13B1C430A0FA /* EthereumRequest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EthereumRequest.swift; sourceTree = "<group>"; };
 		719641A4C2A14A1D1D90C7AF2B37D1AD /* FoundationSecurity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FoundationSecurity.swift; path = Sources/Security/FoundationSecurity.swift; sourceTree = "<group>"; };
 		71D1B2CACE272EFB97E920335B54EE5F /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		73517172C9AA48B9F562C4C7B967C3E8 /* Ethereum.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Ethereum.swift; sourceTree = "<group>"; };
 		74DD1C225D3C3AEFCF251AACD023B713 /* Engine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Engine.swift; path = Sources/Engine/Engine.swift; sourceTree = "<group>"; };
 		757D78E5B8DF2D643D13BE9279CA0EAB /* Pods-metamask-ios-sdk_Tests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-metamask-ios-sdk_Tests-Info.plist"; sourceTree = "<group>"; };
 		75ACCB3475C350031789FCCF1A0756DC /* FoundationHTTPHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FoundationHTTPHandler.swift; path = Sources/Framer/FoundationHTTPHandler.swift; sourceTree = "<group>"; };
-		7671D3CCB9970C54F3ABE49674D5B284 /* Transaction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		7693A9FA4EFF4EB03CF2766AA064F97C /* TCPTransport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TCPTransport.swift; path = Sources/Transport/TCPTransport.swift; sourceTree = "<group>"; };
 		79F00478D9E0E723D6FBA19B9B76D7BD /* Socket.IO-Client-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Socket.IO-Client-Swift.release.xcconfig"; sourceTree = "<group>"; };
-		7A0B55B4D3CFEBA0B961ED86ED30BACE /* metamask-ios-sdk-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "metamask-ios-sdk-xcframeworks.sh"; sourceTree = "<group>"; };
-		7C6C6694B773941C7741407C7BA6B17C /* Models.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		7FFDD72620494D8F821775A96F807ACA /* metamask-ios-sdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "metamask-ios-sdk-Info.plist"; sourceTree = "<group>"; };
+		7B7F7FE36F46C6081168E66C191CE7C4 /* metamask-ios-sdk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "metamask-ios-sdk.debug.xcconfig"; sourceTree = "<group>"; };
+		7BFDBA320340D576981945395AE9B54D /* Event.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		8070A32A7B159B9456730C6E0209E647 /* SocketClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SocketClient.swift; sourceTree = "<group>"; };
 		8160A9B4F56AD38BD833FD93586C8803 /* WebSocketServer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WebSocketServer.swift; path = Sources/Server/WebSocketServer.swift; sourceTree = "<group>"; };
+		825CD206EBD19E52DEFD6DD039AAD6CD /* metamask-ios-sdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "metamask-ios-sdk-Info.plist"; sourceTree = "<group>"; };
 		82753AC64F84BA53C5383E06E255FEA0 /* Pods-metamask-ios-sdk_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-metamask-ios-sdk_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		8331271719AD016711A33A1BCA91857E /* Pods-metamask-ios-sdk_Example-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-metamask-ios-sdk_Example-Info.plist"; sourceTree = "<group>"; };
 		8709E11637F9E7FA4350BA6263010612 /* Pods-metamask-ios-sdk_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-metamask-ios-sdk_Tests.modulemap"; sourceTree = "<group>"; };
 		88482AA60ABA82E5084F43B08BA279CA /* Transport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Transport.swift; path = Sources/Transport/Transport.swift; sourceTree = "<group>"; };
-		88C319AA474FF15C132AB81A3C8678B4 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		891B2270823847ED23F2ECFC28F935EC /* Starscream */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Starscream; path = Starscream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D446BED68DBFBDF4B442BC3A8C5F5BF /* Starscream-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Starscream-prefix.pch"; sourceTree = "<group>"; };
 		8E2B6B83E8895E25C610CD90322B80FA /* Pods-metamask-ios-sdk_Example */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-metamask-ios-sdk_Example"; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		908F15808C9D516B76A6F9AA78FA59E3 /* Endpoint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
-		9215675DAE7B77744E173084CAD3939C /* Crypto.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		8F9AEB3C08446739DE9A25D05EC715C0 /* Ethereum.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Ethereum.swift; sourceTree = "<group>"; };
 		935756E7C08D66D047424EF2B64801C9 /* Pods-metamask-ios-sdk_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-metamask-ios-sdk_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		A06464A3EB0BBED1BA3EBFC3DFABA043 /* metamask-ios-sdk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "metamask-ios-sdk.debug.xcconfig"; sourceTree = "<group>"; };
+		98DE3DDE2BAD074F4AAC18CBD870EDB3 /* EthereumRequest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EthereumRequest.swift; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9E5E912BA68910A2A891829CE2367553 /* Endpoint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		A02AE73824BAB0EEC110098311A25660 /* ClientEvent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClientEvent.swift; sourceTree = "<group>"; };
 		A425AA20E60413BECC2CC0B6FB152FD1 /* Starscream.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Starscream.release.xcconfig; sourceTree = "<group>"; };
 		A450BE6711E25C06122704E4CFCF4D2B /* WSEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WSEngine.swift; path = Sources/Engine/WSEngine.swift; sourceTree = "<group>"; };
-		A4A6CB5DF684C2BF98FF9691483BEE8F /* Dapp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Dapp.swift; sourceTree = "<group>"; };
+		A756FFAAA100BB49BB846381302163A8 /* EthereumError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EthereumError.swift; sourceTree = "<group>"; };
 		AA94FA5104EDE5FD360390799A388C02 /* Socket.IO-Client-Swift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Socket.IO-Client-Swift-prefix.pch"; sourceTree = "<group>"; };
 		ACC08AB39DB9E8B83BE61755A6E2C9D1 /* Starscream.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Starscream.debug.xcconfig; sourceTree = "<group>"; };
 		B1E9B9F18E2743C2B7EB0401F6836985 /* SocketManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketManager.swift; path = Source/SocketIO/Manager/SocketManager.swift; sourceTree = "<group>"; };
 		B241DECEC6444333182F856699A92025 /* FrameCollector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FrameCollector.swift; path = Sources/Framer/FrameCollector.swift; sourceTree = "<group>"; };
 		B3873AD984F67F3152C7660ADC564BCD /* HTTPHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HTTPHandler.swift; path = Sources/Framer/HTTPHandler.swift; sourceTree = "<group>"; };
 		B669AA3E980A3A6A4C9DE8CD7F6C8A0F /* Pods-metamask-ios-sdk_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-metamask-ios-sdk_Example-acknowledgements.plist"; sourceTree = "<group>"; };
+		B6C05AA227E1E7DBABDC6BC4777377AD /* metamask-ios-sdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "metamask-ios-sdk.release.xcconfig"; sourceTree = "<group>"; };
 		B7E9E6077EF416D2CE533CE922805971 /* FoundationTransport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FoundationTransport.swift; path = Sources/Transport/FoundationTransport.swift; sourceTree = "<group>"; };
 		BC3CDE51EBD7CA096939AF660F0B71F9 /* Starscream-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Starscream-dummy.m"; sourceTree = "<group>"; };
 		C3F35CA0DCAE571AEC3F74B6CCC5CB66 /* SocketEnginePollable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketEnginePollable.swift; path = Source/SocketIO/Engine/SocketEnginePollable.swift; sourceTree = "<group>"; };
 		C5FD1057175B07629BB3C64ABA3EBA7D /* Security.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Security.swift; path = Sources/Security/Security.swift; sourceTree = "<group>"; };
-		C992B2CD6AEA3BAD6836A0ED51A0DEE4 /* SDKInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SDKInfo.swift; sourceTree = "<group>"; };
 		CC1C93A70765107E35E9D2F0F8E23834 /* Framer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Framer.swift; path = Sources/Framer/Framer.swift; sourceTree = "<group>"; };
 		CE75E1A9DE668B3013ED5AC8CACF2168 /* Pods-metamask-ios-sdk_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-metamask-ios-sdk_Example-dummy.m"; sourceTree = "<group>"; };
-		D1C402EE3F5758D012E60810D0657184 /* metamask-ios-sdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "metamask-ios-sdk-dummy.m"; sourceTree = "<group>"; };
+		CF5A671E19347229F6B8053A15779CED /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
+		D1B4625895CE1ACE352724AA358E0369 /* QRCodeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
+		D29B1A5D6CFA3945C98570DB8A525778 /* Network.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		D361DB57E6E305CAC5787F4CCFBFC70E /* Transaction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		D4A7D807324D2CBB73D1AE117584D660 /* Pods-metamask-ios-sdk_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-metamask-ios-sdk_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		D52517D180A816C0C2273E017F79687F /* MMSDK.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MMSDK.swift; sourceTree = "<group>"; };
 		D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		DE6D884EC314CD82C67CFF12E455F835 /* SocketRawView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketRawView.swift; path = Source/SocketIO/Client/SocketRawView.swift; sourceTree = "<group>"; };
 		E5347F447C287A91FE055647653B15DB /* NativeEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NativeEngine.swift; path = Sources/Engine/NativeEngine.swift; sourceTree = "<group>"; };
 		E6BC5ACC27F76D306AA21E0FEE896982 /* Server.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Server.swift; path = Sources/Server/Server.swift; sourceTree = "<group>"; };
 		E859009B0486F78C92494FD52EA95571 /* Starscream.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Starscream.modulemap; sourceTree = "<group>"; };
-		EC44FE7D46AFD7A1B8F35D935ACC50A7 /* metamask-ios-sdk.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = "metamask-ios-sdk.podspec"; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		EFBDD4B09D179AE5CDDA1A05DACCF72E /* metamask-ios-sdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "metamask-ios-sdk.modulemap"; sourceTree = "<group>"; };
-		F038A1816D0EA3E6D223995C8B8EE203 /* Logging.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		E9981F6E08D480F1ADDDB46140D11566 /* Dapp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Dapp.swift; sourceTree = "<group>"; };
+		EA928DD102F47E3961C32C1C09CB3079 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		EB0EEC453AE44C03C7E50660622963A1 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
+		EB86654C833DFACA92493673D505F7EE /* metamask-ios-sdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "metamask-ios-sdk-umbrella.h"; sourceTree = "<group>"; };
 		F27C694F1038C1FABFF961A253D0894D /* Compression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Compression.swift; path = Sources/Compression/Compression.swift; sourceTree = "<group>"; };
+		F6193239AAE18EAAA4542A974A9CAD84 /* NetworkError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		F6A0DC862149C36EDBC4A7D8A8F5DD85 /* metamask-ios-sdk.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = "metamask-ios-sdk.podspec"; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		F775F417ED8F21D28A39C1EF6B291157 /* SocketAckManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketAckManager.swift; path = Source/SocketIO/Ack/SocketAckManager.swift; sourceTree = "<group>"; };
 		F845321F72231A73D8D6314BCD9AD997 /* SocketIOClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocketIOClient.swift; path = Source/SocketIO/Client/SocketIOClient.swift; sourceTree = "<group>"; };
 		F8D6F382B9F72DA1E5462A681BAC0311 /* Socket.IO-Client-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Socket.IO-Client-Swift.debug.xcconfig"; sourceTree = "<group>"; };
-		F91F7A276709195DF6B81EC48C779B44 /* QRCodeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
 		FACA4E8BB3D12D967DDFB7788BA6380B /* FoundationHTTPServerHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FoundationHTTPServerHandler.swift; path = Sources/Framer/FoundationHTTPServerHandler.swift; sourceTree = "<group>"; };
+		FB19242A7F633A607951075631632291 /* metamask-ios-sdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "metamask-ios-sdk-dummy.m"; sourceTree = "<group>"; };
 		FFEC1A0A01ED1173EB1CCD49CC82D761 /* WSCompression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WSCompression.swift; path = Sources/Compression/WSCompression.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -259,6 +260,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				3942B129ADDD316CB2CBF92D586F6D6E /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		431895FE7178C7C3A08612AE6517A8A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61D74BAC39932202936E80D2F3755E67 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,14 +287,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C55EBB6E504572A38B66324039ADC9FB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3479C093CF4D7CF5352308A534083F28 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E031711BE444669876B37F1678475962 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,14 +298,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		024D80211E3FE7510FE88FCEE1F20351 /* crypto */ = {
+		092320C6C389AAA13C6C46DC8686B3E3 /* models */ = {
 			isa = PBXGroup;
 			children = (
-				9215675DAE7B77744E173084CAD3939C /* Crypto.swift */,
-				05A00A31ED332AED006FB411CF6A3F3F /* KeyExchange.swift */,
+				1FFD51A208FB5113A66F13131C96BB9E /* Models.swift */,
 			);
-			name = crypto;
-			path = "Sources/metamask-ios-sdk/Classes/crypto";
+			name = models;
+			path = models;
 			sourceTree = "<group>";
 		};
 		099696CBAFE29F965F1B5103010FAB83 /* Pods-metamask-ios-sdk_Example */ = {
@@ -324,6 +324,28 @@
 			path = "Target Support Files/Pods-metamask-ios-sdk_Example";
 			sourceTree = "<group>";
 		};
+		1CF202259C29B361F30D79E2F6C61093 /* Communication */ = {
+			isa = PBXGroup;
+			children = (
+				A02AE73824BAB0EEC110098311A25660 /* ClientEvent.swift */,
+				5CBF6FC92CFB5AE1C38585A4A20505F3 /* SocketChannel.swift */,
+				8070A32A7B159B9456730C6E0209E647 /* SocketClient.swift */,
+				092320C6C389AAA13C6C46DC8686B3E3 /* models */,
+			);
+			name = Communication;
+			path = "Sources/metamask-ios-sdk/Modules/Communication";
+			sourceTree = "<group>";
+		};
+		1D9C7611D8B3DFA43FCB3A545FF3C358 /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				273B4D71DCBD3A024FBCD6C87CD10C67 /* LICENSE.md */,
+				F6A0DC862149C36EDBC4A7D8A8F5DD85 /* metamask-ios-sdk.podspec */,
+				EA928DD102F47E3961C32C1C09CB3079 /* README.md */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
 		28CDE19827B4751519F64153CB9CAE83 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -334,30 +356,6 @@
 				891B2270823847ED23F2ECFC28F935EC /* Starscream */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2F0ABAB62884AC9BE37BD8DC37E213C6 /* api */ = {
-			isa = PBXGroup;
-			children = (
-				908F15808C9D516B76A6F9AA78FA59E3 /* Endpoint.swift */,
-				4190A00CE9ACC7F681AE00723B3CA892 /* Network.swift */,
-				1B5FCA44F635290B610C7DDA87D9D600 /* NetworkError.swift */,
-			);
-			name = api;
-			path = "Sources/metamask-ios-sdk/Classes/api";
-			sourceTree = "<group>";
-		};
-		34B28C76A4D5C6DF063090302F0774A8 /* ethereum */ = {
-			isa = PBXGroup;
-			children = (
-				A4A6CB5DF684C2BF98FF9691483BEE8F /* Dapp.swift */,
-				73517172C9AA48B9F562C4C7B967C3E8 /* Ethereum.swift */,
-				149FD3AEB1EC34D7CF19C474C46C76EE /* EthereumError.swift */,
-				6F215DDA00065003952D13B1C430A0FA /* EthereumRequest.swift */,
-				7671D3CCB9970C54F3ABE49674D5B284 /* Transaction.swift */,
-			);
-			name = ethereum;
-			path = "Sources/metamask-ios-sdk/Classes/ethereum";
 			sourceTree = "<group>";
 		};
 		37484086C9B292B7CE368C9F5EE59763 /* Starscream */ = {
@@ -385,13 +383,24 @@
 				A450BE6711E25C06122704E4CFCF4D2B /* WSEngine.swift */,
 				55370BAAE5D88B3639E05A305309D7EA /* Support Files */,
 			);
+			name = Starscream;
 			path = Starscream;
+			sourceTree = "<group>";
+		};
+		40CB6BC4BD6B6AF874E949910599EF46 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				33AB77206C91460FC605B9177EF7A010 /* Crypto.swift */,
+				67401B746E12F59E6E10934C26E55E3E /* KeyExchange.swift */,
+			);
+			name = Crypto;
+			path = "Sources/metamask-ios-sdk/Modules/Crypto";
 			sourceTree = "<group>";
 		};
 		4FFAD88028794CE6C58E14D0CE9106EE /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				CEF5D08FA2338BE8DF41C4AF651337CA /* metamask-ios-sdk */,
+				F3C3E1EE7B27079BD75DD288C6960A39 /* metamask-ios-sdk */,
 			);
 			name = "Development Pods";
 			sourceTree = "<group>";
@@ -411,6 +420,15 @@
 			path = "../Target Support Files/Starscream";
 			sourceTree = "<group>";
 		};
+		56F791E9DFEEE613DC06D638DBDB58BE /* Backgroundtaskmanager */ = {
+			isa = PBXGroup;
+			children = (
+				CF5A671E19347229F6B8053A15779CED /* BackgroundTaskManager.swift */,
+			);
+			name = Backgroundtaskmanager;
+			path = "Sources/metamask-ios-sdk/Modules/Backgroundtaskmanager";
+			sourceTree = "<group>";
+		};
 		578452D2E740E91742655AC8F1636D1F /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -419,23 +437,37 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		8111204AC1C3CC65317CB54A44019A3B /* Frameworks */ = {
+		653FF0A362530C638C4E4A3B241963EA /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
+				3D30FF3039A055F11F61B7920154C490 /* Analytics.swift */,
+				7BFDBA320340D576981945395AE9B54D /* Event.swift */,
 			);
-			name = Frameworks;
+			name = Analytics;
+			path = "Sources/metamask-ios-sdk/Modules/Analytics";
 			sourceTree = "<group>";
 		};
-		83F6830156AF36100523F007BA18BF4B /* communication */ = {
+		80204D3F7FEBBD3E9458B619B95FA393 /* Ethereum */ = {
 			isa = PBXGroup;
 			children = (
-				60A33D71F753E2455CF96FD047754FB7 /* ClientEvent.swift */,
-				67AFEDDBECDA0460BB24A6F3AA6FFC6D /* SocketChannel.swift */,
-				424DF2BACB229A499768E39C6393D77C /* SocketClient.swift */,
-				C662D80BD1A99721F2554875F921529E /* models */,
+				E9981F6E08D480F1ADDDB46140D11566 /* Dapp.swift */,
+				8F9AEB3C08446739DE9A25D05EC715C0 /* Ethereum.swift */,
+				A756FFAAA100BB49BB846381302163A8 /* EthereumError.swift */,
+				98DE3DDE2BAD074F4AAC18CBD870EDB3 /* EthereumRequest.swift */,
+				D361DB57E6E305CAC5787F4CCFBFC70E /* Transaction.swift */,
 			);
-			name = communication;
-			path = "Sources/metamask-ios-sdk/Classes/communication";
+			name = Ethereum;
+			path = "Sources/metamask-ios-sdk/Modules/Ethereum";
+			sourceTree = "<group>";
+		};
+		808EAADED357BBE81AA6E787039F41B6 /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				51496AC4ADA3513AA7952E4C35194A40 /* MMSDK.swift */,
+				3BA3ACD5F4DDB2740F5B40BD284FBC98 /* SDKInfo.swift */,
+			);
+			name = SDK;
+			path = "Sources/metamask-ios-sdk/Modules/SDK";
 			sourceTree = "<group>";
 		};
 		8AF004B0A079E33080AD4C8516CEDF75 /* Targets Support Files */ = {
@@ -447,49 +479,29 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
-		8BA36FD425DFC6EE0B458DB923E9EE7A /* Support Files */ = {
+		8CDFDD6BA760FDDC8C5FE4E18FDD0105 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				EFBDD4B09D179AE5CDDA1A05DACCF72E /* metamask-ios-sdk.modulemap */,
-				D1C402EE3F5758D012E60810D0657184 /* metamask-ios-sdk-dummy.m */,
-				7FFDD72620494D8F821775A96F807ACA /* metamask-ios-sdk-Info.plist */,
-				3A3C07E57194CF505198F95951676137 /* metamask-ios-sdk-prefix.pch */,
-				1B99407BFA1FCED876DE4EF601454577 /* metamask-ios-sdk-umbrella.h */,
-				7A0B55B4D3CFEBA0B961ED86ED30BACE /* metamask-ios-sdk-xcframeworks.sh */,
-				A06464A3EB0BBED1BA3EBFC3DFABA043 /* metamask-ios-sdk.debug.xcconfig */,
-				0326634346A07A0D52FC9A0536F0C65F /* metamask-ios-sdk.release.xcconfig */,
+				68683612CB3FBA699FB09D5076B7F05F /* metamask-ios-sdk.modulemap */,
+				FB19242A7F633A607951075631632291 /* metamask-ios-sdk-dummy.m */,
+				825CD206EBD19E52DEFD6DD039AAD6CD /* metamask-ios-sdk-Info.plist */,
+				357B71E439EAA20E7E977A117ABCFA2E /* metamask-ios-sdk-prefix.pch */,
+				EB86654C833DFACA92493673D505F7EE /* metamask-ios-sdk-umbrella.h */,
+				208CCECF4E5727F5CA9D9ABB75D06507 /* metamask-ios-sdk-xcframeworks.sh */,
+				7B7F7FE36F46C6081168E66C191CE7C4 /* metamask-ios-sdk.debug.xcconfig */,
+				B6C05AA227E1E7DBABDC6BC4777377AD /* metamask-ios-sdk.release.xcconfig */,
 			);
 			name = "Support Files";
 			path = "Example/Pods/Target Support Files/metamask-ios-sdk";
 			sourceTree = "<group>";
 		};
-		8DC55D7A319206EB599F8AB5EC6ADF1B /* Pod */ = {
+		8E6F8C6D89DDEAC666756CE3D89BA2EB /* Logger */ = {
 			isa = PBXGroup;
 			children = (
-				546BCB962CAC917F218DE5261F6AFC88 /* LICENSE.md */,
-				EC44FE7D46AFD7A1B8F35D935ACC50A7 /* metamask-ios-sdk.podspec */,
-				88C319AA474FF15C132AB81A3C8678B4 /* README.md */,
+				151D911B678362D2D0AF4A716022E6B9 /* Logging.swift */,
 			);
-			name = Pod;
-			sourceTree = "<group>";
-		};
-		A30C01C5301D5531669FB50234543E29 /* logger */ = {
-			isa = PBXGroup;
-			children = (
-				F038A1816D0EA3E6D223995C8B8EE203 /* Logging.swift */,
-			);
-			name = logger;
-			path = "Sources/metamask-ios-sdk/Classes/logger";
-			sourceTree = "<group>";
-		};
-		A9CD6EBA5C01BF9608E304E2C03AFC17 /* qrcode */ = {
-			isa = PBXGroup;
-			children = (
-				5D397E3D868BDF7331ECD9C20A860893 /* QRCodeGenerator.swift */,
-				F91F7A276709195DF6B81EC48C779B44 /* QRCodeView.swift */,
-			);
-			name = qrcode;
-			path = "Sources/metamask-ios-sdk/Classes/qrcode";
+			name = Logger;
+			path = "Sources/metamask-ios-sdk/Modules/Logger";
 			sourceTree = "<group>";
 		};
 		B8B959B2912A4B3AE99AC1745DD8897A /* Socket.IO-Client-Swift */ = {
@@ -521,45 +533,26 @@
 				174031608C01C69A306AD1CB9FD969B2 /* SocketTypes.swift */,
 				E467ECFB60B343C5C2C9939F1B2BAE59 /* Support Files */,
 			);
+			name = "Socket.IO-Client-Swift";
 			path = "Socket.IO-Client-Swift";
 			sourceTree = "<group>";
 		};
-		C662D80BD1A99721F2554875F921529E /* models */ = {
+		C656925B853BF72BB6FF4C7167F02A7C /* Qrcode */ = {
 			isa = PBXGroup;
 			children = (
-				7C6C6694B773941C7741407C7BA6B17C /* Models.swift */,
+				EB0EEC453AE44C03C7E50660622963A1 /* QRCodeGenerator.swift */,
+				D1B4625895CE1ACE352724AA358E0369 /* QRCodeView.swift */,
 			);
-			path = models;
+			name = Qrcode;
+			path = "Sources/metamask-ios-sdk/Modules/Qrcode";
 			sourceTree = "<group>";
 		};
-		CE250F87310CC9C157C6E89DCCE4B039 /* analytics */ = {
+		C72890DA9FEC6AD669C3CCC4A3367703 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				24A525E8AFFDAACFC0B4131DBB820AB8 /* Analytics.swift */,
-				5CA5E4FA46CE12CEA6CA9E0E290BBCF2 /* Event.swift */,
+				5E4010488C26F6520BD9B637CE56B9BF /* Ecies.xcframework */,
 			);
-			name = analytics;
-			path = "Sources/metamask-ios-sdk/Classes/analytics";
-			sourceTree = "<group>";
-		};
-		CEF5D08FA2338BE8DF41C4AF651337CA /* metamask-ios-sdk */ = {
-			isa = PBXGroup;
-			children = (
-				CE250F87310CC9C157C6E89DCCE4B039 /* analytics */,
-				2F0ABAB62884AC9BE37BD8DC37E213C6 /* api */,
-				D3729446DC5BAF8511A08FB8550B8365 /* backgroundtaskmanager */,
-				83F6830156AF36100523F007BA18BF4B /* communication */,
-				024D80211E3FE7510FE88FCEE1F20351 /* crypto */,
-				34B28C76A4D5C6DF063090302F0774A8 /* ethereum */,
-				8111204AC1C3CC65317CB54A44019A3B /* Frameworks */,
-				A30C01C5301D5531669FB50234543E29 /* logger */,
-				8DC55D7A319206EB599F8AB5EC6ADF1B /* Pod */,
-				A9CD6EBA5C01BF9608E304E2C03AFC17 /* qrcode */,
-				FA3C70D4558B849C7418E0DC557DF0B6 /* sdk */,
-				8BA36FD425DFC6EE0B458DB923E9EE7A /* Support Files */,
-			);
-			name = "metamask-ios-sdk";
-			path = ../..;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		CF1408CF629C7361332E53B88F7BD30C = {
@@ -582,15 +575,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		D3729446DC5BAF8511A08FB8550B8365 /* backgroundtaskmanager */ = {
-			isa = PBXGroup;
-			children = (
-				2D5965A8CB181117E38B8E2FE1503C10 /* BackgroundTaskManager.swift */,
-			);
-			name = backgroundtaskmanager;
-			path = "Sources/metamask-ios-sdk/Classes/backgroundtaskmanager";
-			sourceTree = "<group>";
-		};
 		E467ECFB60B343C5C2C9939F1B2BAE59 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -606,14 +590,35 @@
 			path = "../Target Support Files/Socket.IO-Client-Swift";
 			sourceTree = "<group>";
 		};
-		FA3C70D4558B849C7418E0DC557DF0B6 /* sdk */ = {
+		F3C3E1EE7B27079BD75DD288C6960A39 /* metamask-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
-				D52517D180A816C0C2273E017F79687F /* MMSDK.swift */,
-				C992B2CD6AEA3BAD6836A0ED51A0DEE4 /* SDKInfo.swift */,
+				653FF0A362530C638C4E4A3B241963EA /* Analytics */,
+				F58693274CDEEEDCAFB89B7201E34658 /* Api */,
+				56F791E9DFEEE613DC06D638DBDB58BE /* Backgroundtaskmanager */,
+				1CF202259C29B361F30D79E2F6C61093 /* Communication */,
+				40CB6BC4BD6B6AF874E949910599EF46 /* Crypto */,
+				80204D3F7FEBBD3E9458B619B95FA393 /* Ethereum */,
+				C72890DA9FEC6AD669C3CCC4A3367703 /* Frameworks */,
+				8E6F8C6D89DDEAC666756CE3D89BA2EB /* Logger */,
+				1D9C7611D8B3DFA43FCB3A545FF3C358 /* Pod */,
+				C656925B853BF72BB6FF4C7167F02A7C /* Qrcode */,
+				808EAADED357BBE81AA6E787039F41B6 /* SDK */,
+				8CDFDD6BA760FDDC8C5FE4E18FDD0105 /* Support Files */,
 			);
-			name = sdk;
-			path = "Sources/metamask-ios-sdk/Classes/sdk";
+			name = "metamask-ios-sdk";
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		F58693274CDEEEDCAFB89B7201E34658 /* Api */ = {
+			isa = PBXGroup;
+			children = (
+				9E5E912BA68910A2A891829CE2367553 /* Endpoint.swift */,
+				D29B1A5D6CFA3945C98570DB8A525778 /* Network.swift */,
+				F6193239AAE18EAAA4542A974A9CAD84 /* NetworkError.swift */,
+			);
+			name = Api;
+			path = "Sources/metamask-ios-sdk/Modules/Api";
 			sourceTree = "<group>";
 		};
 		FD491CDBDB05F2929EF7F0212070CA51 /* Pods-metamask-ios-sdk_Tests */ = {
@@ -644,19 +649,19 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		5FA28F3F3A31D172E6E8826DC57A4FD4 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9AB249A4EB333FB588071A7DC602EBB6 /* metamask-ios-sdk-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		8992585F54EA21A107162A9E09558A98 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				1500ED8B5D4951C9A6F6FD4CB54334A3 /* Pods-metamask-ios-sdk_Example-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA3EA9B57EF5B6517DB2F3B282CEA8EB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D9845C39DD69DB95795440121C98136 /* metamask-ios-sdk-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -747,18 +752,18 @@
 		};
 		DECA121C3DB6E876BBF1C56D59A523A8 /* metamask-ios-sdk */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6E5AE709C009DEDF7CD9BDA50B22F2F3 /* Build configuration list for PBXNativeTarget "metamask-ios-sdk" */;
+			buildConfigurationList = E508B6837A30EB3FD9ED01A2FCADF1F9 /* Build configuration list for PBXNativeTarget "metamask-ios-sdk" */;
 			buildPhases = (
-				5FA28F3F3A31D172E6E8826DC57A4FD4 /* Headers */,
-				77939DE1AAE5CB64877D5FB62DE06A25 /* [CP] Copy XCFrameworks */,
-				DB952021FFA1A79DDE8DCB2D6E232318 /* Sources */,
-				C55EBB6E504572A38B66324039ADC9FB /* Frameworks */,
-				5EE5E8D75D9954E698069E633C09AE0C /* Resources */,
+				CA3EA9B57EF5B6517DB2F3B282CEA8EB /* Headers */,
+				109ECC3BC70814206CD8B81A89280E09 /* [CP] Copy XCFrameworks */,
+				0BC71BAAE2695F5E4B94F385B6599B2E /* Sources */,
+				431895FE7178C7C3A08612AE6517A8A6 /* Frameworks */,
+				8510441C655822DC236226B83BF9FBA8 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8CA3480E233BC6F2E1860FFC6A7136D5 /* PBXTargetDependency */,
+				973730BD2D233D960634FD30EB787858 /* PBXTargetDependency */,
 			);
 			name = "metamask-ios-sdk";
 			productName = metamask_ios_sdk;
@@ -794,7 +799,7 @@
 				LastUpgradeCheck = 1240;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
-			compatibilityVersion = "Xcode 11.0";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -823,13 +828,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5EE5E8D75D9954E698069E633C09AE0C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6058316849D29D8A029656D0200F6B44 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -838,6 +836,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7C4EB847A089A3BB8A2BF49426BDE432 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8510441C655822DC236226B83BF9FBA8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -854,17 +859,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		77939DE1AAE5CB64877D5FB62DE06A25 /* [CP] Copy XCFrameworks */ = {
+		109ECC3BC70814206CD8B81A89280E09 /* [CP] Copy XCFrameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/metamask-ios-sdk/metamask-ios-sdk-xcframeworks-input-files.xcfilelist",
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/metamask-ios-sdk/metamask-ios-sdk-xcframeworks.sh",
+				"${PODS_ROOT}/../../Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework",
 			);
 			name = "[CP] Copy XCFrameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/metamask-ios-sdk/metamask-ios-sdk-xcframeworks-output-files.xcfilelist",
+			outputPaths = (
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/metamask-ios-sdk/Ecies.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -874,6 +880,36 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0BC71BAAE2695F5E4B94F385B6599B2E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C63829CA0CEE73016D99B0241DB0FBB /* Analytics.swift in Sources */,
+				DEAC310C81D3759B19BB51E614AF5290 /* BackgroundTaskManager.swift in Sources */,
+				258FB817F27AC6BEE04E481371D4D3CA /* ClientEvent.swift in Sources */,
+				8A0B0FCE15EDF8E723D7ECC899499D74 /* Crypto.swift in Sources */,
+				2F19D6D466C005F4F1569D3755C0208D /* Dapp.swift in Sources */,
+				07A73A6B904CBD7426CE24446FC30824 /* Endpoint.swift in Sources */,
+				AFC789A252CF9434476E6C52D1ACDEB8 /* Ethereum.swift in Sources */,
+				D4AE1F1470839EFCE0EB08682035F8E1 /* EthereumError.swift in Sources */,
+				A1580B79406B72E465F6784833CA6BD1 /* EthereumRequest.swift in Sources */,
+				5046073C1C3B7706F473ECFA411F8081 /* Event.swift in Sources */,
+				CBEF48278B0830A2950E4404B9D255C4 /* KeyExchange.swift in Sources */,
+				F25C9C235D0D943AAC6A024E692A84AC /* Logging.swift in Sources */,
+				7DB0CB809FA243D0AB9A34968B316129 /* metamask-ios-sdk-dummy.m in Sources */,
+				778C6F3CE5A459EB1A5F751FD0C90963 /* MMSDK.swift in Sources */,
+				669BE7DE3D221212DE3C9D5A44A66341 /* Models.swift in Sources */,
+				15AAD3A55963C79883C68ECE1D4DDF49 /* Network.swift in Sources */,
+				90E6BAA21562F55A193BA6BB1735618C /* NetworkError.swift in Sources */,
+				72E4B58C19F395A9D0A764BF201324AC /* QRCodeGenerator.swift in Sources */,
+				7025C0A0CE32579258753422EA611B6C /* QRCodeView.swift in Sources */,
+				F2A2B406397EA317A9E66BE11F0E5F12 /* SDKInfo.swift in Sources */,
+				AEB04CC3C7FC86A97398584023391EC4 /* SocketChannel.swift in Sources */,
+				732CB8D2570606F4CD53BC43E77E8E74 /* SocketClient.swift in Sources */,
+				B420C84091D4DCFD6C34029A8BE0D10F /* Transaction.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1BFBDBD26949493FF51571B948E102ED /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -919,36 +955,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4548446071D3D05940CD8AA9FE450745 /* Pods-metamask-ios-sdk_Tests-dummy.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB952021FFA1A79DDE8DCB2D6E232318 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				78B1561EA958BE5FC3C6FE839D818779 /* Analytics.swift in Sources */,
-				BBF42C944894B8FE8DDAB69C03888E40 /* BackgroundTaskManager.swift in Sources */,
-				3AB3EDEC4B53175EE94AD7FD35882D82 /* ClientEvent.swift in Sources */,
-				D7A64B3E96DC4EEF12E6907581277AAF /* Crypto.swift in Sources */,
-				AA6A69CB60913D7A891CD48F81CD0E97 /* Dapp.swift in Sources */,
-				1C3DD0733DD1A3A50A8B91B4C8874868 /* Endpoint.swift in Sources */,
-				E41AD839AC02FE9518DBD4B5B5594B23 /* Ethereum.swift in Sources */,
-				0A72B15CEAE21EB16113C635A647F242 /* EthereumError.swift in Sources */,
-				14FE16C508015CBA78D84DE20AE4D6B0 /* EthereumRequest.swift in Sources */,
-				2FC03B0EE082F37F80AC08EFAA4670B8 /* Event.swift in Sources */,
-				9DE901AD06D69D0FF75DD468D42568A6 /* KeyExchange.swift in Sources */,
-				A9CC43A408E406A4708880BFB499F771 /* Logging.swift in Sources */,
-				D734E9062AD86B49CEEA75E259ED3B46 /* metamask-ios-sdk-dummy.m in Sources */,
-				13C8C6795025884C59CFC08A5D1F3024 /* MMSDK.swift in Sources */,
-				53A578BDE789A35FD81B0B0D9EBB2643 /* Models.swift in Sources */,
-				30512907EE70E22FCAF872BE522F3C0D /* Network.swift in Sources */,
-				6D8834ABCE03AED23C2419794BF195D4 /* NetworkError.swift in Sources */,
-				F1B6177CE7A9DEB3C59A6F853DB9E5E1 /* QRCodeGenerator.swift in Sources */,
-				C2F222BCC876776BE6A3E094409F54E8 /* QRCodeView.swift in Sources */,
-				943273FAE687F0AFE7924BCBAA7473E5 /* SDKInfo.swift in Sources */,
-				013944009CC8E003760DBCE2F02A2181 /* SocketChannel.swift in Sources */,
-				71A4ED9A1ECCB62F6CCB49955AEF8199 /* SocketClient.swift in Sources */,
-				2C16F2CFE74D43E21BD3C03B2D3BA7AC /* Transaction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1001,11 +1007,11 @@
 			target = 9B78EE4AF6AE03E79D88886319853FF7 /* Starscream */;
 			targetProxy = E22A565B8786A77BEBF0130903EC2275 /* PBXContainerItemProxy */;
 		};
-		8CA3480E233BC6F2E1860FFC6A7136D5 /* PBXTargetDependency */ = {
+		973730BD2D233D960634FD30EB787858 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Socket.IO-Client-Swift";
 			target = A44D85440C5D58BC5C4D70A539C5EEF0 /* Socket.IO-Client-Swift */;
-			targetProxy = C80A4938775130B1D083E9B91266E188 /* PBXContainerItemProxy */;
+			targetProxy = 21D95778F986907AEDF13EED0B91D4D7 /* PBXContainerItemProxy */;
 		};
 		DFFC9EF145F3B70DCAF7FAAD9BA07A6E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1022,11 +1028,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		077CDA0309454E72792B2E16B75D776E /* Release */ = {
+		1FE2B32F8F3225255BAF9B495C389CAF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57DC864BC63EA48DF2DB1B36ECD184C9 /* Pods-metamask-ios-sdk_Example.release.xcconfig */;
+			baseConfigurationReference = D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1039,11 +1046,7 @@
 				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.modulemap";
 				OTHER_LDFLAGS = "";
@@ -1054,16 +1057,16 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
+			name = Debug;
 		};
-		2A39251DBD6B8D631D86705FA12A2B27 /* Release */ = {
+		338EBA588A9923229C75D4EE2EE4ABE8 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79F00478D9E0E723D6FBA19B9B76D7BD /* Socket.IO-Client-Swift.release.xcconfig */;
+			baseConfigurationReference = B6C05AA227E1E7DBABDC6BC4777377AD /* metamask-ios-sdk.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1073,21 +1076,18 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-Info.plist";
+				GCC_PREFIX_HEADER = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift.modulemap";
-				PRODUCT_MODULE_NAME = SocketIO;
-				PRODUCT_NAME = SocketIO;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk.modulemap";
+				PRODUCT_MODULE_NAME = metamask_ios_sdk;
+				PRODUCT_NAME = metamask_ios_sdk;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1161,82 +1161,12 @@
 			};
 			name = Debug;
 		};
-		63399325869193E5657A31488C3334E7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = ACC08AB39DB9E8B83BE61755A6E2C9D1 /* Starscream.debug.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/Starscream/Starscream-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Starscream/Starscream-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/Starscream/Starscream.modulemap";
-				PRODUCT_MODULE_NAME = Starscream;
-				PRODUCT_NAME = Starscream;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		6CBE62621F92544A4DD4FEEF7716CD36 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = D9303308A2AA2B7D34B6EA8BAB941631 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.modulemap";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		8281FFACF245A2076D7B0D6C90DCBFE6 /* Debug */ = {
+		69241E414E8649E113CD025D4C4BAFF5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 71D1B2CACE272EFB97E920335B54EE5F /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1249,11 +1179,7 @@
 				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.modulemap";
 				OTHER_LDFLAGS = "";
@@ -1268,6 +1194,73 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
+		};
+		77ABE394D8603D7D94C60C8B7D9651EB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B7F7FE36F46C6081168E66C191CE7C4 /* metamask-ios-sdk.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk.modulemap";
+				PRODUCT_MODULE_NAME = metamask_ios_sdk;
+				PRODUCT_NAME = metamask_ios_sdk;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		79D64353ABADB2758591C9F674767DA1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 57DC864BC63EA48DF2DB1B36ECD184C9 /* Pods-metamask-ios-sdk_Example.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
 		};
 		8B5A46FF8D3C1289CDEE3BAFACABCD2A /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1331,10 +1324,11 @@
 			};
 			name = Release;
 		};
-		9C8439A296A82F05E3A67E1EB7CFEDEE /* Release */ = {
+		A2F1E231054B067CFDDB14302F6B673F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A425AA20E60413BECC2CC0B6FB152FD1 /* Starscream.release.xcconfig */;
+			baseConfigurationReference = ACC08AB39DB9E8B83BE61755A6E2C9D1 /* Starscream.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1347,11 +1341,69 @@
 				INFOPLIST_FILE = "Target Support Files/Starscream/Starscream-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Starscream/Starscream.modulemap";
+				PRODUCT_MODULE_NAME = Starscream;
+				PRODUCT_NAME = Starscream;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		A4D7B6AAF13EF70A9CA2E85FEC18843E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F8D6F382B9F72DA1E5462A681BAC0311 /* Socket.IO-Client-Swift.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift.modulemap";
+				PRODUCT_MODULE_NAME = SocketIO;
+				PRODUCT_NAME = SocketIO;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B9C090772F444E9E769860B1D4E6690E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A425AA20E60413BECC2CC0B6FB152FD1 /* Starscream.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/Starscream/Starscream-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Starscream/Starscream-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Starscream/Starscream.modulemap";
 				PRODUCT_MODULE_NAME = Starscream;
 				PRODUCT_NAME = Starscream;
@@ -1366,10 +1418,46 @@
 			};
 			name = Release;
 		};
-		9E47ACF1D7E0C5E0810F52DE037DE41F /* Debug */ = {
+		BAF637875FA4A85A6DD777B477482C85 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8D6F382B9F72DA1E5462A681BAC0311 /* Socket.IO-Client-Swift.debug.xcconfig */;
+			baseConfigurationReference = 1C7A50F5899AA821AA86B7D62543883D /* Pods-metamask-ios-sdk_Tests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		F2C66E17F699D57CC6BDA426CD1F787B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 79F00478D9E0E723D6FBA19B9B76D7BD /* Socket.IO-Client-Swift.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1383,125 +1471,13 @@
 				INFOPLIST_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Socket.IO-Client-Swift/Socket.IO-Client-Swift.modulemap";
 				PRODUCT_MODULE_NAME = SocketIO;
 				PRODUCT_NAME = SocketIO;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		D6C4E8D722EFA5B9ED1089DF6EC36823 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0326634346A07A0D52FC9A0536F0C65F /* metamask-ios-sdk.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk.modulemap";
-				PRODUCT_MODULE_NAME = metamask_ios_sdk;
-				PRODUCT_NAME = metamask_ios_sdk;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		F00D6109DEFDDF0A4D5ABE84E86D993F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A06464A3EB0BBED1BA3EBFC3DFABA043 /* metamask-ios-sdk.debug.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/metamask-ios-sdk/metamask-ios-sdk.modulemap";
-				PRODUCT_MODULE_NAME = metamask_ios_sdk;
-				PRODUCT_NAME = metamask_ios_sdk;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		F945EE578E56C455F8047979691C11ED /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1C7A50F5899AA821AA86B7D62543883D /* Pods-metamask-ios-sdk_Tests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.modulemap";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1524,17 +1500,8 @@
 		53EDECC431B4B130BEB1E2F0FD5D4713 /* Build configuration list for PBXNativeTarget "Starscream" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				63399325869193E5657A31488C3334E7 /* Debug */,
-				9C8439A296A82F05E3A67E1EB7CFEDEE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		6E5AE709C009DEDF7CD9BDA50B22F2F3 /* Build configuration list for PBXNativeTarget "metamask-ios-sdk" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F00D6109DEFDDF0A4D5ABE84E86D993F /* Debug */,
-				D6C4E8D722EFA5B9ED1089DF6EC36823 /* Release */,
+				A2F1E231054B067CFDDB14302F6B673F /* Debug */,
+				B9C090772F444E9E769860B1D4E6690E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1542,8 +1509,8 @@
 		727702BA8F64A3A1FA6CFBC363A35BA2 /* Build configuration list for PBXNativeTarget "Pods-metamask-ios-sdk_Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6CBE62621F92544A4DD4FEEF7716CD36 /* Debug */,
-				077CDA0309454E72792B2E16B75D776E /* Release */,
+				1FE2B32F8F3225255BAF9B495C389CAF /* Debug */,
+				79D64353ABADB2758591C9F674767DA1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1551,8 +1518,8 @@
 		8DDD340B81125FAD968367DC967138E9 /* Build configuration list for PBXNativeTarget "Socket.IO-Client-Swift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9E47ACF1D7E0C5E0810F52DE037DE41F /* Debug */,
-				2A39251DBD6B8D631D86705FA12A2B27 /* Release */,
+				A4D7B6AAF13EF70A9CA2E85FEC18843E /* Debug */,
+				F2C66E17F699D57CC6BDA426CD1F787B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1560,8 +1527,17 @@
 		AD81FDE3BB2EE5F63ADCEE638B8D5AA7 /* Build configuration list for PBXNativeTarget "Pods-metamask-ios-sdk_Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8281FFACF245A2076D7B0D6C90DCBFE6 /* Debug */,
-				F945EE578E56C455F8047979691C11ED /* Release */,
+				69241E414E8649E113CD025D4C4BAFF5 /* Debug */,
+				BAF637875FA4A85A6DD777B477482C85 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E508B6837A30EB3FD9ED01A2FCADF1F9 /* Build configuration list for PBXNativeTarget "metamask-ios-sdk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77ABE394D8603D7D94C60C8B7D9651EB /* Debug */,
+				338EBA588A9923229C75D4EE2EE4ABE8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
