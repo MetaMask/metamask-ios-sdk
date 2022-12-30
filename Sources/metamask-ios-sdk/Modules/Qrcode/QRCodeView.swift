@@ -6,12 +6,12 @@ import SwiftUI
 
 public struct QRCodeView: View {
     let url: String
-    private let metamaskTint = Color(red: 241/255, green: 215/255, blue: 181/255)
-    
+    private let metamaskTint = Color(red: 241 / 255, green: 215 / 255, blue: 181 / 255)
+
     public init(url: String) {
         self.url = url
     }
-    
+
     public var body: some View {
         if let image = generateQRCode(from: url) {
             Image(uiImage: image)
@@ -20,7 +20,8 @@ public struct QRCodeView: View {
                 .frame(
                     width: 200,
                     height: 200,
-                    alignment: .center)
+                    alignment: .center
+                )
                 .colorMultiply(metamaskTint)
         }
     }

@@ -9,14 +9,14 @@ import metamask_ios_sdk
 
 struct TransactionView: View {
     @ObservedObject var ethereum: Ethereum = MMSDK.shared.ethereum
-    
+
     @State private var amount = "0x0"
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
     @State private var cancellables: Set<AnyCancellable> = []
     @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
-    
+
     var body: some View {
         Form {
             Section {
@@ -27,7 +27,7 @@ struct TransactionView: View {
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
             }
-            
+
             Section {
                 Text("To")
                     .modifier(TextCallout())
@@ -35,9 +35,8 @@ struct TransactionView: View {
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
-                
             }
-            
+
             Section {
                 Text("Amount")
                     .modifier(TextCallout())
@@ -46,7 +45,7 @@ struct TransactionView: View {
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
             }
-            
+
             Section {
                 Text("Result")
                     .modifier(TextCallout())
@@ -55,7 +54,7 @@ struct TransactionView: View {
                     .frame(minHeight: 40)
                     .modifier(TextCurvature())
             }
-            
+
             Section {
                 Button {
                     sendTransaction()
@@ -80,20 +79,22 @@ struct TransactionView: View {
         }
         .background(Color.blue.grayscale(0.5))
     }
-    
+
     func sendTransaction() {
         let transaction = Transaction(
             to: to,
             from: ethereum.selectedAddress,
-            value: "0x0")
-        
+            value: "0x0"
+        )
+
         let transactionRequest = EthereumRequest(
             method: .sendTransaction,
-            params: [transaction])
-        
+            params: [transaction]
+        )
+
         ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
             switch completion {
-            case .failure(let error):
+            case let .failure(error):
                 errorMessage = error.localizedDescription
                 showError = true
                 print("Transaction error: \(errorMessage)")

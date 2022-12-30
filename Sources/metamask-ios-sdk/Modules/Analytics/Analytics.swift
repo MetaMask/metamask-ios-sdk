@@ -12,24 +12,24 @@ protocol Tracking {
 class Analytics: Tracking {
     private let network: Network
     private var debug: Bool!
-    
+
     var enableDebug: Bool {
         get { debug }
         set { debug = newValue }
     }
-    
+
     convenience init(debug: Bool) {
         self.init(network: Network(), debug: debug)
     }
-    
+
     init(network: Network, debug: Bool) {
         self.debug = debug
         self.network = network
     }
-    
+
     func trackEvent(_ event: Event, parameters: [String: Any]) async {
         if !debug { return }
-        
+
         var params = parameters
         params["event"] = event.name
         do {

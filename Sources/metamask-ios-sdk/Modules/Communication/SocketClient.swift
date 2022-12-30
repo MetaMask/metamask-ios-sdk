@@ -3,21 +3,21 @@
 //
 
 import OSLog
-import SocketIO
 import UIKit
-import Foundation
 import Combine
+import SocketIO
+import Foundation
 
 protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
     var isConnected: Bool { get set }
-    
+
     var onClientsReady: (() -> Void)? { get set }
     var tearDownConnection: (() -> Void)? { get set }
     var receiveEvent: (([String: Any]) -> Void)? { get set }
     var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
-    
+
     func connect()
     func disconnect()
     func enableTracking(_ enable: Bool)
@@ -29,52 +29,52 @@ class SocketClient: CommunicationClient {
     private var tracker: Tracking
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
-    
+
     private var channelId: String = UUID().uuidString.lowercased()
     private var connectionPaused: Bool = false
-    
+
     var clientName: String {
         "socket"
     }
-    
+
     var isConnected: Bool = false
     var onClientsReady: (() -> Void)?
     var tearDownConnection: (() -> Void)?
     var onClientsDisconnected: (() -> Void)?
-    
+
     var receiveEvent: (([String: Any]) -> Void)?
     var receiveResponse: ((String, [String: Any]) -> Void)?
-    
+
     var deeplinkUrl: String {
         "https://metamask.app.link/connect?channelId="
-        + channelId
-        + "&comm=socket"
-        + "&pubkey="
-        + keyExchange.pubkey
+            + channelId
+            + "&comm=socket"
+            + "&pubkey="
+            + keyExchange.pubkey
     }
-    
+
     init(tracker: Tracking) {
         self.tracker = tracker
         setupClient()
     }
-    
+
     private func setupClient() {
         handleReceiveMessages()
         handleConnection()
         handleDisconnection()
     }
-    
+
     private func resetClient() {
         isConnected = false
         keyExchange.restart()
         tearDownConnection?()
     }
-    
+
     func connect() {
         trackEvent(.connectionRequest)
         channel.connect()
     }
-    
+
     func disconnect() {
         isConnected = false
         channel.disconnect()
@@ -82,55 +82,62 @@ class SocketClient: CommunicationClient {
 }
 
 // MARK: Event handling
+
 private extension SocketClient {
     func handleConnection() {
         let channelId = channelId
-        
+
         // MARK: Connection error event
+
         channel.on(clientEvent: .error) { data in
             Logging.error("mmsdk| Client connection error: \(data)")
         }
-        
+
         // MARK: Clients connected event
+
         channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
             Logging.log("mmsdk| Clients connected: \(data)")
-            
+
             self.trackEvent(.connected)
-            
+
             // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
-                userInfo: ["value": "Clients Connected"])
-            
+                userInfo: ["value": "Clients Connected"]
+            )
+
             if !self.keyExchange.keysExchanged {
                 let keyExchangeSync = self.keyExchange.message(type: .syn)
                 self.sendMessage(keyExchangeSync, encrypt: false)
             }
         }
-        
+
         // MARK: Socket connected event
-        channel.on(clientEvent: .connect) { [weak self] data in
+
+        channel.on(clientEvent: .connect) { [weak self] _ in
             guard let self = self else { return }
-            
+
             // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
-                userInfo: ["value": "Connected to Socket"])
-            
+                userInfo: ["value": "Connected to Socket"]
+            )
+
             Logging.log("mmsdk| SDK connected to socket")
-            
+
             self.channel.emit(ClientEvent.joinChannel, channelId)
-            
+
             if !self.isConnected {
                 self.deeplinkToMetaMask()
             }
         }
     }
-    
+
     // MARK: New message event
+
     func handleReceiveMessages() {
         channel.on(ClientEvent.message(on: channelId)) { [weak self] data in
             guard
@@ -147,21 +154,23 @@ private extension SocketClient {
             }
         }
     }
-    
+
     // MARK: Socket disconnected event
+
     func handleDisconnection() {
-        channel.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] data in
+        channel.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] _ in
             guard let self = self else { return }
             Logging.log("mmsdk| SDK disconnected")
-            
+
             self.trackEvent(.disconnected)
-            
+
             // for debug purposes only
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
-                userInfo: ["value": "Clients Disconnected"])
-            
+                userInfo: ["value": "Clients Disconnected"]
+            )
+
             if !self.connectionPaused {
                 self.resetClient()
             }
@@ -170,6 +179,7 @@ private extension SocketClient {
 }
 
 // MARK: Message handling
+
 private extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         guard
@@ -178,40 +188,40 @@ private extension SocketClient {
         else { return }
 
         sendMessage(nextKeyExchangeMessage, encrypt: false)
-        
+
         if keyExchange.keysExchanged {
             sendOriginatorInfo()
         }
     }
-    
+
     func handleMessage(_ message: [String: Any]) {
         if
             connectionPaused,
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
-            
             keyExchange.restart()
             isConnected = false
             sendMessage(nextKeyExchangeMessage, encrypt: false)
             return
         }
-        
+
         guard let message = Message<String>.message(from: message) else { return }
         let decryptedText: String
-        
+
         do {
             decryptedText = try keyExchange.decryptMessage(message.message)
         } catch {
             Logging.error("mmsdk| Error: \(error.localizedDescription)")
             return
         }
-        
+
         do {
             let json: [String: Any] = try JSONSerialization.jsonObject(
                 with: Data(decryptedText.utf8),
-                options: [])
-            as? [String: Any] ?? [:]
-            
+                options: []
+            )
+                as? [String: Any] ?? [:]
+
             if json["type"] as? String == "pause" {
                 Logging.log("mmsdk| Connection has been paused")
                 connectionPaused = true
@@ -239,13 +249,14 @@ private extension SocketClient {
 }
 
 // MARK: Helper methods
+
 extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
-        
+
         DispatchQueue.main.async {
             UIApplication.shared.open(url)
         }
@@ -253,31 +264,35 @@ extension SocketClient {
 }
 
 // MARK: Message sending
+
 extension SocketClient {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: dapp?.name,
-            url: dapp?.url)
-        
+            url: dapp?.url
+        )
+
         let requestInfo = RequestInfo(
             type: "originator_info",
-            originator: originatorInfo)
-        
+            originator: originatorInfo
+        )
+
         sendMessage(requestInfo, encrypt: true)
     }
-    
+
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
             return
         }
-        
+
         if encrypt {
             do {
                 let encryptedMessage: String = try keyExchange.encryptMessage(message)
                 let message: Message<String> = Message(
                     id: channelId,
-                    message: encryptedMessage)
-                
+                    message: encryptedMessage
+                )
+
                 if connectionPaused {
                     Logging.log("mmsdk| Will send once wallet is open again")
                     onClientsReady = { [weak self] in
@@ -293,19 +308,21 @@ extension SocketClient {
         } else {
             let message = Message(
                 id: channelId,
-                message: message)
-            
+                message: message
+            )
+
             channel.emit(ClientEvent.message, message)
         }
     }
 }
 
 // MARK: Analytics
+
 extension SocketClient {
     func trackEvent(_ event: Event) {
         let id = channelId
         var parameters: [String: Any] = ["id": id]
-        
+
         switch event {
         case .connected, .disconnected:
             break
@@ -317,16 +334,17 @@ extension SocketClient {
                 "title": dapp?.name ?? "",
                 "platform": UIDevice.current.systemName
             ]
-            parameters.merge(additionalParams) { (current, _) in current }
+            parameters.merge(additionalParams) { current, _ in current }
         }
-        
+
         Task { [parameters] in
             await self.tracker.trackEvent(
                 event,
-                parameters: parameters)
+                parameters: parameters
+            )
         }
     }
-    
+
     func enableTracking(_ enable: Bool) {
         tracker.enableDebug = enable
     }

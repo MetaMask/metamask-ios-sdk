@@ -133,13 +133,15 @@ Then use struct object as shown in [Example 2](#example-2-send-transaction) abov
 ## Examples
 We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests. There are three illustrated examples:
 
-a) `ConnectView.swift` - How to connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
+a) `ConnectView.swift` - Connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
 
-b) `TransactionView.swift` - How to send a transaction
+b) `TransactionView.swift` - Send a transaction
 
-c) `SignView.swift` - How to sign a transaction
+c) `SignView.swift` - Sign a transaction
 
-To run the example project, clone this repository, change directory to `metamask-ios-sdk/Example`, and then run `pod install` from the Example directory to install the SDK as a dependency on the project, and then open the `metamask-ios-sdk.xcworkspace`
+To run the example project, clone this repository, change directory to `metamask-ios-sdk/Example`, and then run `pod install` from the Example directory to install the SDK as a dependency on the project, and then open `metamask-ios-sdk.xcworkspace` and run the project. 
+
+You will need to have MetaMask Mobile wallet installed on your target i.e physical device or simulator, so you can either have it installed from the [App Store](https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202), or clone and compile MetaMask Mobile wallet from [source](https://github.com/MetaMask/metamask-mobile) and build to your target device. 
 
 ## Requirements
 This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0.
