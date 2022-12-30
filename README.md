@@ -1,8 +1,8 @@
 # MetaMask iOS SDK
-MetaMask iOS SDK is a library that enables developers to run decentralised applications (Dapps) as native iOS applications.
+The MetaMask iOS SDK enables developers to connect their native iOS apps to the Ethereum blockchain via the MetaMask Mobile wallet, effectively enabling the creation of iOS native decentralised applications (Dapps).
 
-## How it works
-You can import the MetaMask iOS SDK into your iOS application to enable users to easily connect with their MetaMask Mobile wallet.
+## Getting Started
+You can import the MetaMask iOS SDK into your native iOS app to enable users to easily connect with their MetaMask Mobile wallet.
 
 ### 1. Install
 
@@ -16,18 +16,9 @@ And then run:
 pod install
 ```
 #### Swift Package Manager
-To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `File -> Swift Packages -> Add Package Dependency`.
-
-And then enter this repository's url, i.e https://github.com/MetaMask/metamask-ios-sdk. Now you can import the SDK:
-```
-import metamask_ios_sdk
-```
+To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `File -> Swift Packages -> Add Package Dependency`. And then enter this repository's url, i.e https://github.com/MetaMask/metamask-ios-sdk.
 #### Note
-Please note that the SDK currently supports the following architectures 
-- `aarch64-apple-ios` (iOS devices) and 
-- `x86_64-apple-ios` (Intel Mac-based simulators)
-
-We currently do not support `aarch64-apple-ios-sim` (M1 or Apple Silicon simulators). However, you should be able run it on an M1 simulator by setting your Xcode to open in Rosetta mode. This can be done by going to the location `/Applications/`, right click on `Xcode -> Get Info -> check the option "Open using Rosetta"`. This effectively runs Xcode in Intel mode.
+Please note that the SDK supports `ios-arm64` (iOS devices) and `ios-arm64-simulator` (M1 chip simulators). We currently do not support `ios-ax86_64-simulator` (Intel chip simulators).
 
 ### 2. Import the SDK
 ```
