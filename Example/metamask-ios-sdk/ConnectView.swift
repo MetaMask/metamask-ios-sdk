@@ -15,17 +15,17 @@ extension Notification.Name {
 struct ConnectView: View {
     @ObservedObject var ethereum = MMSDK.shared.ethereum
     @State private var cancellables: Set<AnyCancellable> = []
-    
+
     private let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
-    
+
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
-    
+
     @State private var errorMessage = ""
     @State private var showError = false
-    
+
     @State private var showProgressView = false
-    
+
     var body: some View {
         NavigationView {
             List {
@@ -39,7 +39,7 @@ struct ConnectView: View {
                             Text(status)
                                 .modifier(TextCaption())
                         }
-                        
+
                         HStack {
                             Text("Chain ID")
                                 .bold()
@@ -48,7 +48,7 @@ struct ConnectView: View {
                             Text(ethereum.chainId ?? "")
                                 .modifier(TextCaption())
                         }
-                        
+
                         HStack {
                             Text("Account")
                                 .bold()
@@ -59,30 +59,30 @@ struct ConnectView: View {
                         }
                     }
                 }
-                
+
                 if !ethereum.selectedAddress.isEmpty {
                     Section {
                         Group {
                             NavigationLink("Sign") {
                                 SignView()
                             }
-                            
+
                             NavigationLink("Transact") {
                                 TransactionView()
                             }
                         }
                     }
                 }
-                
+
                 if ethereum.selectedAddress.isEmpty {
                     Section(footer: Text("This will open the MetaMask app. Please sign in and accept the connection prompt.").modifier(TextCallout())) {
                         ZStack {
                             Button {
                                 showProgressView = true
-                                
+
                                 ethereum.connect(dapp)?.sink(receiveCompletion: { completion in
                                     switch completion {
-                                    case .failure(let error):
+                                    case let .failure(error):
                                         errorMessage = error.localizedDescription
                                         showError = true
                                         print("Connection error: \(errorMessage)")
@@ -100,7 +100,7 @@ struct ConnectView: View {
                             .padding(.vertical, 10)
                             .background(Color.blue.grayscale(0.5))
                             .modifier(ButtonCurvature())
-                            
+
                             if showProgressView && !ethereum.connected {
                                 ProgressView()
                                     .scaleEffect(1.5, anchor: .center)

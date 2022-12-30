@@ -2,20 +2,20 @@
 //  EthereumRequest.swift
 //
 
-import Foundation
 import Combine
+import Foundation
 
 public struct EthereumRequest<T: CodableData>: CodableData {
     public var id: String?
     public let method: EthereumMethod
     public var params: [T]
-    
+
     public init(id: String? = nil, method: EthereumMethod, params: [T] = [""]) {
         self.id = id
         self.method = method
         self.params = params
     }
-    
+
     public func socketRepresentation() -> NetworkData {
         [
             "id": id ?? "",
@@ -28,17 +28,17 @@ public struct EthereumRequest<T: CodableData>: CodableData {
 struct SubmittedRequest {
     let method: EthereumMethod
     private let requestSubject = PassthroughSubject<Any, EthereumError>()
-    
+
     var publisher: EthereumPublisher? {
         requestSubject
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
-    
+
     func send(_ value: Any) {
         requestSubject.send(value)
     }
-    
+
     func error(_ err: EthereumError) {
         requestSubject.send(completion: .failure(err))
     }
