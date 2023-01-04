@@ -1,10 +1,10 @@
 {
   "name": "metamask-ios-sdk",
   "version": "0.1.0",
-  "summary": "A short description of metamask-ios-sdk.",
+  "summary": "Enable users to easily connect with their MetaMask Mobile wallet.",
   "swift_versions": "5.0",
-  "description": "An SDK that enables native iOS apps to interact with the Ethereum blockchain via the MetaMask wallet.",
-  "homepage": "github.com/MetaMask/metamask-ios-sdk",
+  "description": "The iOS MetaMask SDK enables native iOS apps to interact with the Ethereum blockchain via the MetaMask Mobile wallet.",
+  "homepage": "https://github.com/MetaMask/metamask-ios-sdk",
   "authors": {
     "Mpendulo Ndlovu": "mpendulo@elefantel.com"
   },
@@ -15,7 +15,7 @@
   "platforms": {
     "ios": "14.0"
   },
-  "source_files": "Sources/metamask-ios-sdk/Modules/**/*",
+  "source_files": "Sources/metamask-ios-sdk/Classes/**/*",
   "vendored_frameworks": "Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework",
   "dependencies": {
     "Socket.IO-Client-Swift": [
