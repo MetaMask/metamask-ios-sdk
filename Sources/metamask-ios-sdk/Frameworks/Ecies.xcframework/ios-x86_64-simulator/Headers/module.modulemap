@@ -1,4 +1,0 @@
-module Ecies {
-    header "ecies.h"
-    export *
-}
