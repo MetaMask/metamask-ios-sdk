@@ -5,7 +5,7 @@
 import Foundation
 
 enum Endpoint {
-    static let SOCKET_IO_SERVER = "https://metamask-sdk-socket.metafi.codefi.network/"
+    static let SOCKET_IO_SERVER = "http://192.168.0.101:4000/"//"https://metamask-sdk-socket.metafi.codefi.network/"
 
     case analytics
 

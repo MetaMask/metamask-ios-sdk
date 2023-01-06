@@ -30,7 +30,7 @@ class SocketClient: CommunicationClient {
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
-    private var channelId: String = UUID().uuidString.lowercased()
+    private var channelId: String = UUID().uuidString
     private var connectionPaused: Bool = false
 
     var clientName: String {
@@ -197,60 +197,62 @@ private extension SocketClient {
     func handleMessage(_ message: [String: Any]) {
         if
             connectionPaused,
-            let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
-            let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
+            KeyExchange.isHandshakeRestartMessage(message) {
             keyExchange.restart()
-            isConnected = false
-            sendMessage(nextKeyExchangeMessage, encrypt: false)
+            isConnected = true
+            connectionPaused = false
+            
+            if
+                let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
+                let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
+                sendMessage(nextKeyExchangeMessage, encrypt: false)
+            }
             return
         }
 
         guard let message = Message<String>.message(from: message) else { return }
-        let decryptedText: String
 
         do {
-            decryptedText = try keyExchange.decryptMessage(message.message)
-        } catch {
-            Logging.error("mmsdk| Error: \(error.localizedDescription)")
-            return
-        }
-
-        do {
-            let json: [String: Any] = try JSONSerialization.jsonObject(
-                with: Data(decryptedText.utf8),
-                options: []
-            )
-                as? [String: Any] ?? [:]
-
-            if json["type"] as? String == "pause" {
-                Logging.log("mmsdk| Connection has been paused")
-                connectionPaused = true
-            } else if json["type"] as? String == "ready" {
-                Logging.log("mmsdk| Connection is ready")
-                trackEvent(.connected)
-                connectionPaused = false
-                onClientsReady?()
-            } else if json["type"] as? String == "wallet_info" {
-                Logging.log("mmsdk| Received wallet info")
-                isConnected = true
-                onClientsReady?()
-                connectionPaused = false
-            } else if let data = json["data"] as? [String: Any] {
-                if let id = data["id"] as? String {
-                    receiveResponse?(id, data)
-                } else {
-                    receiveEvent?(data)
-                }
-            }
+            try handleEncryptedMessage(message)
         } catch {
             Logging.error("mmsdk| Error: \(error.localizedDescription)")
         }
     }
+    
+    func handleEncryptedMessage(_ message: Message<String>) throws {
+        let decryptedText = try keyExchange.decryptMessage(message.message)
+        
+        let json: [String: Any] = try JSONSerialization.jsonObject(
+            with: Data(decryptedText.utf8),
+            options: []
+        )
+            as? [String: Any] ?? [:]
+
+        if json["type"] as? String == "pause" {
+            Logging.log("mmsdk| Connection has been paused")
+            connectionPaused = true
+        } else if json["type"] as? String == "ready" {
+            Logging.log("mmsdk| Connection is ready")
+            connectionPaused = false
+            onClientsReady?()
+        } else if json["type"] as? String == "wallet_info" {
+            Logging.log("mmsdk| Received wallet info")
+            isConnected = true
+            onClientsReady?()
+            connectionPaused = false
+        } else if let data = json["data"] as? [String: Any] {
+            if let id = data["id"] as? String {
+                receiveResponse?(id, data)
+            } else {
+                receiveEvent?(data)
+            }
+        }
+    }
 }
 
-// MARK: Helper methods
+// MARK: Deeplinking
 
-extension SocketClient {
+private extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),

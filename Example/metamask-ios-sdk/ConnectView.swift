@@ -55,7 +55,7 @@ struct ConnectView: View {
                                 .modifier(TextCallout())
                             Spacer()
                             Text(ethereum.selectedAddress)
-                                .modifier(TextCallout())
+                                .modifier(TextCaption())
                         }
                     }
                 }

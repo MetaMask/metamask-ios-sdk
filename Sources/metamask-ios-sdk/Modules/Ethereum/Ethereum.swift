@@ -110,7 +110,7 @@ extension Ethereum {
         } else if !connected {
             Logging.error(EthereumError.notConnected)
         } else {
-            let id = UUID().uuidString.lowercased()
+            let id = UUID().uuidString
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
