@@ -201,7 +201,7 @@ private extension SocketClient {
             keyExchange.restart()
             isConnected = true
             connectionPaused = false
-            
+
             if
                 let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
                 let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
@@ -220,10 +220,10 @@ private extension SocketClient {
             }
         }
     }
-    
+
     func handleEncryptedMessage(_ message: Message<String>) throws {
         let decryptedText = try keyExchange.decryptMessage(message.message)
-        
+
         let json: [String: Any] = try JSONSerialization.jsonObject(
             with: Data(decryptedText.utf8),
             options: []

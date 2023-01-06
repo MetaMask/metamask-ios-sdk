@@ -16,7 +16,7 @@ protocol SDKDelegate: AnyObject {
 
 public class MMSDK: ObservableObject, SDKDelegate {
     private var client: CommunicationClient!
-    
+
     public static let shared = MMSDK()
     @ObservedObject public var ethereum = Ethereum()
 

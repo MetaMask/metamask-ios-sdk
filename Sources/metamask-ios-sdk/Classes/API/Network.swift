@@ -14,7 +14,7 @@ class Network: Networking {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
         }
-        
+
         let request = request(for: url)
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(Type, from: data)

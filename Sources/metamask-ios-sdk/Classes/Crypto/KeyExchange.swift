@@ -102,7 +102,7 @@ public class KeyExchange {
     func setTheirPublicKey(_ publicKey: String?) {
         theirPublicKey = publicKey
     }
-    
+
     static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
         guard
             let message = message["message"] as? [String: Any],
