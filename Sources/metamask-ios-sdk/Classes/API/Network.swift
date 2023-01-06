@@ -5,6 +5,7 @@
 import SwiftUI
 
 protocol Networking: ObservableObject {
+    func post(_ parameters: [String: Any], endpoint: Endpoint) async throws
     func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T
 }
 
@@ -13,6 +14,7 @@ class Network: Networking {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
         }
+
         let request = request(for: url)
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(Type, from: data)
@@ -30,11 +32,7 @@ class Network: Networking {
         request.httpBody = payload
         request.httpMethod = "POST"
 
-        let (data, _) = try await URLSession.shared.data(for: request)
-
-        // (TODO): remove debugging
-        let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
-        print("JSON response: \(json)")
+        _ = try await URLSession.shared.data(for: request)
     }
 
     private func request(for url: URL) -> URLRequest {

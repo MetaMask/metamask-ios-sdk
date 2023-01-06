@@ -30,7 +30,7 @@ class SocketClient: CommunicationClient {
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
-    private var channelId: String = UUID().uuidString.lowercased()
+    private var channelId: String = UUID().uuidString
     private var connectionPaused: Bool = false
 
     var clientName: String {
@@ -90,14 +90,14 @@ private extension SocketClient {
         // MARK: Connection error event
 
         channel.on(clientEvent: .error) { data in
-            Logging.error("mmsdk| Client connection error: \(data)")
+            Logging.error("Client connection error: \(data)")
         }
 
         // MARK: Clients connected event
 
         channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
-            Logging.log("mmsdk| Clients connected: \(data)")
+            Logging.log("Clients connected: \(data)")
 
             self.trackEvent(.connected)
 
@@ -126,7 +126,7 @@ private extension SocketClient {
                 userInfo: ["value": "Connected to Socket"]
             )
 
-            Logging.log("mmsdk| SDK connected to socket")
+            Logging.log("SDK connected to socket")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
 
@@ -160,7 +160,7 @@ private extension SocketClient {
     func handleDisconnection() {
         channel.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] _ in
             guard let self = self else { return }
-            Logging.log("mmsdk| SDK disconnected")
+            Logging.log("SDK disconnected")
 
             self.trackEvent(.disconnected)
 
@@ -197,60 +197,64 @@ private extension SocketClient {
     func handleMessage(_ message: [String: Any]) {
         if
             connectionPaused,
-            let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
-            let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
+            KeyExchange.isHandshakeRestartMessage(message) {
             keyExchange.restart()
-            isConnected = false
-            sendMessage(nextKeyExchangeMessage, encrypt: false)
-            return
-        }
+            isConnected = true
+            connectionPaused = false
 
-        guard let message = Message<String>.message(from: message) else { return }
-        let decryptedText: String
-
-        do {
-            decryptedText = try keyExchange.decryptMessage(message.message)
-        } catch {
-            Logging.error("mmsdk| Error: \(error.localizedDescription)")
-            return
-        }
-
-        do {
-            let json: [String: Any] = try JSONSerialization.jsonObject(
-                with: Data(decryptedText.utf8),
-                options: []
-            )
-                as? [String: Any] ?? [:]
-
-            if json["type"] as? String == "pause" {
-                Logging.log("mmsdk| Connection has been paused")
-                connectionPaused = true
-            } else if json["type"] as? String == "ready" {
-                Logging.log("mmsdk| Connection is ready")
-                trackEvent(.connected)
-                connectionPaused = false
-                onClientsReady?()
-            } else if json["type"] as? String == "wallet_info" {
-                Logging.log("mmsdk| Received wallet info")
-                isConnected = true
-                onClientsReady?()
-                connectionPaused = false
-            } else if let data = json["data"] as? [String: Any] {
-                if let id = data["id"] as? String {
-                    receiveResponse?(id, data)
-                } else {
-                    receiveEvent?(data)
-                }
+            if
+                let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
+                let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
+                sendMessage(nextKeyExchangeMessage, encrypt: false)
             }
-        } catch {
-            Logging.error("mmsdk| Error: \(error.localizedDescription)")
+        } else {
+            guard let message = Message<String>.message(from: message) else {
+                Logging.error("Could not handle message")
+                return
+            }
+
+            do {
+                try handleEncryptedMessage(message)
+            } catch {
+                Logging.error("\(error.localizedDescription)")
+            }
+        }
+    }
+
+    func handleEncryptedMessage(_ message: Message<String>) throws {
+        let decryptedText = try keyExchange.decryptMessage(message.message)
+
+        let json: [String: Any] = try JSONSerialization.jsonObject(
+            with: Data(decryptedText.utf8),
+            options: []
+        )
+            as? [String: Any] ?? [:]
+
+        if json["type"] as? String == "pause" {
+            Logging.log("Connection has been paused")
+            connectionPaused = true
+        } else if json["type"] as? String == "ready" {
+            Logging.log("Connection is ready")
+            connectionPaused = false
+            onClientsReady?()
+        } else if json["type"] as? String == "wallet_info" {
+            Logging.log("Received wallet info")
+            isConnected = true
+            onClientsReady?()
+            connectionPaused = false
+        } else if let data = json["data"] as? [String: Any] {
+            if let id = data["id"] as? String {
+                receiveResponse?(id, data)
+            } else {
+                receiveEvent?(data)
+            }
         }
     }
 }
 
-// MARK: Helper methods
+// MARK: Deeplinking
 
-extension SocketClient {
+private extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -294,16 +298,16 @@ extension SocketClient {
                 )
 
                 if connectionPaused {
-                    Logging.log("mmsdk| Will send once wallet is open again")
+                    Logging.log("Will send once wallet is open again")
                     onClientsReady = { [weak self] in
-                        Logging.log("mmsdk| Sending now")
+                        Logging.log("Sending now")
                         self?.channel.emit(ClientEvent.message, message)
                     }
                 } else {
                     channel.emit(ClientEvent.message, message)
                 }
             } catch {
-                Logging.error("mmsdk| Error: \(error.localizedDescription)")
+                Logging.error("\(error.localizedDescription)")
             }
         } else {
             let message = Message(

@@ -35,7 +35,7 @@ struct Message<T: CodableData>: CodableData {
             let message = try JSONDecoder().decode(Message<T>.self, from: json)
             return message
         } catch {
-            Logging.error("mmsdk| Message \(message) could not be decoded: \(error.localizedDescription)")
+            Logging.error("Message \(message) could not be decoded: \(error.localizedDescription)")
         }
         return nil
     }

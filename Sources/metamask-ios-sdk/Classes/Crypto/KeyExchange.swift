@@ -92,15 +92,25 @@ public class KeyExchange {
         }
     }
 
-    public func message(type: KeyExchangeType) -> KeyExchangeMessage {
+    func message(type: KeyExchangeType) -> KeyExchangeMessage {
         KeyExchangeMessage(
             type: type,
             pubkey: pubkey
         )
     }
 
-    public func setTheirPublicKey(_ publicKey: String?) {
+    func setTheirPublicKey(_ publicKey: String?) {
         theirPublicKey = publicKey
+    }
+
+    static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
+        guard
+            let message = message["message"] as? [String: Any],
+            let type = message["type"] as? String,
+            let exchangeType = KeyExchangeType(rawValue: type),
+            exchangeType == .start
+        else { return false }
+        return true
     }
 
     public func encryptMessage<T: CodableData>(_ message: T) throws -> String {

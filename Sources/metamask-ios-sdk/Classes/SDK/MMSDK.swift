@@ -15,7 +15,10 @@ protocol SDKDelegate: AnyObject {
 }
 
 public class MMSDK: ObservableObject, SDKDelegate {
+    private var client: CommunicationClient!
+
     public static let shared = MMSDK()
+    @ObservedObject public var ethereum = Ethereum()
 
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
     public var enableDebug: Bool = true {
@@ -23,10 +26,6 @@ public class MMSDK: ObservableObject, SDKDelegate {
             client.enableTracking(enableDebug)
         }
     }
-
-    @ObservedObject public var ethereum = Ethereum()
-
-    private var client: CommunicationClient!
 
     public var isConnected: Bool {
         client.isConnected
