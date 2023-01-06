@@ -175,7 +175,7 @@ extension Ethereum {
                 updateAccount(account)
                 submittedRequests[id]?.send(account)
             } else {
-                Logging.error("mmsdk| Request accounts failure")
+                Logging.error("Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
@@ -186,19 +186,19 @@ extension Ethereum {
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
-                Logging.error("mmsdk| Signature v4 failure")
+                Logging.error("Signature v4 failure")
             }
         case .sendTransaction:
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
-                Logging.error("mmsdk| Transaction failure")
+                Logging.error("Transaction failure")
             }
         default:
             if let result = data["result"] {
                 submittedRequests[id]?.send(result)
             }
-            Logging.log("mmsdk| Unhandled result")
+            Logging.log("Unhandled result")
         }
     }
 

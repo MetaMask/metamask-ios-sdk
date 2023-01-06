@@ -90,14 +90,14 @@ private extension SocketClient {
         // MARK: Connection error event
 
         channel.on(clientEvent: .error) { data in
-            Logging.error("mmsdk| Client connection error: \(data)")
+            Logging.error("Client connection error: \(data)")
         }
 
         // MARK: Clients connected event
 
         channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
             guard let self = self else { return }
-            Logging.log("mmsdk| Clients connected: \(data)")
+            Logging.log("Clients connected: \(data)")
 
             self.trackEvent(.connected)
 
@@ -126,7 +126,7 @@ private extension SocketClient {
                 userInfo: ["value": "Connected to Socket"]
             )
 
-            Logging.log("mmsdk| SDK connected to socket")
+            Logging.log("SDK connected to socket")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
 
@@ -160,7 +160,7 @@ private extension SocketClient {
     func handleDisconnection() {
         channel.on(ClientEvent.clientDisconnected(on: channelId)) { [weak self] _ in
             guard let self = self else { return }
-            Logging.log("mmsdk| SDK disconnected")
+            Logging.log("SDK disconnected")
 
             self.trackEvent(.disconnected)
 
@@ -207,15 +207,17 @@ private extension SocketClient {
                 let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
                 sendMessage(nextKeyExchangeMessage, encrypt: false)
             }
-            return
-        }
+        } else {
+            guard let message = Message<String>.message(from: message) else {
+                Logging.error("Could not handle message")
+                return
+            }
 
-        guard let message = Message<String>.message(from: message) else { return }
-
-        do {
-            try handleEncryptedMessage(message)
-        } catch {
-            Logging.error("mmsdk| Error: \(error.localizedDescription)")
+            do {
+                try handleEncryptedMessage(message)
+            } catch {
+                Logging.error("\(error.localizedDescription)")
+            }
         }
     }
     
@@ -229,14 +231,14 @@ private extension SocketClient {
             as? [String: Any] ?? [:]
 
         if json["type"] as? String == "pause" {
-            Logging.log("mmsdk| Connection has been paused")
+            Logging.log("Connection has been paused")
             connectionPaused = true
         } else if json["type"] as? String == "ready" {
-            Logging.log("mmsdk| Connection is ready")
+            Logging.log("Connection is ready")
             connectionPaused = false
             onClientsReady?()
         } else if json["type"] as? String == "wallet_info" {
-            Logging.log("mmsdk| Received wallet info")
+            Logging.log("Received wallet info")
             isConnected = true
             onClientsReady?()
             connectionPaused = false
@@ -296,16 +298,16 @@ extension SocketClient {
                 )
 
                 if connectionPaused {
-                    Logging.log("mmsdk| Will send once wallet is open again")
+                    Logging.log("Will send once wallet is open again")
                     onClientsReady = { [weak self] in
-                        Logging.log("mmsdk| Sending now")
+                        Logging.log("Sending now")
                         self?.channel.emit(ClientEvent.message, message)
                     }
                 } else {
                     channel.emit(ClientEvent.message, message)
                 }
             } catch {
-                Logging.error("mmsdk| Error: \(error.localizedDescription)")
+                Logging.error("\(error.localizedDescription)")
             }
         } else {
             let message = Message(

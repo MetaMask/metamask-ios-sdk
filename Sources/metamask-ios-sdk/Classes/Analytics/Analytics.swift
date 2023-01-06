@@ -36,7 +36,7 @@ class Analytics: Tracking {
         do {
             try await network.post(params, endpoint: .analytics)
         } catch {
-            Logging.error("mmsdk| tracking error: \(error.localizedDescription)")
+            Logging.error("tracking error: \(error.localizedDescription)")
         }
     }
 }
