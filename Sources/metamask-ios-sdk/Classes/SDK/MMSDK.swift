@@ -7,6 +7,7 @@ import Combine
 
 protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
+    var networkUrl: String { get set }
     var onClientsReady: (() -> Void)? { get set }
 
     func connect()
@@ -16,6 +17,7 @@ protocol SDKDelegate: AnyObject {
 
 public class MMSDK: ObservableObject, SDKDelegate {
     private var client: CommunicationClient!
+    public static var SERVER_URL = "https://metamask-sdk-socket.metafi.codefi.network/"
 
     public static let shared = MMSDK()
     @ObservedObject public var ethereum = Ethereum()
@@ -29,6 +31,14 @@ public class MMSDK: ObservableObject, SDKDelegate {
 
     public var isConnected: Bool {
         client.isConnected
+    }
+    
+    var networkUrl: String {
+        get {
+            client.serverUrl
+        } set {
+            client.serverUrl = newValue
+        }
     }
 
     var dapp: Dapp? {

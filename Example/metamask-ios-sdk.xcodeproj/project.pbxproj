@@ -18,6 +18,7 @@
 		D107588F293F385700D6C66B /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588E293F385700D6C66B /* TransactionView.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
+		D1896062296C3F9500216307 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1896061296C3F9500216307 /* NetworkView.swift */; };
 		D1EA931D29538C570078F088 /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* Text.swift */; };
 		DD5539BA381D81243FC39C4D /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F160289D32176B583BB56A3 /* Pods_metamask_ios_sdk_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -52,6 +53,7 @@
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
+		D1896061296C3F9500216307 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		F64C3CE55BBAE4908CF676A7 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		607FACD21AFB9204008FA782 /* Example for metamask-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				D1896060296C3E0600216307 /* Views */,
 				D11D2F192950757A000E8003 /* Modifiers */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
@@ -109,9 +112,6 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				D148AC74292FCF1B001791E5 /* ConnectView.swift */,
-				D107588C293F289500D6C66B /* SignView.swift */,
-				D107588E293F385700D6C66B /* TransactionView.swift */,
 			);
 			name = "Example for metamask-ios-sdk";
 			path = "metamask-ios-sdk";
@@ -169,6 +169,17 @@
 				D1EA931C29538C570078F088 /* Text.swift */,
 			);
 			name = Modifiers;
+			sourceTree = "<group>";
+		};
+		D1896060296C3E0600216307 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D148AC74292FCF1B001791E5 /* ConnectView.swift */,
+				D107588C293F289500D6C66B /* SignView.swift */,
+				D107588E293F385700D6C66B /* TransactionView.swift */,
+				D1896061296C3F9500216307 /* NetworkView.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		E1776468B410544A8646D99F /* Frameworks */ = {
@@ -233,8 +244,9 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 6TKEXNX4L5;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -358,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */,
+				D1896062296C3F9500216307 /* NetworkView.swift in Sources */,
 				D107588D293F289500D6C66B /* SignView.swift in Sources */,
 				D107588F293F385700D6C66B /* TransactionView.swift in Sources */,
 				D1EA931D29538C570078F088 /* Text.swift in Sources */,
@@ -518,8 +531,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6TKEXNX4L5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/Socket.IO-Client-Swift\"",
@@ -547,8 +560,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6TKEXNX4L5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/Socket.IO-Client-Swift\"",
