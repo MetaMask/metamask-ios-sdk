@@ -10,9 +10,19 @@ public typealias EthereumPublisher = AnyPublisher<Any, EthereumError>
 
 public class Ethereum: ObservableObject {
     private let AUTHORIZATION_ERROR_CODE = 4001
+    private let INVALID_PARAMETERS_CODE = -32602
     private let CONNECTION_ID = "connection-id"
 
     weak var delegate: SDKDelegate?
+    
+    public var networkUrl: String {
+        get {
+            delegate?.networkUrl ?? ""
+        } set {
+            delegate?.networkUrl = newValue
+        }
+    }
+    
     @Published public var chainId: String?
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
@@ -146,16 +156,16 @@ extension Ethereum {
             if let message = error["message"] as? String {
                 submittedRequests[id]?.error(EthereumError.requestError(message))
             } else if code == AUTHORIZATION_ERROR_CODE {
-                submittedRequests[id]?.error(EthereumError.requestError("User rejected the request"))
+                submittedRequests[id]?.error(EthereumError.requestError("The request was rejected by the user"))
+            } else if code == INVALID_PARAMETERS_CODE {
+                submittedRequests[id]?.error(EthereumError.requestError("The parameters were invalid"))
             } else {
-                submittedRequests[id]?.error(EthereumError.requestError("Request failed with error code \(code)"))
+                submittedRequests[id]?.error(EthereumError.requestError("The request failed with error code \(code)"))
             }
             return
         }
 
-        let method = request.method
-
-        switch method {
+        switch request.method {
         case .getMetamaskProviderState:
             let result: [String: Any] = data["result"] as? [String: Any] ?? [:]
             let accounts = result["accounts"] as? [String] ?? []

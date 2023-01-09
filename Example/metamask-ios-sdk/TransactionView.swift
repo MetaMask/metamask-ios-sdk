@@ -22,7 +22,7 @@ struct TransactionView: View {
             Section {
                 Text("From")
                     .modifier(TextCallout())
-                TextEditor(text: $ethereum.selectedAddress)
+                TextField("Enter sender address", text: $ethereum.selectedAddress)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -40,7 +40,7 @@ struct TransactionView: View {
             Section {
                 Text("Amount")
                     .modifier(TextCallout())
-                TextEditor(text: $amount)
+                TextField("Enter amount", text: $amount)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())

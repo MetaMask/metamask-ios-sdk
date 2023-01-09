@@ -12,6 +12,7 @@ protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
     var isConnected: Bool { get set }
+    var serverUrl: String { get set }
 
     var onClientsReady: (() -> Void)? { get set }
     var tearDownConnection: (() -> Void)? { get set }
@@ -35,6 +36,14 @@ class SocketClient: CommunicationClient {
 
     var clientName: String {
         "socket"
+    }
+    
+    var serverUrl: String {
+        get {
+            channel.serverUrl
+        } set {
+            channel.serverUrl = newValue
+        }
     }
 
     var isConnected: Bool = false

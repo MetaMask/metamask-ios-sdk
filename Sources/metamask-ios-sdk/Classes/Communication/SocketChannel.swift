@@ -6,11 +6,28 @@ import SocketIO
 import Foundation
 
 class SocketChannel {
-    let socket: SocketIOClient
-    private let socketManager: SocketManager
+    var serverUrl: String {
+        get {
+            Endpoint.SERVER_URL
+        } set {
+            Endpoint.SERVER_URL = newValue
+            configureSocket(url: newValue)
+        }
+    }
+    
+    var socket: SocketIOClient!
+    private var socketManager: SocketManager!
 
     init() {
-        let url = URL(string: Endpoint.SOCKET_IO_SERVER)!
+        configureSocket(url: Endpoint.SERVER_URL)
+    }
+    
+    func configureSocket(url: String) {
+        guard let url = URL(string: url) else {
+            Logging.error("Socket url is invalid")
+            return
+        }
+        
         let options: SocketIOClientOption = .extraHeaders(
             [
                 "User-Agent": "SocketIOClient"

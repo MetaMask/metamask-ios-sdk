@@ -73,9 +73,32 @@ struct ConnectView: View {
                         }
                     }
                 }
+                
+                if ethereum.selectedAddress.isEmpty {
+                    Section {
+                        // Silly ZStack hack to hide disclosure indicator on NavigationLink
+                        ZStack() {
+                            NavigationLink {
+                                NetworkView()
+                            } label: {
+                                Text(" ")
+                            }
+                            .opacity(0)
+                            Text("Change network url")
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10)
+                                .padding(.horizontal)
+                                .background(Color.blue.grayscale(0.5))
+                                .modifier(ButtonCurvature())
+                        }
+                    }
+                }
 
                 if ethereum.selectedAddress.isEmpty {
-                    Section(footer: Text("This will open the MetaMask app. Please sign in and accept the connection prompt.").modifier(TextCallout())) {
+                    Section {
                         ZStack {
                             Button {
                                 showProgressView = true
@@ -113,6 +136,9 @@ struct ConnectView: View {
                                 message: Text(errorMessage)
                             )
                         }
+                    } footer: {
+                        Text("This will open the MetaMask app. Please sign in and accept the connection prompt.")
+                            .modifier(TextCaption())
                     }
                 }
             }
