@@ -7,7 +7,6 @@ PODS:
 
 DEPENDENCIES:
   - metamask-ios-sdk (from `../`)
-  - Socket.IO-Client-Swift (~> 16.0.1)
 
 SPEC REPOS:
   trunk:
@@ -19,10 +18,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  metamask-ios-sdk: f42afc85fa4773adc58ade1ecef0efc0d42019d3
+  metamask-ios-sdk: 664127b4b3f83b4fb44d0430604ae6ae71588b9c
   Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
 
-PODFILE CHECKSUM: 5a22b7d0fe24906d8d0216ff8f03e25c5121f25e
+PODFILE CHECKSUM: 30cfeff26f9d86047bb467599292bb0eb9657829
 
 COCOAPODS: 1.11.3

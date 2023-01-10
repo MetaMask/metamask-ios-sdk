@@ -58,12 +58,35 @@ public class MMSDK: ObservableObject, SDKDelegate {
 
         ethereum.delegate = self
         setupClientCommunication()
+        setupAppLifeCycleObservers()
     }
 
     private func setupClientCommunication() {
         client.receiveEvent = ethereum.receiveEvent
         client.tearDownConnection = ethereum.disconnect
         client.receiveResponse = ethereum.receiveResponse
+    }
+    
+    private func setupAppLifeCycleObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(startBackgroundTask),
+            name: UIApplication.willResignActiveNotification,
+            object: nil)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(stopBackgroundTask),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil)
+    }
+    
+    @objc private func startBackgroundTask() {
+        BackgroundTaskManager.start()
+    }
+    
+    @objc private func stopBackgroundTask() {
+        BackgroundTaskManager.stop()
     }
 }
 

@@ -1,6 +1,0 @@
-framework module metamask_ios_sdk {
-  umbrella header "metamask-ios-sdk-umbrella.h"
-
-  export *
-  module * { export * }
-}
