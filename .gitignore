@@ -1,6 +1,7 @@
 .DS_Store
 /.build
 /Packages
+Example/Pods/
 /*.xcodeproj
 xcuserdata/
 DerivedData/
