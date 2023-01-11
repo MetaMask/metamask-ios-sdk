@@ -26,7 +26,7 @@ import metamask_ios_sdk
 ```
 
 ### 3. Connect your Dapp
-```
+```swift
 @ObservedObject var ethereum = MMSDK.shared.ethereum
 
 // We log three events: connection request, connected, disconnected, otherwise no tracking. 
@@ -44,11 +44,11 @@ We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Ot
 
 ### 4. You can now call any ethereum provider method
 We use Combine to publish ethereum events, so you'll need an `AnyCancellable` storage.
-```
+```swift
 @State private var cancellables: Set<AnyCancellable> = []
 ```
 #### Example 1: Get `eth_chainId`
-```
+```swift
 @State var chainID: String?
 
 let chainIdRequest = EthereumRequest(method: .ethChainId)
@@ -66,7 +66,7 @@ ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
 ```
 
 #### Example 2: Send transaction
-```
+```swift
 // Create a transaction
 let transaction = Transaction(
     to: "0x...",
@@ -93,7 +93,7 @@ ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { co
 
 #### Example 3: Custom requests
 To create your own requests, you can use a primitive key-pair data type dictionary object or use a struct that conforms to `CodableData` i.e implementing the `func socketRepresentation() -> NetworkData` requirement, so that the type can be represented as a socket packet.
-```
+```swift
 let params: [String: String] = [
     "to": "0x...", // receiver address
     "from": ethereum.selectedAddress, // or any sender address
@@ -107,7 +107,7 @@ let request = EthereumRequest(
 ethereum.request(request)
 ```
 OR
-```
+```swift
 public struct SendTransaction: CodableData {
     public var to: String
     public let from: String
