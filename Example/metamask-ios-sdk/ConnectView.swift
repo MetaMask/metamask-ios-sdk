@@ -85,6 +85,7 @@ struct ConnectView: View {
                             }
                             .opacity(0)
                             Text("Change network url")
+                                .frame(maxWidth: .infinity, maxHeight: 32)
                                 .modifier(ButtonStyle())
                         }
                     }
