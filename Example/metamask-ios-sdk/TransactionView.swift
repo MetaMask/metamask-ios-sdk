@@ -69,12 +69,7 @@ struct TransactionView: View {
                         message: Text(errorMessage)
                     )
                 }
-                .font(.title3)
-                .foregroundColor(.white)
-                .padding(.vertical, 10)
-                .padding(.horizontal)
-                .background(Color.blue.grayscale(0.5))
-                .modifier(ButtonCurvature())
+                .modifier(ButtonStyle())
             }
         }
         .background(Color.blue.grayscale(0.5))

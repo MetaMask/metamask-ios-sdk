@@ -87,12 +87,7 @@ struct ConnectView: View {
                             Text("Change network url")
                                 .modifier(TextButton())
                                 .frame(maxWidth: .infinity, maxHeight: 32)
-                                .font(.title3)
-                                .foregroundColor(.white)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal)
-                                .background(Color.blue.grayscale(0.5))
-                                .modifier(ButtonCurvature())
+                                .modifier(ButtonStyle())
                         }
                     }
                 }
@@ -116,13 +111,10 @@ struct ConnectView: View {
                                 }).store(in: &cancellables)
                             } label: {
                                 Text("Connect to MetaMask")
+                                    .modifier(TextButton())
                                     .frame(maxWidth: .infinity, maxHeight: 32)
                             }
-                            .modifier(TextButton())
-                            .foregroundColor(.white)
-                            .padding(.vertical, 10)
-                            .background(Color.blue.grayscale(0.5))
-                            .modifier(ButtonCurvature())
+                            .modifier(ButtonStyle())
 
                             if showProgressView && !ethereum.connected {
                                 ProgressView()
