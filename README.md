@@ -2,7 +2,9 @@
 The MetaMask iOS SDK enables developers to connect their native iOS apps to the Ethereum blockchain via the MetaMask Mobile wallet, effectively enabling the creation of iOS native decentralised applications (Dapps).
 
 ## Getting Started
-You can import the MetaMask iOS SDK into your native iOS app to enable users to easily connect with their MetaMask Mobile wallet. Refer to the [MetaMask API Reference](https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/guide/rpc-api.html#table-of-contents) to see all the RPC calls supported.
+This is a quick video tutorial explaining how to integrate and use MetaMask iOS SDK. Refer to the [MetaMask API Reference](https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/guide/rpc-api.html#table-of-contents) to see all the ethereum RPC methods available.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/0D1cIH-PZtI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
 
 ### 1. Install
 
@@ -16,7 +18,19 @@ And then run:
 pod install
 ```
 #### Swift Package Manager
+##### Via Xcode Menu
 To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `File -> Swift Packages -> Add Package Dependency`. And then enter this repository's url, i.e https://github.com/MetaMask/metamask-ios-sdk.
+
+##### Via Package file
+```swift
+    dependencies: [
+        .package(
+            url: "https://github.com/MetaMask/metamask-ios-sdk",
+            from: "0.1.0"
+        )
+    ]
+```
+
 #### Note
 Please note that the SDK supports `ios-arm64` (iOS devices) and `ios-arm64-simulator` (M1 chip simulators). We currently do not support `ios-ax86_64-simulator` (Intel chip simulators).
 
