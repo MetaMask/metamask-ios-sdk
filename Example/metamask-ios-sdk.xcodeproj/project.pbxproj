@@ -17,9 +17,10 @@
 		D107588D293F289500D6C66B /* SignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588C293F289500D6C66B /* SignView.swift */; };
 		D107588F293F385700D6C66B /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588E293F385700D6C66B /* TransactionView.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
+		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
 		D1896062296C3F9500216307 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1896061296C3F9500216307 /* NetworkView.swift */; };
-		D1EA931D29538C570078F088 /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* Text.swift */; };
+		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
 		DD5539BA381D81243FC39C4D /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F160289D32176B583BB56A3 /* Pods_metamask_ios_sdk_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -52,9 +53,10 @@
 		D107588C293F289500D6C66B /* SignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignView.swift; sourceTree = "<group>"; };
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
+		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
 		D1896061296C3F9500216307 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
-		D1EA931C29538C570078F088 /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
+		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		F64C3CE55BBAE4908CF676A7 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		FDD82A6E260BDD7F65DA6D92 /* Pods-metamask-ios-sdk_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.release.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -166,7 +168,8 @@
 			isa = PBXGroup;
 			children = (
 				D11D2F1A295075A3000E8003 /* Curvature.swift */,
-				D1EA931C29538C570078F088 /* Text.swift */,
+				D1EA931C29538C570078F088 /* TextStyle.swift */,
+				D13A7534296E7EA0005EE461 /* ButtonStyle.swift */,
 			);
 			name = Modifiers;
 			sourceTree = "<group>";
@@ -372,9 +375,10 @@
 				D1896062296C3F9500216307 /* NetworkView.swift in Sources */,
 				D107588D293F289500D6C66B /* SignView.swift in Sources */,
 				D107588F293F385700D6C66B /* TransactionView.swift in Sources */,
-				D1EA931D29538C570078F088 /* Text.swift in Sources */,
+				D1EA931D29538C570078F088 /* TextStyle.swift in Sources */,
 				D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

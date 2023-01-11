@@ -1,5 +1,5 @@
 //
-//  Text.swift
+//  TextStyle.swift
 //  metamask-ios-sdk_Example
 //
 

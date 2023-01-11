@@ -53,10 +53,7 @@ struct SignView: View {
                             message: Text(errorMessage)
                         )
                     }
-                    .foregroundColor(.white)
-                    .padding(.vertical, 10)
-                    .background(Color.blue.grayscale(0.5))
-                    .modifier(ButtonCurvature())
+                    .modifier(ButtonStyle())
                 }
             }
         }
