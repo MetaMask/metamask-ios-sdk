@@ -85,6 +85,7 @@ struct ConnectView: View {
                             }
                             .opacity(0)
                             Text("Change network url")
+                                .modifier(TextButton())
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                                 .modifier(ButtonStyle())
                         }
@@ -110,6 +111,7 @@ struct ConnectView: View {
                                 }).store(in: &cancellables)
                             } label: {
                                 Text("Connect to MetaMask")
+                                    .modifier(TextButton())
                                     .frame(maxWidth: .infinity, maxHeight: 32)
                             }
                             .modifier(ButtonStyle())
