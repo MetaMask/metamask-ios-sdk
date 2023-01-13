@@ -25,7 +25,7 @@ The iOS MetaMask SDK enables native iOS apps to interact with the Ethereum block
   s.homepage         = 'https://github.com/MetaMask/metamask-ios-sdk'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'Copyright ConsenSys Software Inc. 2022. All rights reserved.', :file => 'LICENSE' }
-  s.author           = { 'Mpendulo Ndlovu' => 'mpendulo@elefantel.com' }
+  s.author           = { 'MetaMask' => 'sdk@metamask.io' }
   s.source           = { :git => 'https://github.com/MetaMask/metamask-ios-sdk.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '14.0'

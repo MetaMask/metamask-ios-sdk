@@ -17,7 +17,6 @@ protocol SDKDelegate: AnyObject {
 
 public class MMSDK: ObservableObject, SDKDelegate {
     private var client: CommunicationClient!
-    public static var SERVER_URL = "https://metamask-sdk-socket.metafi.codefi.network/"
 
     public static let shared = MMSDK()
     @ObservedObject public var ethereum = Ethereum()

@@ -2,9 +2,6 @@
 //  NetworkView.swift
 //  metamask-ios-sdk_Example
 //
-//  Created by Mpendulo Ndlovu on 2023/01/09.
-//  Copyright © 2023 CocoaPods. All rights reserved.
-//
 
 import SwiftUI
 import metamask_ios_sdk

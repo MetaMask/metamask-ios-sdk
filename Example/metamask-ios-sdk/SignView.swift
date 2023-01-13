@@ -49,7 +49,7 @@ struct SignView: View {
                     }
                     .alert(isPresented: $showError) {
                         Alert(
-                            title: Text("Authorization Error"),
+                            title: Text("Error"),
                             message: Text(errorMessage)
                         )
                     }
@@ -72,7 +72,7 @@ struct SignView: View {
             case let .failure(error):
                 errorMessage = error.localizedDescription
                 showError = true
-                print("Authorization error: \(errorMessage)")
+                print("Error: \(errorMessage)")
             default: break
             }
         }, receiveValue: { value in
