@@ -27,7 +27,7 @@ public struct EthereumRequest<T: CodableData>: CodableData {
 
 struct SubmittedRequest {
     let method: EthereumMethod
-    private let requestSubject = PassthroughSubject<Any, EthereumError>()
+    private let requestSubject = PassthroughSubject<Any, RequestError>()
 
     var publisher: EthereumPublisher? {
         requestSubject
@@ -39,7 +39,7 @@ struct SubmittedRequest {
         requestSubject.send(value)
     }
 
-    func error(_ err: EthereumError) {
+    func error(_ err: RequestError) {
         requestSubject.send(completion: .failure(err))
     }
 }

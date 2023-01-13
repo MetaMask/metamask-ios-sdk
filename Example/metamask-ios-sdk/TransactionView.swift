@@ -65,7 +65,7 @@ struct TransactionView: View {
                 }
                 .alert(isPresented: $showError) {
                     Alert(
-                        title: Text("Authorization Error"),
+                        title: Text("Error"),
                         message: Text(errorMessage)
                     )
                 }

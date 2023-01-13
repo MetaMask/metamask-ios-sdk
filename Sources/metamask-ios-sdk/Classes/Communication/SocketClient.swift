@@ -301,7 +301,7 @@ extension SocketClient {
         if encrypt {
             do {
                 let encryptedMessage: String = try keyExchange.encryptMessage(message)
-                let message: Message<String> = Message(
+                let message: Message = Message(
                     id: channelId,
                     message: encryptedMessage
                 )

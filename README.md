@@ -78,6 +78,7 @@ ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
 ```
 
 #### Example 2: Send transaction
+The SDK comes with a simple transaction struct that you can use right away as a parameter object:
 ```swift
 // Create a transaction
 let transaction = Transaction(
@@ -88,7 +89,7 @@ let transaction = Transaction(
 // Create a request
 let transactionRequest = EthereumRequest(
     method: .sendTransaction,
-    params: [transaction])
+    parameters: [transaction])
 
 // Send a transaction request
 ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { completion in
@@ -103,10 +104,11 @@ ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { co
 .store(in: &cancellables)  
 ```
 
-#### Example 3: Custom requests
-To create your own requests, you can use a primitive key-pair data type dictionary object or use a struct that conforms to `CodableData` i.e implementing the `func socketRepresentation() -> NetworkData` requirement, so that the type can be represented as a socket packet.
+#### Example 3: Adding Custom Parameters
+##### Using parameters dictionary
+If your request parameters is a simple dictionary of string key-value pairs, you can use it directly. Note that the use of `Any` or even `AnyHashable` types is not supported as the type needs to be explicitly known. 
 ```swift
-let params: [String: String] = [
+let parameters: [String: String] = [
     "to": "0x...", // receiver address
     "from": ethereum.selectedAddress, // or any sender address
     "value": "0x..." // amount
@@ -114,28 +116,29 @@ let params: [String: String] = [
   
 let request = EthereumRequest(
     method: .sendTransaction,
-    params: [params])
+    parameters: [parameters])
 
 ethereum.request(request)
 ```
-OR
+
+##### Using a struct
+ For more a more complex parameters representation, you can define and use a struct that conforms to `CodableData` i.e implementing the requirement:
+ ```
+ func socketRepresentation() -> NetworkData
+ ```
+ so that the type can be represented as a socket packet.
+
 ```swift
-public struct SendTransaction: CodableData {
-    public var to: String
-    public let from: String
-    public var value: String
-    
-    public init(to: String, from: String, value: String) {
-        self.to = to
-        self.from = from
-        self.value = value
-    }
+public struct AddChainRequest: CodableData {
+    let chainId: String
+    let chainName: String
+    let rpcUrls: [String]
     
     public func socketRepresentation() -> NetworkData {
         [
-            "to": to,
-            "from": from,
-            "value": value
+            "chainId": chainId,
+            "chainName": chainName,
+            "rpcUrls": rpcUrls
         ]
     }
 }
@@ -145,11 +148,13 @@ Then use struct object as shown in [Example 2](#example-2-send-transaction) abov
 ## Examples
 We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests. There are three illustrated examples:
 
-a) `ConnectView.swift` - Connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
+1) `ConnectView.swift` - Connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
 
-b) `TransactionView.swift` - Send a transaction
+2) `TransactionView.swift` - Send a transaction
 
-c) `SignView.swift` - Sign a transaction
+3) `SignView.swift` - Sign a transaction
+
+4) `SwitchChainView.swift` - Switch to a different network chain (you need to call the `addEthereumChain` rpc call first if it doesn't already exist in the MetaMask wallet). 
 
 To run the example project, clone this repository, change directory to `metamask-ios-sdk/Example`, and then run `pod install` from the Example directory to install the SDK as a dependency on the project, and then open `metamask-ios-sdk.xcworkspace` and run the project. 
 

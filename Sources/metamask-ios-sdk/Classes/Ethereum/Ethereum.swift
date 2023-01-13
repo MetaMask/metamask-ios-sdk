@@ -6,11 +6,9 @@ import UIKit
 import Combine
 import Foundation
 
-public typealias EthereumPublisher = AnyPublisher<Any, EthereumError>
+public typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
 public class Ethereum: ObservableObject {
-    private let AUTHORIZATION_ERROR_CODE = 4001
-    private let INVALID_PARAMETERS_CODE = -32602
     private let CONNECTION_ID = "connection-id"
 
     weak var delegate: SDKDelegate?
@@ -23,7 +21,7 @@ public class Ethereum: ObservableObject {
         }
     }
     
-    @Published public var chainId: String?
+    @Published public var chainId: String = ""
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
 
@@ -57,7 +55,7 @@ public extension Ethereum {
 
     func disconnect() {
         connected = false
-        chainId = nil
+        chainId = ""
         selectedAddress = ""
     }
 }
@@ -118,7 +116,7 @@ extension Ethereum {
 
             delegate?.onClientsReady = requestAccounts
         } else if !connected {
-            Logging.error(EthereumError.notConnected)
+            Logging.error("Attempted to perform request while not connected")
         } else {
             let id = UUID().uuidString
             let submittedRequest = SubmittedRequest(method: request.method)
@@ -139,7 +137,7 @@ extension Ethereum {
 // MARK: Request Receiving
 
 extension Ethereum {
-    private func updateChainId(_ id: String?) {
+    private func updateChainId(_ id: String) {
         chainId = id
     }
 
@@ -151,17 +149,8 @@ extension Ethereum {
         guard let request = submittedRequests[id] else { return }
 
         if let error = data["error"] as? [String: Any] {
-            let code = error["code"] as? Int ?? -1
-
-            if let message = error["message"] as? String {
-                submittedRequests[id]?.error(EthereumError.requestError(message))
-            } else if code == AUTHORIZATION_ERROR_CODE {
-                submittedRequests[id]?.error(EthereumError.requestError("The request was rejected by the user"))
-            } else if code == INVALID_PARAMETERS_CODE {
-                submittedRequests[id]?.error(EthereumError.requestError("The parameters were invalid"))
-            } else {
-                submittedRequests[id]?.error(EthereumError.requestError("The request failed with error code \(code)"))
-            }
+            let RequestError = RequestError(from: error)
+            submittedRequests[id]?.error(RequestError)
             return
         }
 
@@ -208,7 +197,6 @@ extension Ethereum {
             if let result = data["result"] {
                 submittedRequests[id]?.send(result)
             }
-            Logging.log("Unhandled result")
         }
     }
 

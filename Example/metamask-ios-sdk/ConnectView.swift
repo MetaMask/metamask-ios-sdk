@@ -45,7 +45,7 @@ struct ConnectView: View {
                                 .bold()
                                 .modifier(TextCallout())
                             Spacer()
-                            Text(ethereum.chainId ?? "")
+                            Text(ethereum.chainId)
                                 .modifier(TextCaption())
                         }
 
@@ -70,10 +70,15 @@ struct ConnectView: View {
                             NavigationLink("Transact") {
                                 TransactionView()
                             }
+                            
+                            NavigationLink("Switch chain") {
+                                SwitchChainView()
+                            }
                         }
                     }
                 }
                 
+                /* Hide this until changing network url is fully supported by MM
                 if ethereum.selectedAddress.isEmpty {
                     Section {
                         // Silly ZStack hack to hide disclosure indicator on NavigationLink
@@ -91,6 +96,7 @@ struct ConnectView: View {
                         }
                     }
                 }
+                */
 
                 if ethereum.selectedAddress.isEmpty {
                     Section {
@@ -124,7 +130,7 @@ struct ConnectView: View {
                         }
                         .alert(isPresented: $showError) {
                             Alert(
-                                title: Text("Authorization Error"),
+                                title: Text("Error"),
                                 message: Text(errorMessage)
                             )
                         }
