@@ -70,33 +70,33 @@ struct ConnectView: View {
                             NavigationLink("Transact") {
                                 TransactionView()
                             }
-                            
+
                             NavigationLink("Switch chain") {
                                 SwitchChainView()
                             }
                         }
                     }
                 }
-                
+
                 /* Hide this until changing network url is fully supported by MM
-                if ethereum.selectedAddress.isEmpty {
-                    Section {
-                        // Silly ZStack hack to hide disclosure indicator on NavigationLink
-                        ZStack() {
-                            NavigationLink {
-                                NetworkView()
-                            } label: {
-                                Text(" ")
-                            }
-                            .opacity(0)
-                            Text("Change network url")
-                                .modifier(TextButton())
-                                .frame(maxWidth: .infinity, maxHeight: 32)
-                                .modifier(ButtonStyle())
-                        }
-                    }
-                }
-                */
+                 if ethereum.selectedAddress.isEmpty {
+                     Section {
+                         // Silly ZStack hack to hide disclosure indicator on NavigationLink
+                         ZStack() {
+                             NavigationLink {
+                                 NetworkView()
+                             } label: {
+                                 Text(" ")
+                             }
+                             .opacity(0)
+                             Text("Change network url")
+                                 .modifier(TextButton())
+                                 .frame(maxWidth: .infinity, maxHeight: 32)
+                                 .modifier(ButtonStyle())
+                         }
+                     }
+                 }
+                 */
 
                 if ethereum.selectedAddress.isEmpty {
                     Section {

@@ -14,20 +14,20 @@ class SocketChannel {
             configureSocket(url: newValue)
         }
     }
-    
+
     var socket: SocketIOClient!
     private var socketManager: SocketManager!
 
     init() {
         configureSocket(url: Endpoint.SERVER_URL)
     }
-    
+
     func configureSocket(url: String) {
         guard let url = URL(string: url) else {
             Logging.error("Socket url is invalid")
             return
         }
-        
+
         let options: SocketIOClientOption = .extraHeaders(
             [
                 "User-Agent": "SocketIOClient"
