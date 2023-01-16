@@ -5,17 +5,18 @@
 import Foundation
 
 // MARK: - RequestError
+
 public struct RequestError: Codable, Error {
     public let code: Int
     public let data: DataInfo?
     public let message: String
-    
+
     init(code: Int, message: String) {
         self.code = code
-        self.data = nil
+        data = nil
         self.message = message
     }
-    
+
     init(from dictionary: [String: Any]) {
         let defaultError = RequestError(code: -1, message: "The request failed")
         guard
@@ -27,7 +28,7 @@ public struct RequestError: Codable, Error {
         }
         self = value
     }
-    
+
     public var localizedDescription: String {
         message
     }
@@ -40,10 +41,11 @@ public extension RequestError {
 }
 
 // MARK: - DataInfo
+
 public struct DataInfo: Codable {
     let originalError: OriginalError
 }
 
 // MARK: - OriginalError
-public struct OriginalError: Codable {
-}
+
+public struct OriginalError: Codable {}

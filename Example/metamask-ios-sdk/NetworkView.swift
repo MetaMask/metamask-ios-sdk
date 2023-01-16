@@ -10,7 +10,7 @@ struct NetworkView: View {
     @ObservedObject var ethereum = MMSDK.shared.ethereum
     @Environment(\.presentationMode) var presentationMode
     @State var networkUrl: String = ""
-    
+
     var body: some View {
         Form {
             Section {
@@ -22,7 +22,7 @@ struct NetworkView: View {
                     .modifier(TextCurvature())
                     .disabled(true)
             }
-            
+
             Section {
                 Text("New network URL")
                     .modifier(TextCallout())
@@ -32,7 +32,7 @@ struct NetworkView: View {
                     .modifier(TextCurvature())
                     .autocapitalization(.none)
             }
-            
+
             Section {
                 Button {
                     changeNetwork()
@@ -53,7 +53,7 @@ struct NetworkView: View {
             }
         }
     }
-    
+
     func changeNetwork() {
         ethereum.networkUrl = networkUrl
         presentationMode.wrappedValue.dismiss()

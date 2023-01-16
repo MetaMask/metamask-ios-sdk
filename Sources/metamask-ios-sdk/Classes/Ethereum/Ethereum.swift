@@ -12,7 +12,7 @@ public class Ethereum: ObservableObject {
     private let CONNECTION_ID = "connection-id"
 
     weak var delegate: SDKDelegate?
-    
+
     public var networkUrl: String {
         get {
             delegate?.networkUrl ?? ""
@@ -20,7 +20,7 @@ public class Ethereum: ObservableObject {
             delegate?.networkUrl = newValue
         }
     }
-    
+
     @Published public var chainId: String = ""
     @Published public var connected: Bool = false
     @Published public var selectedAddress: String = ""
@@ -219,7 +219,7 @@ extension Ethereum {
                 updateChainId(chainId)
             }
         default:
-            break
+            Logging.log("Unhandled event: \(event)")
         }
     }
 }

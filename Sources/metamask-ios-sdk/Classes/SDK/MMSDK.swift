@@ -31,7 +31,7 @@ public class MMSDK: ObservableObject, SDKDelegate {
     public var isConnected: Bool {
         client.isConnected
     }
-    
+
     var networkUrl: String {
         get {
             client.serverUrl
@@ -65,26 +65,30 @@ public class MMSDK: ObservableObject, SDKDelegate {
         client.tearDownConnection = ethereum.disconnect
         client.receiveResponse = ethereum.receiveResponse
     }
-    
+
     private func setupAppLifeCycleObservers() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(startBackgroundTask),
             name: UIApplication.willResignActiveNotification,
-            object: nil)
-        
+            object: nil
+        )
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(stopBackgroundTask),
             name: UIApplication.didBecomeActiveNotification,
-            object: nil)
+            object: nil
+        )
     }
-    
-    @objc private func startBackgroundTask() {
+
+    @objc
+    private func startBackgroundTask() {
         BackgroundTaskManager.start()
     }
-    
-    @objc private func stopBackgroundTask() {
+
+    @objc
+    private func stopBackgroundTask() {
         BackgroundTaskManager.stop()
     }
 }

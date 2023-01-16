@@ -37,7 +37,7 @@ class SocketClient: CommunicationClient {
     var clientName: String {
         "socket"
     }
-    
+
     var serverUrl: String {
         get {
             channel.serverUrl
@@ -301,7 +301,7 @@ extension SocketClient {
         if encrypt {
             do {
                 let encryptedMessage: String = try keyExchange.encryptMessage(message)
-                let message: Message = Message(
+                let message: Message = .init(
                     id: channelId,
                     message: encryptedMessage
                 )
