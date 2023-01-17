@@ -107,12 +107,14 @@ struct ConnectView: View {
                                 ethereum.connect(dapp)?.sink(receiveCompletion: { completion in
                                     switch completion {
                                     case let .failure(error):
+                                        showProgressView = false
                                         errorMessage = error.localizedDescription
                                         showError = true
                                         print("Connection error: \(errorMessage)")
                                     default: break
                                     }
                                 }, receiveValue: { result in
+                                    showProgressView = false
                                     print("Connection result: \(result)")
                                 }).store(in: &cancellables)
                             } label: {

@@ -132,10 +132,10 @@ private extension SocketClient {
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
-                userInfo: ["value": "Connected to Socket"]
+                userInfo: ["value": "Connected to server"]
             )
 
-            Logging.log("SDK connected to socket")
+            Logging.log("SDK connected to server")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
 
@@ -225,7 +225,7 @@ private extension SocketClient {
             do {
                 try handleEncryptedMessage(message)
             } catch {
-                Logging.error("\(error.localizedDescription)")
+                Logging.error("(decryption) - \(error.localizedDescription)")
             }
         }
     }
@@ -295,6 +295,7 @@ extension SocketClient {
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
+            Logging.error("Attempting to send encrypted message without exchanging encryption keys")
             return
         }
 
@@ -307,9 +308,9 @@ extension SocketClient {
                 )
 
                 if connectionPaused {
-                    Logging.log("Will send once wallet is open again")
+                    Logging.log("Connection paused. Will send once wallet is open again")
                     onClientsReady = { [weak self] in
-                        Logging.log("Sending now")
+                        Logging.log("Resuming sending requests")
                         self?.channel.emit(ClientEvent.message, message)
                     }
                 } else {
