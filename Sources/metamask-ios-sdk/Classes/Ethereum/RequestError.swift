@@ -8,25 +8,11 @@ import Foundation
 
 public struct RequestError: Codable, Error {
     public let code: Int
-    public let data: DataInfo?
     public let message: String
 
-    init(code: Int, message: String) {
-        self.code = code
-        data = nil
-        self.message = message
-    }
-
-    init(from dictionary: [String: Any]) {
-        let defaultError = RequestError(code: -1, message: "The request failed")
-        guard
-            let data = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-            let value = try? JSONDecoder().decode(Self.self, from: data) else {
-            print("Could not handle error: \(dictionary)")
-            self = defaultError
-            return
-        }
-        self = value
+    init(from info: [String: Any]) {
+        self.code = info["code"] as? Int ?? -1
+        self.message = info["message"] as? String ?? ErrorType(rawValue: code)?.message ?? ""
     }
 
     public var localizedDescription: String {
@@ -36,16 +22,6 @@ public struct RequestError: Codable, Error {
 
 public extension RequestError {
     var codeType: ErrorType {
-        ErrorType(rawValue: code) ?? .unknown
+        ErrorType(rawValue: code) ?? .unknownError
     }
 }
-
-// MARK: - DataInfo
-
-public struct DataInfo: Codable {
-    let originalError: OriginalError
-}
-
-// MARK: - OriginalError
-
-public struct OriginalError: Codable {}

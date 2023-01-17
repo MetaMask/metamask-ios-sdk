@@ -196,6 +196,8 @@ extension Ethereum {
         default:
             if let result = data["result"] {
                 submittedRequests[id]?.send(result)
+            } else {
+                Logging.error("Unknown response: \(data)")
             }
         }
     }
@@ -204,7 +206,10 @@ extension Ethereum {
         guard
             let method = event["method"] as? String,
             let ethereumMethod = EthereumMethod(rawValue: method)
-        else { return }
+        else {
+            Logging.error("Unhandled event: \(event)")
+            return
+        }
 
         switch ethereumMethod {
         case .metaMaskAccountsChanged:

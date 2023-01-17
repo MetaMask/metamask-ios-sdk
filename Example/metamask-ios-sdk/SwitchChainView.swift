@@ -38,12 +38,11 @@ struct SwitchChainView: View {
             Section {
                 Text("Chain info")
                     .modifier(TextCallout())
-                TextField("Chain ID", text: $chainId)
+                TextField("Chain name", text: $chainName)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
-
-                TextField("Chain name", text: $chainName)
+                TextField("Chain ID", text: $chainId)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -97,7 +96,7 @@ struct SwitchChainView: View {
         ethereum.request(switchChainRequest)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
-                if error.codeType == .unrecognizedChainId || error.codeType == .internalServerError {
+                if error.codeType == .unrecognizedChainId || error.codeType == .serverError {
                     alert = AlertInfo(
                         id: .chainDoesNotExist,
                         title: "Error",

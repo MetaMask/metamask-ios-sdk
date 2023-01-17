@@ -132,10 +132,10 @@ private extension SocketClient {
             NotificationCenter.default.post(
                 name: NSNotification.Name("connection"),
                 object: nil,
-                userInfo: ["value": "Connected to Socket"]
+                userInfo: ["value": "Connected to server"]
             )
 
-            Logging.log("SDK connected to socket")
+            Logging.log("SDK connected to server")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
 
@@ -225,7 +225,7 @@ private extension SocketClient {
             do {
                 try handleEncryptedMessage(message)
             } catch {
-                Logging.error("\(error.localizedDescription)")
+                Logging.error("Decryption - \(error.localizedDescription)")
             }
         }
     }
@@ -238,6 +238,8 @@ private extension SocketClient {
             options: []
         )
             as? [String: Any] ?? [:]
+        
+        Logging.log("Decrypted message: \(decryptedText)")
 
         if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
@@ -295,8 +297,11 @@ extension SocketClient {
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
+            Logging.error("Attempting to send encrypted message without exchanging encryption keys")
             return
         }
+        
+        Logging.log("Sending message: \(message)")
 
         if encrypt {
             do {

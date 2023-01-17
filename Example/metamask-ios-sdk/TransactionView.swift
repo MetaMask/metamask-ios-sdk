@@ -10,7 +10,7 @@ import metamask_ios_sdk
 struct TransactionView: View {
     @ObservedObject var ethereum: Ethereum = MMSDK.shared.ethereum
 
-    @State private var amount = "0x0"
+    @State private var amount = ""
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
@@ -40,7 +40,7 @@ struct TransactionView: View {
             Section {
                 Text("Amount")
                     .modifier(TextCallout())
-                TextField("Enter amount", text: $amount)
+                TextField("Amount in wei", text: $amount)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -59,7 +59,7 @@ struct TransactionView: View {
                 Button {
                     sendTransaction()
                 } label: {
-                    Text("Send")
+                    Text("Send transaction")
                         .modifier(TextButton())
                         .frame(maxWidth: .infinity, maxHeight: 32)
                 }
@@ -79,7 +79,7 @@ struct TransactionView: View {
         let transaction = Transaction(
             to: to,
             from: ethereum.selectedAddress,
-            value: "0x0"
+            value: amount
         )
 
         let transactionRequest = EthereumRequest(
