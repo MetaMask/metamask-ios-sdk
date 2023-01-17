@@ -40,7 +40,7 @@ struct TransactionView: View {
             Section {
                 Text("Amount")
                     .modifier(TextCallout())
-                TextField("Amount in wei", text: $amount)
+                TextField("Amount", text: $amount)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
