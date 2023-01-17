@@ -225,7 +225,7 @@ private extension SocketClient {
             do {
                 try handleEncryptedMessage(message)
             } catch {
-                Logging.error("Decryption - \(error.localizedDescription)")
+                Logging.error("(decryption) - \(error.localizedDescription)")
             }
         }
     }
@@ -238,8 +238,6 @@ private extension SocketClient {
             options: []
         )
             as? [String: Any] ?? [:]
-        
-        Logging.log("Decrypted message: \(decryptedText)")
 
         if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
@@ -300,8 +298,6 @@ extension SocketClient {
             Logging.error("Attempting to send encrypted message without exchanging encryption keys")
             return
         }
-        
-        Logging.log("Sending message: \(message)")
 
         if encrypt {
             do {
@@ -312,9 +308,9 @@ extension SocketClient {
                 )
 
                 if connectionPaused {
-                    Logging.log("Will send once wallet is open again")
+                    Logging.log("Connection paused. Will send once wallet is open again")
                     onClientsReady = { [weak self] in
-                        Logging.log("Sending now")
+                        Logging.log("Resuming sending requests")
                         self?.channel.emit(ClientEvent.message, message)
                     }
                 } else {

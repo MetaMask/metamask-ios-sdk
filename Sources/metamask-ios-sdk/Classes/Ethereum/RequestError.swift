@@ -11,8 +11,8 @@ public struct RequestError: Codable, Error {
     public let message: String
 
     init(from info: [String: Any]) {
-        self.code = info["code"] as? Int ?? -1
-        self.message = info["message"] as? String ?? ErrorType(rawValue: code)?.message ?? ""
+        code = info["code"] as? Int ?? -1
+        message = info["message"] as? String ?? ErrorType(rawValue: code)?.message ?? ""
     }
 
     public var localizedDescription: String {

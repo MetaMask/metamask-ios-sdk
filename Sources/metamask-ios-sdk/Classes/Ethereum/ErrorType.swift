@@ -24,7 +24,7 @@ public enum ErrorType: Int {
     case serverError = -32603 // Could be one of many outcomes
     case parseError = -32700 // JSON RPC 2.0 Parse error
     case unknownError = -1 // check RequestError.code instead
-    
+
     var message: String {
         switch self {
         case .userRejectedRequest:
