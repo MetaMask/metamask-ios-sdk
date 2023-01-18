@@ -78,7 +78,7 @@ ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
 ```
 
 
-#### Example 1: Get account balance
+#### Example 2: Get account balance
 ```swift
 @State var balance: String?
 
