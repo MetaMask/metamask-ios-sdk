@@ -83,7 +83,7 @@ struct TransactionView: View {
         )
 
         let transactionRequest = EthereumRequest(
-            method: .sendTransaction,
+            method: "eth_sendTransaction",
             params: [transaction]
         )
 
@@ -96,8 +96,32 @@ struct TransactionView: View {
             default: break
             }
         }, receiveValue: { value in
+            print("Transaction result: \(value)")
             self.result = value as? String ?? ""
         }).store(in: &cancellables)
+    }
+}
+
+struct Transaction: CodableData {
+    let to: String
+    let from: String
+    let value: String
+    let data: String?
+
+    init(to: String, from: String, value: String, data: String? = nil) {
+        self.to = to
+        self.from = from
+        self.value = value
+        self.data = data
+    }
+
+    func socketRepresentation() -> NetworkData {
+        [
+            "to": to,
+            "from": from,
+            "value": value,
+            "data": data
+        ]
     }
 }
 

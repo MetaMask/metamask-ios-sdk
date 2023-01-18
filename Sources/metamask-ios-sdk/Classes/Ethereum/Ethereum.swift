@@ -9,10 +9,28 @@ import Foundation
 public typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
 public class Ethereum: ObservableObject {
-    private let CONNECTION_ID = "connection-id"
-
     weak var delegate: SDKDelegate?
+    private let CONNECTION_ID = "connection-id"
+    private var submittedRequests: [String: SubmittedRequest] = [:]
 
+    /// The active/selected MetaMask account chain
+    @Published public var chainId: String = ""
+    /// Indicated whether connected to MetaMask
+    @Published public var connected: Bool = false
+
+    /// The active/selected MetaMask account address
+    @Published public var selectedAddress: String = ""
+
+    /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
+    public var enableDebug: Bool {
+        get {
+            delegate?.enableDebug ?? true
+        } set {
+            delegate?.enableDebug = newValue
+        }
+    }
+
+    /// Set and use a custom network url. Currently fully supported
     public var networkUrl: String {
         get {
             delegate?.networkUrl ?? ""
@@ -20,12 +38,6 @@ public class Ethereum: ObservableObject {
             delegate?.networkUrl = newValue
         }
     }
-
-    @Published public var chainId: String = ""
-    @Published public var connected: Bool = false
-    @Published public var selectedAddress: String = ""
-
-    private var submittedRequests: [String: SubmittedRequest] = [:]
 }
 
 // MARK: Session Management
@@ -35,40 +47,45 @@ public extension Ethereum {
     private func initialise() -> EthereumPublisher? {
         let providerRequest = EthereumRequest(
             id: nil,
-            method: .getMetamaskProviderState
+            method: "metamask_getProviderState"
         )
 
         return request(providerRequest)
     }
 
     @discardableResult
+    /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
+    /// - Parameter dapp: A struct describing the dapp making the request
+    /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect(_ dapp: Dapp) -> EthereumPublisher? {
         delegate?.dapp = dapp
 
         let accountsRequest = EthereumRequest(
             id: nil,
-            method: .requestAccounts
+            method: "eth_requestAccounts"
         )
 
         return request(accountsRequest)
     }
 
+    /// Disconnect dapp
     func disconnect() {
         connected = false
         chainId = ""
         selectedAddress = ""
+        delegate?.disconnect()
     }
 }
 
 // MARK: Deeplinking
 
-extension Ethereum {
-    func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
+private extension Ethereum {
+    func shouldOpenMetaMask(method: DeeplinkMethod) -> Bool {
         switch method {
         case .requestAccounts:
             return selectedAddress.isEmpty ? true : false
         default:
-            return EthereumMethod.allCases.contains(method)
+            return DeeplinkMethod.allCases.contains(method)
         }
     }
 }
@@ -97,20 +114,23 @@ extension Ethereum {
         initialise()
 
         sendRequest(
-            EthereumRequest(method: .requestAccounts),
+            EthereumRequest(method: "eth_requestAccounts"),
             id: CONNECTION_ID,
             openDeeplink: false
         )
     }
 
     @discardableResult
+    /// Performs and Ethereum remote procedural call (RPC)
+    /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
+    /// - Returns: A Combine publisher that will emit a result or error once a response is received
     public func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
         var publisher: EthereumPublisher?
 
-        if request.method == .requestAccounts && !connected {
+        if request.method == "eth_requestAccounts" && !connected {
             delegate?.connect()
 
-            let submittedRequest = SubmittedRequest(method: .requestAccounts)
+            let submittedRequest = SubmittedRequest(method: "eth_requestAccounts")
             submittedRequests[CONNECTION_ID] = submittedRequest
             publisher = submittedRequests[CONNECTION_ID]?.publisher
 
@@ -123,11 +143,19 @@ extension Ethereum {
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
 
-            sendRequest(
-                request,
-                id: id,
-                openDeeplink: shouldOpenMetaMask(method: request.method)
-            )
+            if let deeplinkMethod = DeeplinkMethod(rawValue: request.method) {
+                sendRequest(
+                    request,
+                    id: id,
+                    openDeeplink: shouldOpenMetaMask(method: deeplinkMethod)
+                )
+            } else {
+                sendRequest(
+                    request,
+                    id: id,
+                    openDeeplink: false
+                )
+            }
         }
 
         return publisher
@@ -154,7 +182,16 @@ extension Ethereum {
             return
         }
 
-        switch request.method {
+        guard let method = ResponseMethod(rawValue: request.method) else {
+            if let result = data["result"] {
+                submittedRequests[id]?.send(result)
+            } else {
+                submittedRequests[id]?.send(data)
+            }
+            return
+        }
+
+        switch method {
         case .getMetamaskProviderState:
             let result: [String: Any] = data["result"] as? [String: Any] ?? [:]
             let accounts = result["accounts"] as? [String] ?? []
@@ -181,17 +218,13 @@ extension Ethereum {
                 updateChainId(result)
                 submittedRequests[id]?.send(result)
             }
-        case .signTypedDataV4:
+        case .signTypedDataV4,
+             .signTypedDataV3,
+             .sendTransaction:
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
-                Logging.error("Signature v4 failure")
-            }
-        case .sendTransaction:
-            if let result: String = data["result"] as? String {
-                submittedRequests[id]?.send(result)
-            } else {
-                Logging.error("Transaction failure")
+                Logging.error("Unexpected response \(data)")
             }
         default:
             if let result = data["result"] {
@@ -205,13 +238,13 @@ extension Ethereum {
     func receiveEvent(_ event: [String: Any]) {
         guard
             let method = event["method"] as? String,
-            let ethereumMethod = EthereumMethod(rawValue: method)
+            let stateEvent = StateEvent(rawValue: method)
         else {
             Logging.error("Unhandled event: \(event)")
             return
         }
 
-        switch ethereumMethod {
+        switch stateEvent {
         case .metaMaskAccountsChanged:
             let accounts: [String] = event["params"] as? [String] ?? []
             if let account = accounts.first {
@@ -223,8 +256,6 @@ extension Ethereum {
             if let chainId = params["chainId"] as? String {
                 updateChainId(chainId)
             }
-        default:
-            Logging.log("Unhandled event: \(event)")
         }
     }
 }

@@ -63,7 +63,7 @@ struct SignView: View {
         let from = ethereum.selectedAddress
         let params: [String] = [from, message]
         let signRequest = EthereumRequest(
-            method: .signTypedDataV4,
+            method: "eth_signTypedData_v4",
             params: params
         )
 
