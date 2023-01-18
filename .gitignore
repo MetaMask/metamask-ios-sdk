@@ -2,6 +2,7 @@
 /.build
 /Packages
 Example/Pods/
+Example/Podfile.lock
 /*.xcodeproj
 xcuserdata/
 DerivedData/

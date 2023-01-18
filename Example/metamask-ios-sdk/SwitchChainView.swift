@@ -89,7 +89,7 @@ struct SwitchChainView: View {
         ]
 
         let switchChainRequest = EthereumRequest(
-            method: .switchEthereumChain,
+            method: "wallet_switchEthereumChain",
             params: [switchChainParams]
         )
 
@@ -145,7 +145,7 @@ struct SwitchChainView: View {
         )
 
         let addChainRequest = EthereumRequest(
-            method: .addEthereumChain,
+            method: "wallet_addEthereumChain",
             params: [addChainParams]
         )
 
@@ -172,20 +172,19 @@ struct SwitchChainView: View {
             print("Add chain result: \(value)")
         }).store(in: &cancellables)
     }
+}
 
-    // request structs need to implement `CodableData`
-    struct AddChainRequest: CodableData {
-        let chainId: String
-        let chainName: String
-        let rpcUrls: [String]
+struct AddChainRequest: CodableData {
+    let chainId: String
+    let chainName: String
+    let rpcUrls: [String]
 
-        public func socketRepresentation() -> NetworkData {
-            [
-                "chainId": chainId,
-                "chainName": chainName,
-                "rpcUrls": rpcUrls
-            ]
-        }
+    public func socketRepresentation() -> NetworkData {
+        [
+            "chainId": chainId,
+            "chainName": chainName,
+            "rpcUrls": rpcUrls
+        ]
     }
 }
 

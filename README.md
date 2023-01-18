@@ -45,13 +45,13 @@ import metamask_ios_sdk
 // This helps us to monitor any SDK connection issues. 
 //  
 
-let dappMetaData = DappMetadata(name: "myapp", url: "myapp.com")
+let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
 
 // This is the same as calling "eth_requestAccounts"
-ethereum.connect(dappMetaData)
+ethereum.connect(dapp)
 ```
 
-We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Otherwise no tracking. This helps us to monitor any SDK connection issues. If you wish to disable this, you can do so by setting `MMSDK.shared.enableDebug = false`.
+We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Otherwise no tracking. This helps us to monitor any SDK connection issues. If you wish to disable this, you can do so by setting `MMSDK.shared.enableDebug = false` or `ethereum.enableDebug = false`.
 
 
 ### 4. You can now call any ethereum provider method
@@ -59,11 +59,11 @@ We use Combine to publish ethereum events, so you'll need an `AnyCancellable` st
 ```swift
 @State private var cancellables: Set<AnyCancellable> = []
 ```
-#### Example 1: Get `eth_chainId`
+#### Example 1: Get Chain ID
 ```swift
-@State var chainID: String?
+@State var chainId: String?
 
-let chainIdRequest = EthereumRequest(method: .ethChainId)
+let chainIdRequest = EthereumRequest(method: "eth_chainId")
 
 ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
     switch completion {
@@ -71,28 +71,60 @@ ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
         print("\(error.localizedDescription)")
     default: break
     }
-}, receiveValue: { chainId in
-    self.chainID = chainId
+}, receiveValue: { result in
+    self.chainId = result
 })
 .store(in: &cancellables)  
 ```
 
-#### Example 2: Send transaction
-The SDK comes with a simple transaction struct that you can use right away as a parameter object:
-```swift
-// Create a transaction
-let transaction = Transaction(
-    to: "0x...",
-    from: ethereum.selectedAddress,
-    value: "0x...")
-    
-// Create a request
-let transactionRequest = EthereumRequest(
-    method: .sendTransaction,
-    parameters: [transaction])
 
-// Send a transaction request
-ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { completion in
+#### Example 1: Get account balance
+```swift
+@State var balance: String?
+
+// Create parameters
+let parameters: [String] = [
+    ethereum.selectedAddress, // address to check for balance
+    "latest" // "latest", "earliest" or "pending" (optional)
+  ]
+  
+// Create request  
+let getBalanceRequest = EthereumRequest(
+    method: "eth_getBalance",
+    parameters: [parameters])
+
+// Make request
+ethereum.request(getBalanceRequest)?.sink(receiveCompletion: { completion in
+    switch completion {
+    case .failure(let error):
+        print("\(error.localizedDescription)")
+    default: break
+    }
+}, receiveValue: { result in
+    self.balance = result
+})
+.store(in: &cancellables)  
+```
+
+#### Example 3: Send transaction
+##### Using parameters dictionary
+If your request parameters is a simple dictionary of string key-value pairs, you can use it directly. Note that the use of `Any` or even `AnyHashable` types is not supported as the type needs to be explicitly known.
+
+```swift
+// Create parameters
+let parameters: [String: String] = [
+    "to": "0x...", // receiver address
+    "from": ethereum.selectedAddress, // sender address
+    "value": "0x..." // amount
+  ]
+    
+// Create request
+let transactionRequest = EthereumRequest(
+    method: "eth_sendTransaction",
+    parameters: [parameters])
+
+// Make a transaction request
+ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
     switch completion {
     case .failure(let error):
         print("\(error.localizedDescription)")
@@ -103,50 +135,51 @@ ethereum.request(chainItransactionRequestdRequest)?.sink(receiveCompletion: { co
 })
 .store(in: &cancellables)  
 ```
-
-#### Example 3: Adding Custom Parameters
-##### Using parameters dictionary
-If your request parameters is a simple dictionary of string key-value pairs, you can use it directly. Note that the use of `Any` or even `AnyHashable` types is not supported as the type needs to be explicitly known. 
-```swift
-let parameters: [String: String] = [
-    "to": "0x...", // receiver address
-    "from": ethereum.selectedAddress, // or any sender address
-    "value": "0x..." // amount
-  ]
-  
-let request = EthereumRequest(
-    method: .sendTransaction,
-    parameters: [parameters])
-
-ethereum.request(request)
-```
-
 ##### Using a struct
- For more a more complex parameters representation, you can define and use a struct that conforms to `CodableData` i.e implementing the requirement:
+ For a more complex parameters representation, you can define and use a struct that conforms to `CodableData` i.e implementing the requirement:
  ```
  func socketRepresentation() -> NetworkData
  ```
  so that the type can be represented as a socket packet.
 
 ```swift
-public struct AddChainRequest: CodableData {
-    let chainId: String
-    let chainName: String
-    let rpcUrls: [String]
-    
-    public func socketRepresentation() -> NetworkData {
+struct Transaction: CodableData {
+    let to: String
+    let from: String
+    let value: String
+    let data: String?
+
+    init(to: String, from: String, value: String, data: String? = nil) {
+        self.to = to
+        self.from = from
+        self.value = value
+        self.data = data
+    }
+
+    func socketRepresentation() -> NetworkData {
         [
-            "chainId": chainId,
-            "chainName": chainName,
-            "rpcUrls": rpcUrls
+            "to": to,
+            "from": from,
+            "value": value,
+            "data": data
         ]
     }
 }
+
+let transaction = Transaction(
+    to: "0x...", // receiver address
+    from: ethereum.selectedAddress, // sender address
+    value: "0x..." // amount
+)
+
+let transactionRequest = EthereumRequest(
+    method: "eth_sendTransaction",
+    parameters: [transaction])
 ```
-Then use struct object as shown in [Example 2](#example-2-send-transaction) above
+Then make a request as shown in [Example 3](#example-3-send-transaction) above
 
 ## Examples
-We have created an [Example](./Example/) project as a guide on how to connect to ethereum and make requests. There are three illustrated examples:
+We have created an [Example](./Example/) dapp as a guide on how to connect to ethereum and make requests. There are three illustrated examples:
 
 1) `ConnectView.swift` - Connect to the ethereum blockchain via the MetaMask SDK. The other examples are based on a successful connection as demonstrated in this example
 
