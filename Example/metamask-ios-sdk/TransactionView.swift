@@ -83,8 +83,8 @@ struct TransactionView: View {
         )
 
         let transactionRequest = EthereumRequest(
-            method: "eth_getBalance",
-            params: [ethereum.selectedAddress, "latest"]
+            method: "eth_sendTransaction",
+            params: [transaction]
         )
 
         ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
