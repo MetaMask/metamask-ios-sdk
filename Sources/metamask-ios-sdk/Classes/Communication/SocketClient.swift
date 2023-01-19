@@ -195,7 +195,7 @@ private extension SocketClient {
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
         else { return }
-        
+
         sendMessage(nextKeyExchangeMessage, encrypt: false)
 
         if keyExchange.keysExchanged {
@@ -309,7 +309,7 @@ extension SocketClient {
                     onClientsReady = { [weak self] in
                         guard let self = self else { return }
                         Logging.log("Resuming sending requests")
-                        
+
                         if self.restartedConnection {
                             // their public key has changed, encrypt message again
                             do {
