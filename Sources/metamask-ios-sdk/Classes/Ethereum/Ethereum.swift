@@ -71,9 +71,6 @@ public extension Ethereum {
     /// Disconnect dapp
     func disconnect() {
         connected = false
-        chainId = ""
-        selectedAddress = ""
-        delegate?.disconnect()
     }
 }
 
@@ -130,13 +127,11 @@ extension Ethereum {
         if request.method == "eth_requestAccounts" && !connected {
             delegate?.connect()
 
-            let submittedRequest = SubmittedRequest(method: "eth_requestAccounts")
+            let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[CONNECTION_ID] = submittedRequest
             publisher = submittedRequests[CONNECTION_ID]?.publisher
 
             delegate?.onClientsReady = requestAccounts
-        } else if !connected {
-            Logging.error("Attempted to perform request while not connected")
         } else {
             let id = UUID().uuidString
             let submittedRequest = SubmittedRequest(method: request.method)
@@ -147,13 +142,13 @@ extension Ethereum {
                 sendRequest(
                     request,
                     id: id,
-                    openDeeplink: shouldOpenMetaMask(method: deeplinkMethod)
+                    openDeeplink: connected ? shouldOpenMetaMask(method: deeplinkMethod) : true
                 )
             } else {
                 sendRequest(
                     request,
                     id: id,
-                    openDeeplink: false
+                    openDeeplink: connected ? false : true
                 )
             }
         }
