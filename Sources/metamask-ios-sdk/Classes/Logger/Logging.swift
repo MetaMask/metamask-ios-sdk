@@ -10,11 +10,17 @@ class Logging {
         Logger().log("mmsdk| \(message)")
     }
 
-    static func error(_ error: String) {
-        Logger().log(level: .error, "mmsdk| Error: \(error)")
+    static func error(_ error: String, file: String = #file, function: String = #function, line: Int = #line) {
+        Logger().log(
+            level: .error,
+            "\n============\nmmsdk| Error: \(error)\nFunc: \(function)\nFile: \(fileName(from: file))\nLine: \(line)\n============\n")
     }
 
-    static func error(_ error: Error) {
-        Logger().log(level: .error, "mmsdk| Error: \(error.localizedDescription)")
+    static func error(_ error: Error, file: String = #file, function: String = #function, line: Int = #line) {
+        Logger().log(level: .error, "\n============\nmmsdk| Error \nFunc: \(function)\nFile: \(fileName(from: file))\nLine: \(line)\nError: \(error.localizedDescription)\n============\n")
+    }
+    
+    static func fileName(from path: String) -> String {
+        path.components(separatedBy: "/").last ?? ""
     }
 }

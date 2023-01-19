@@ -33,6 +33,7 @@ class SocketClient: CommunicationClient {
 
     private var channelId: String = UUID().uuidString
     private var connectionPaused: Bool = false
+    private var restartedConnection = false
 
     var clientName: String {
         "socket"
@@ -75,7 +76,6 @@ class SocketClient: CommunicationClient {
 
     private func resetClient() {
         isConnected = false
-        keyExchange.restart()
         tearDownConnection?()
     }
 
@@ -195,7 +195,7 @@ private extension SocketClient {
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
         else { return }
-
+        
         sendMessage(nextKeyExchangeMessage, encrypt: false)
 
         if keyExchange.keysExchanged {
@@ -205,11 +205,11 @@ private extension SocketClient {
 
     func handleMessage(_ message: [String: Any]) {
         if
-            connectionPaused,
             KeyExchange.isHandshakeRestartMessage(message) {
             keyExchange.restart()
             isConnected = true
             connectionPaused = false
+            restartedConnection = true
 
             if
                 let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
@@ -225,7 +225,7 @@ private extension SocketClient {
             do {
                 try handleEncryptedMessage(message)
             } catch {
-                Logging.error("(decryption) - \(error.localizedDescription)")
+                Logging.error(error.localizedDescription)
             }
         }
     }
@@ -294,6 +294,7 @@ extension SocketClient {
     }
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
+        let msg = message
         if encrypt && !keyExchange.keysExchanged {
             Logging.error("Attempting to send encrypted message without exchanging encryption keys")
             return
@@ -301,19 +302,34 @@ extension SocketClient {
 
         if encrypt {
             do {
-                let encryptedMessage: String = try keyExchange.encryptMessage(message)
-                let message: Message = .init(
-                    id: channelId,
-                    message: encryptedMessage
-                )
+                var encryptedMessage: String = try keyExchange.encryptMessage(message)
 
                 if connectionPaused {
                     Logging.log("Connection paused. Will send once wallet is open again")
                     onClientsReady = { [weak self] in
+                        guard let self = self else { return }
                         Logging.log("Resuming sending requests")
-                        self?.channel.emit(ClientEvent.message, message)
+                        
+                        if self.restartedConnection {
+                            // their public key has changed, encrypt message again
+                            do {
+                                encryptedMessage = try self.keyExchange.encryptMessage(message)
+                            } catch {
+                                Logging.error("\(error.localizedDescription)")
+                            }
+                            self.restartedConnection = false
+                        }
+                        let message: Message = .init(
+                            id: self.channelId,
+                            message: encryptedMessage
+                        )
+                        self.channel.emit(ClientEvent.message, message)
                     }
                 } else {
+                    let message: Message = .init(
+                        id: channelId,
+                        message: encryptedMessage
+                    )
                     channel.emit(ClientEvent.message, message)
                 }
             } catch {
