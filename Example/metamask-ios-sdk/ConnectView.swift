@@ -13,7 +13,7 @@ extension Notification.Name {
 }
 
 struct ConnectView: View {
-    @ObservedObject var ethereum = MMSDK.shared.ethereum
+    @ObservedObject var ethereum = MetaMaskSDK.shared.ethereum
     @State private var cancellables: Set<AnyCancellable> = []
 
     private let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")

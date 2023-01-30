@@ -1,5 +1,6 @@
 //
 //  QRCodeView.swift
+//  metamask-ios-sdk
 //
 
 import SwiftUI

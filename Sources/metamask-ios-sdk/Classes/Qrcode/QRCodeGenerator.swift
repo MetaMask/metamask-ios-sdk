@@ -1,5 +1,6 @@
 //
 //  QRCodeGenerator.swift
+//  metamask-ios-sdk
 //
 
 import SwiftUI

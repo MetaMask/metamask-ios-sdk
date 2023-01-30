@@ -1,5 +1,5 @@
 //
-//  MMSDK.swift
+//  MetaMaskSDK.swift
 //
 
 import SwiftUI
@@ -16,11 +16,11 @@ protocol SDKDelegate: AnyObject {
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
 
-public class MMSDK: ObservableObject, SDKDelegate {
+public class MetaMaskSDK: ObservableObject, SDKDelegate {
     private var client: CommunicationClient!
 
     /// Shared instance of the SDK through which Ethereum is accessed
-    public static let shared = MMSDK()
+    public static let shared = MetaMaskSDK()
 
     /// Ethereum abstraction via which all requests should be done
     @ObservedObject public var ethereum = Ethereum()
@@ -65,7 +65,7 @@ public class MMSDK: ObservableObject, SDKDelegate {
     }
 }
 
-private extension MMSDK {
+private extension MetaMaskSDK {
     func setupClientCommunication() {
         client.receiveEvent = ethereum.receiveEvent
         client.tearDownConnection = ethereum.disconnect
@@ -99,7 +99,7 @@ private extension MMSDK {
     }
 }
 
-extension MMSDK {
+extension MetaMaskSDK {
     func connect() {
         client.connect()
     }
