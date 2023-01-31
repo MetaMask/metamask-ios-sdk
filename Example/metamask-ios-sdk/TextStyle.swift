@@ -21,10 +21,11 @@ struct TextCallout: ViewModifier {
     }
 }
 
-struct TextCalloutBold: ViewModifier {
+struct TextCalloutLight: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .modifier(TextCallout())
+            .font(.system(.callout, design: .rounded))
+            .foregroundColor(.gray)
     }
 }
 

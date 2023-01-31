@@ -294,7 +294,6 @@ extension SocketClient {
     }
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
-        let msg = message
         if encrypt && !keyExchange.keysExchanged {
             Logging.error("Attempting to send encrypted message without exchanging encryption keys")
             return

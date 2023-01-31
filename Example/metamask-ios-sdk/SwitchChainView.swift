@@ -12,10 +12,8 @@ struct SwitchChainView: View {
     @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
 
     @State private var cancellables: Set<AnyCancellable> = []
-    @State private var chainId = ""
-    @State private var chainName = ""
-    @State private var chainUrls = ""
     @State private var alert: AlertInfo?
+    @State var networkSelection: Network = .goerli
 
     struct AlertInfo: Identifiable {
         enum Status {
@@ -32,25 +30,55 @@ struct SwitchChainView: View {
         var secondarButton: Alert.Button?
         var dismissButton: Alert.Button?
     }
+    
+    enum Network: String, CaseIterable, Identifiable {
+        case goerli = "0x5"
+        case kovan = "0x2a"
+        case ethereum = "0x1"
+        case polygon = "0x89"
+        
+        var id: Self { self }
+        
+        var chainId: String {
+            rawValue
+        }
+        
+        var name: String {
+            switch self {
+                case .polygon: return "Polygon"
+                case .ethereum: return "Ethereum"
+                case .kovan: return "Kovan Testnet"
+                case .goerli: return "Goerli Testnet"
+            }
+        }
+        
+        var rpcUrls: [String] {
+            switch self {
+            case .polygon: return ["https://polygon-rpc.com"]
+            default: return []
+            }
+        }
+        
+        static func chain(for chainId: String) -> String {
+            self.allCases.first(where: { $0.rawValue == chainId })?.name ?? ""
+        }
+    }
 
     var body: some View {
         Form {
             Section {
-                Text("Chain info")
-                    .modifier(TextCallout())
-                TextField("Chain name", text: $chainName)
-                    .modifier(TextCaption())
-                    .frame(minHeight: 32)
-                    .modifier(TextCurvature())
-                TextField("Chain ID", text: $chainId)
-                    .modifier(TextCaption())
-                    .frame(minHeight: 32)
-                    .modifier(TextCurvature())
-
-                TextField("Chain url(s) (comma separated)", text: $chainUrls)
-                    .modifier(TextCaption())
-                    .frame(minHeight: 32)
-                    .modifier(TextCurvature())
+                HStack {
+                    Text("Current chain:")
+                        .modifier(TextCallout())
+                    Spacer()
+                    Text("\(Network.chain(for: ethereum.chainId)) (\(ethereum.chainId))")
+                        .modifier(TextCalloutLight())
+                }
+                Picker("Switch to:", selection: $networkSelection) {
+                    ForEach(Network.allCases) { network in
+                        Text("\(network.name)")
+                    }
+                }
             }
 
             Section {
@@ -85,7 +113,7 @@ struct SwitchChainView: View {
 
     func switchEthereumChain() {
         let switchChainParams: [String: String] = [
-            "chainId": chainId
+            "chainId": networkSelection.chainId
         ]
 
         let switchChainRequest = EthereumRequest(
@@ -100,7 +128,7 @@ struct SwitchChainView: View {
                     alert = AlertInfo(
                         id: .chainDoesNotExist,
                         title: "Error",
-                        message: "\(chainName) (\(chainId)) has not been added to your MetaMask wallet. Add chain?",
+                        message: "\(networkSelection.name) (\(networkSelection.chainId)) has not been added to your MetaMask wallet. Add chain?",
                         primaryButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
                             addEthereumChain()
                         }),
@@ -121,7 +149,7 @@ struct SwitchChainView: View {
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
-                message: "Successfully switched to \(chainName)",
+                message: "Successfully switched to \(networkSelection.name)",
                 dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
                     presentationMode.wrappedValue.dismiss()
                 })
@@ -131,17 +159,10 @@ struct SwitchChainView: View {
     }
 
     func addEthereumChain() {
-        /*
-             For example for Polygon:
-             chainId = "0x89"
-             chainName = "Polygon"
-             rpcUrls = ["https://polygon-rpc.com"]
-         */
-        let rpcUrls: [String] = chainUrls.components(separatedBy: ",") // expecting no whitespace after comma
         let addChainParams = AddChainRequest(
-            chainId: chainId,
-            chainName: chainName,
-            rpcUrls: rpcUrls
+            chainId: networkSelection.chainId,
+            chainName: networkSelection.name,
+            rpcUrls: networkSelection.rpcUrls
         )
 
         let addChainRequest = EthereumRequest(
@@ -164,7 +185,9 @@ struct SwitchChainView: View {
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
-                message: ethereum.chainId == chainId ? "Successfully switched to \(chainName)" : "Successfully added \(chainName)",
+                message: ethereum.chainId == networkSelection.chainId
+                    ? "Successfully switched to \(networkSelection.name)"
+                    : "Successfully added \(networkSelection.name)",
                 dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
                     presentationMode.wrappedValue.dismiss()
                 })
