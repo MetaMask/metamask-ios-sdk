@@ -177,11 +177,9 @@ extension Ethereum {
             return
         }
 
-        guard let method = EthereumMethod(rawValue: request.method) else {
-            return
-        }
-
-        if EthereumMethod.isResultMethod(method) {
+        guard
+            let method = EthereumMethod(rawValue: request.method),
+            EthereumMethod.isResultMethod(method) else {
             if let result = data["result"] {
                 submittedRequests[id]?.send(result)
             } else {

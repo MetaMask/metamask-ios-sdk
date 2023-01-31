@@ -84,7 +84,7 @@ struct TransactionView: View {
 
         let transactionRequest = EthereumRequest(
             method: .ethSendTransaction,
-            params: transaction
+            params: [transaction] // eth_sendTransaction rpc call expects an array parameters object
         )
 
         ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in

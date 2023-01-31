@@ -90,7 +90,7 @@ struct SwitchChainView: View {
 
         let switchChainRequest = EthereumRequest(
             method: .switchEthereumChain,
-            params: switchChainParams
+            params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
         )
 
         ethereum.request(switchChainRequest)?.sink(receiveCompletion: { completion in
@@ -146,7 +146,7 @@ struct SwitchChainView: View {
 
         let addChainRequest = EthereumRequest(
             method: .addEthereumChain,
-            params: addChainParams
+            params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
         )
 
         ethereum.request(addChainRequest)?.sink(receiveCompletion: { completion in

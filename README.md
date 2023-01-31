@@ -121,7 +121,8 @@ let parameters: [String: String] = [
 // Create request
 let transactionRequest = EthereumRequest(
     method: .ethSendTransaction,
-    params: parameters)
+    params: [parameters] // eth_sendTransaction rpc call expects an array parameters object
+    )
 
 // Make a transaction request
 ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
@@ -174,7 +175,8 @@ let transaction = Transaction(
 
 let transactionRequest = EthereumRequest(
     method: .ethSendTransaction,
-    params: transaction)
+    params: [transaction] // eth_sendTransaction rpc call expects an array parameters object
+    )
 ```
 Then make a request as shown in [Example 3](#example-3-send-transaction) above
 
