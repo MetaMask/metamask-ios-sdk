@@ -8,14 +8,14 @@ import Combine
 import metamask_ios_sdk
 
 struct TransactionView: View {
-    @ObservedObject var ethereum: Ethereum = MMSDK.shared.ethereum
+    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
 
     @State private var amount = ""
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
     @State private var cancellables: Set<AnyCancellable> = []
-    @State private var to = "0xd0059fB234f15dFA9371a7B45c09d451a2dd2B5a"
+    @State private var to = "0x0000000000000000000000000000000000000000"
 
     var body: some View {
         Form {
@@ -83,8 +83,8 @@ struct TransactionView: View {
         )
 
         let transactionRequest = EthereumRequest(
-            method: "eth_sendTransaction",
-            params: [transaction]
+            method: .ethSendTransaction,
+            params: [transaction] // eth_sendTransaction rpc call expects an array parameters object
         )
 
         ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in

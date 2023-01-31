@@ -47,7 +47,7 @@ public extension Ethereum {
     private func initialise() -> EthereumPublisher? {
         let providerRequest = EthereumRequest(
             id: nil,
-            method: "metamask_getProviderState"
+            method: .getMetamaskProviderState
         )
 
         return request(providerRequest)
@@ -62,7 +62,7 @@ public extension Ethereum {
 
         let accountsRequest = EthereumRequest(
             id: nil,
-            method: "eth_requestAccounts"
+            method: .ethRequestAccounts
         )
 
         return request(accountsRequest)
@@ -77,12 +77,12 @@ public extension Ethereum {
 // MARK: Deeplinking
 
 private extension Ethereum {
-    func shouldOpenMetaMask(method: DeeplinkMethod) -> Bool {
+    func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
         switch method {
-        case .requestAccounts:
+        case .ethRequestAccounts:
             return selectedAddress.isEmpty ? true : false
         default:
-            return DeeplinkMethod.allCases.contains(method)
+            return EthereumMethod.requiresDeeplinking(method)
         }
     }
 }
@@ -111,7 +111,7 @@ extension Ethereum {
         initialise()
 
         sendRequest(
-            EthereumRequest(method: "eth_requestAccounts"),
+            EthereumRequest(method: .ethRequestAccounts),
             id: CONNECTION_ID,
             openDeeplink: false
         )
@@ -124,7 +124,7 @@ extension Ethereum {
     public func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
         var publisher: EthereumPublisher?
 
-        if request.method == "eth_requestAccounts" && !connected {
+        if request.methodType == .ethRequestAccounts && !connected {
             delegate?.connect()
 
             let submittedRequest = SubmittedRequest(method: request.method)
@@ -138,11 +138,11 @@ extension Ethereum {
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
 
-            if let deeplinkMethod = DeeplinkMethod(rawValue: request.method) {
+            if let method = EthereumMethod(rawValue: request.method) {
                 sendRequest(
                     request,
                     id: id,
-                    openDeeplink: connected ? shouldOpenMetaMask(method: deeplinkMethod) : true
+                    openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
                 )
             } else {
                 sendRequest(
@@ -177,7 +177,9 @@ extension Ethereum {
             return
         }
 
-        guard let method = ResponseMethod(rawValue: request.method) else {
+        guard
+            let method = EthereumMethod(rawValue: request.method),
+            EthereumMethod.isResultMethod(method) else {
             if let result = data["result"] {
                 submittedRequests[id]?.send(result)
             } else {
@@ -200,7 +202,7 @@ extension Ethereum {
                 updateChainId(chainId)
                 submittedRequests[id]?.send(chainId)
             }
-        case .requestAccounts:
+        case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 updateAccount(account)
@@ -213,9 +215,9 @@ extension Ethereum {
                 updateChainId(result)
                 submittedRequests[id]?.send(result)
             }
-        case .signTypedDataV4,
-             .signTypedDataV3,
-             .sendTransaction:
+        case .ethSignTypedDataV4,
+             .ethSignTypedDataV3,
+             .ethSendTransaction:
             if let result: String = data["result"] as? String {
                 submittedRequests[id]?.send(result)
             } else {
@@ -233,13 +235,13 @@ extension Ethereum {
     func receiveEvent(_ event: [String: Any]) {
         guard
             let method = event["method"] as? String,
-            let stateEvent = StateEvent(rawValue: method)
+            let ethMethod = EthereumMethod(rawValue: method)
         else {
             Logging.error("Unhandled event: \(event)")
             return
         }
 
-        switch stateEvent {
+        switch ethMethod {
         case .metaMaskAccountsChanged:
             let accounts: [String] = event["params"] as? [String] ?? []
             if let account = accounts.first {
@@ -251,6 +253,8 @@ extension Ethereum {
             if let chainId = params["chainId"] as? String {
                 updateChainId(chainId)
             }
+        default:
+            break
         }
     }
 }

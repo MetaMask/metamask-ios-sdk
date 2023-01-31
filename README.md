@@ -39,7 +39,7 @@ import metamask_ios_sdk
 
 ### 3. Connect your Dapp
 ```swift
-@ObservedObject var ethereum = MMSDK.shared.ethereum
+@ObservedObject var ethereum = MetaMaskSDK.shared.ethereum
 
 // We log three events: connection request, connected, disconnected, otherwise no tracking. 
 // This helps us to monitor any SDK connection issues. 
@@ -51,7 +51,7 @@ let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
 ethereum.connect(dapp)
 ```
 
-We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Otherwise no tracking. This helps us to monitor any SDK connection issues. If you wish to disable this, you can do so by setting `MMSDK.shared.enableDebug = false` or `ethereum.enableDebug = false`.
+We log three SDK events: `connectionRequest`, `connected` and `disconnected`. Otherwise no tracking. This helps us to monitor any SDK connection issues. If you wish to disable this, you can do so by setting `MetaMaskSDK.shared.enableDebug = false` or `ethereum.enableDebug = false`.
 
 
 ### 4. You can now call any ethereum provider method
@@ -63,7 +63,7 @@ We use Combine to publish ethereum events, so you'll need an `AnyCancellable` st
 ```swift
 @State var chainId: String?
 
-let chainIdRequest = EthereumRequest(method: "eth_chainId")
+let chainIdRequest = EthereumRequest(method: .ethChainId)
 
 ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
     switch completion {
@@ -90,8 +90,8 @@ let parameters: [String] = [
   
 // Create request  
 let getBalanceRequest = EthereumRequest(
-    method: "eth_getBalance",
-    parameters: [parameters])
+    method: .ethGetBalance,
+    params: parameters)
 
 // Make request
 ethereum.request(getBalanceRequest)?.sink(receiveCompletion: { completion in
@@ -120,8 +120,9 @@ let parameters: [String: String] = [
     
 // Create request
 let transactionRequest = EthereumRequest(
-    method: "eth_sendTransaction",
-    parameters: [parameters])
+    method: .ethSendTransaction,
+    params: [parameters] // eth_sendTransaction rpc call expects an array parameters object
+    )
 
 // Make a transaction request
 ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
@@ -173,8 +174,9 @@ let transaction = Transaction(
 )
 
 let transactionRequest = EthereumRequest(
-    method: "eth_sendTransaction",
-    parameters: [transaction])
+    method: .ethSendTransaction,
+    params: [transaction] // eth_sendTransaction rpc call expects an array parameters object
+    )
 ```
 Then make a request as shown in [Example 3](#example-3-send-transaction) above
 

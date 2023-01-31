@@ -7,7 +7,7 @@ import SwiftUI
 import metamask_ios_sdk
 
 struct NetworkView: View {
-    @ObservedObject var ethereum = MMSDK.shared.ethereum
+    @ObservedObject var ethereum = MetaMaskSDK.shared.ethereum
     @Environment(\.presentationMode) var presentationMode
     @State var networkUrl: String = ""
 

@@ -9,7 +9,7 @@ import metamask_ios_sdk
 
 struct SwitchChainView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var ethereum: Ethereum = MMSDK.shared.ethereum
+    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
 
     @State private var cancellables: Set<AnyCancellable> = []
     @State private var chainId = ""
@@ -89,8 +89,8 @@ struct SwitchChainView: View {
         ]
 
         let switchChainRequest = EthereumRequest(
-            method: "wallet_switchEthereumChain",
-            params: [switchChainParams]
+            method: .switchEthereumChain,
+            params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
         )
 
         ethereum.request(switchChainRequest)?.sink(receiveCompletion: { completion in
@@ -145,8 +145,8 @@ struct SwitchChainView: View {
         )
 
         let addChainRequest = EthereumRequest(
-            method: "wallet_addEthereumChain",
-            params: [addChainParams]
+            method: .addEthereumChain,
+            params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
         )
 
         ethereum.request(addChainRequest)?.sink(receiveCompletion: { completion in
