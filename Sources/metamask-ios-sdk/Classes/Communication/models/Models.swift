@@ -12,9 +12,14 @@ public typealias CodableData = Codable & SocketData
 struct OriginatorInfo: CodableData {
     let title: String?
     let url: String?
+    let platform: String?
 
     func socketRepresentation() -> NetworkData {
-        ["title": title ?? "", "url": url ?? ""]
+        [
+            "title": title,
+            "url": url,
+            "platform": platform
+        ]
     }
 }
 

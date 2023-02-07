@@ -282,7 +282,8 @@ extension SocketClient {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: dapp?.name,
-            url: dapp?.url
+            url: dapp?.url,
+            platform: SDKInfo.platform
         )
 
         let requestInfo = RequestInfo(
