@@ -362,7 +362,7 @@ extension SocketClient {
                 "sdkVersion": SDKInfo.version,
                 "url": dapp?.url ?? "",
                 "title": dapp?.name ?? "",
-                "platform": UIDevice.current.systemName
+                "platform": SDKInfo.platform
             ]
             parameters.merge(additionalParams) { current, _ in current }
         }

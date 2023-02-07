@@ -108,6 +108,11 @@ struct SwitchChainView: View {
                 .modifier(ButtonStyle())
             }
         }
+        .onAppear {
+            networkSelection = ethereum.chainId == networkSelection.rawValue
+                ? .ethereum
+            : .goerli
+        }
         .background(Color.blue.grayscale(0.5))
     }
 

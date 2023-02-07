@@ -12,5 +12,6 @@ public struct Dapp {
     public init(name: String, url: String) {
         self.name = name
         self.url = url
+        
     }
 }
