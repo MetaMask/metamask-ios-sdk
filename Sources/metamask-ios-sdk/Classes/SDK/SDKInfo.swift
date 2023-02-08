@@ -16,8 +16,8 @@ enum SDKInfo {
         sdkBundle["CFBundleShortVersionString"] as? String ?? ""
     }
     
-    /// The platform OS on which the SDK is run e.g `iOS, iPadOS`
+    /// The platform OS on which the SDK is run e.g `ios, ipados`
     static var platform: String {
-        UIDevice.current.systemName
+        UIDevice.current.systemName.lowercased()
     }
 }
