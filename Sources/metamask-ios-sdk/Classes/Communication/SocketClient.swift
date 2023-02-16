@@ -28,12 +28,18 @@ protocol CommunicationClient: AnyObject {
 class SocketClient: CommunicationClient {
     var dapp: Dapp?
     private var tracker: Tracking
+    private let store: SecureStore
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
-    private var channelId: String = UUID().uuidString
+    private var channelId: String {
+        storedSessionId ?? UUID().uuidString
+    }
+    
     private var connectionPaused: Bool = false
     private var restartedConnection = false
+    
+    private let CHANNEL_ID_KEY = "channel-id"
 
     var clientName: String {
         "socket"
@@ -62,8 +68,17 @@ class SocketClient: CommunicationClient {
             + "&pubkey="
             + keyExchange.pubkey
     }
+    
+    var isReconnection: Bool {
+        store.string(for: CHANNEL_ID_KEY) != nil
+    }
+    
+    var storedSessionId: String? {
+        store.string(for: CHANNEL_ID_KEY)
+    }
 
-    init(tracker: Tracking) {
+    init(store: SecureStore, tracker: Tracking) {
+        self.store = store
         self.tracker = tracker
         setupClient()
     }
@@ -138,6 +153,7 @@ private extension SocketClient {
             Logging.log("SDK connected to server")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
+            self.store.save(string: channelId, key: self.CHANNEL_ID_KEY)
 
             if !self.isConnected {
                 self.deeplinkToMetaMask()

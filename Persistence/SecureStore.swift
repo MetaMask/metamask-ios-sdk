@@ -16,7 +16,11 @@ public protocol SecureStore {
 }
 
 public struct Keychain: SecureStore {
-    private let service: String = "com.metamask.ios.sdk"
+    private let service: String
+    
+    public init(service: String = "com.metamask.ios.sdk") {
+        self.service = service
+    }
     
     public func string(for key: String) -> String? {
         guard
@@ -49,11 +53,6 @@ public struct Keychain: SecureStore {
             case errSecSuccess:
                 return dataTypeRef as? Data
             default:
-                let info: [String: Any] = [
-                    "key": key,
-                    "status": String(describing: status)
-                ]
-                Logging.error("Keychain data could not be fetched \(info)")
                 return nil
         }
     }
@@ -71,12 +70,6 @@ public struct Keychain: SecureStore {
                 guard deleteData(for: key) else { return false }
                 return save(data: data, key: key)
             default:
-                let info: [String: Any] = [
-                    "key": key,
-                    "status": String(describing: status),
-                    "attributes": String(describing: attributes)
-                ]
-                Logging.error("Keychain data could not be saved \(info)")
                 return false
         }
     }

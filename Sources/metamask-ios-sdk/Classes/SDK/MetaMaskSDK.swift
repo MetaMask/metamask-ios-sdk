@@ -55,9 +55,13 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
             client.onClientsReady = onClientsReady
         }
     }
+    
+    public convenience init(store: SecureStore = Keychain()) {
+        self.init(client: SocketClient(store: store, tracker: Analytics(debug: true)))
+    }
 
-    private init(tracker: Tracking = Analytics(debug: true)) {
-        client = SocketClient(tracker: tracker)
+    init(client: CommunicationClient) {
+        self.client = client
 
         ethereum.delegate = self
         setupClientCommunication()
