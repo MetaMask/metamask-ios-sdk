@@ -2,7 +2,19 @@
 //  SessionConfig.swift
 //  metamask-ios-sdk
 //
-//  Created by Mpendulo Ndlovu on 2023/02/21.
-//
 
 import Foundation
+
+class SessionConfig: Codable {
+    let sessionId: String
+    let expiry: Date
+    
+    var isValid: Bool {
+        expiry > Date()
+    }
+    
+    init(sessionId: String, expiry: Date) {
+        self.sessionId = sessionId
+        self.expiry = expiry
+    }
+}

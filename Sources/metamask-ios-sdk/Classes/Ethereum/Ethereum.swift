@@ -131,7 +131,7 @@ extension Ethereum {
             submittedRequests[CONNECTION_ID] = submittedRequest
             publisher = submittedRequests[CONNECTION_ID]?.publisher
 
-            delegate?.onClientsReady = requestAccounts
+            delegate?.addRequest(requestAccounts)
         } else {
             let id = UUID().uuidString
             let submittedRequest = SubmittedRequest(method: request.method)

@@ -8,13 +8,16 @@ import Combine
 import SocketIO
 import Foundation
 
+typealias RequestJob = () -> Void
+
 protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
     var isConnected: Bool { get set }
     var serverUrl: String { get set }
+    var hasValidSession: Bool { get }
+    var sessionDuration: TimeInterval { get set }
 
-    var onClientsReady: (() -> Void)? { get set }
     var tearDownConnection: (() -> Void)? { get set }
     var receiveEvent: (([String: Any]) -> Void)? { get set }
     var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
@@ -22,6 +25,7 @@ protocol CommunicationClient: AnyObject {
     func connect()
     func disconnect()
     func enableTracking(_ enable: Bool)
+    func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
 
@@ -32,17 +36,22 @@ class SocketClient: CommunicationClient {
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
-    private var channelId: String {
-        storedSessionId ?? UUID().uuidString
-    }
+    private var channelId: String = ""
     
     private var connectionPaused: Bool = false
     private var restartedConnection = false
     
-    private let CHANNEL_ID_KEY = "channel-id"
+    private let SESSION_KEY = "session_id"
 
     var clientName: String {
         "socket"
+    }
+    
+    // 24 hours default
+    var sessionDuration: TimeInterval = 24 * 3600 {
+        didSet {
+            updateSessionConfig()
+        }
     }
 
     var serverUrl: String {
@@ -52,14 +61,19 @@ class SocketClient: CommunicationClient {
             channel.serverUrl = newValue
         }
     }
+    
+    var hasValidSession: Bool {
+        sessionConfig?.isValid ?? false
+    }
 
     var isConnected: Bool = false
-    var onClientsReady: (() -> Void)?
     var tearDownConnection: (() -> Void)?
     var onClientsDisconnected: (() -> Void)?
 
     var receiveEvent: (([String: Any]) -> Void)?
     var receiveResponse: ((String, [String: Any]) -> Void)?
+    
+    var requestJobs: [RequestJob] = []
 
     var deeplinkUrl: String {
         "https://metamask.app.link/connect?channelId="
@@ -69,28 +83,24 @@ class SocketClient: CommunicationClient {
             + keyExchange.pubkey
     }
     
-    var isReconnection: Bool {
-        store.string(for: CHANNEL_ID_KEY) != nil
-    }
-    
-    var storedSessionId: String? {
-        store.string(for: CHANNEL_ID_KEY)
-    }
+    private var sessionConfig: SessionConfig?
 
     init(store: SecureStore, tracker: Tracking) {
         self.store = store
         self.tracker = tracker
         setupClient()
     }
-
-    private func setupClient() {
+    
+    func setupClient() {
+        configureSession()
         handleReceiveMessages()
         handleConnection()
         handleDisconnection()
     }
 
-    private func resetClient() {
+    func resetClient() {
         isConnected = false
+        self.keyExchange.restart()
         tearDownConnection?()
     }
 
@@ -102,6 +112,50 @@ class SocketClient: CommunicationClient {
     func disconnect() {
         isConnected = false
         channel.disconnect()
+    }
+    
+    private func fetchSessionConfig() -> SessionConfig? {
+        let config: SessionConfig? = store.model(for: SESSION_KEY)
+        return config
+    }
+    
+    private func configureSession() {
+        if let config = fetchSessionConfig(), config.isValid {
+            channelId = config.sessionId
+        } else {
+            // purge any existing session info
+            store.deleteData(for: SESSION_KEY)
+            channelId = UUID().uuidString
+        }
+        updateSessionConfig()
+    }
+    
+    private func updateSessionConfig() {
+        // update session expiry date
+        let config = SessionConfig(sessionId: channelId,
+                                   expiry: Date(timeIntervalSinceNow: sessionDuration))
+        
+        sessionConfig = config
+        
+        // persist session config
+        if let configData = try? JSONEncoder().encode(config) {
+            store.save(data: configData, key: SESSION_KEY)
+        }
+    }
+}
+
+// MARK: Request jobs
+
+extension SocketClient {
+    func addRequest(_ job: @escaping RequestJob) {
+        requestJobs.append(job)
+    }
+    
+    func runJobs() {
+        while !requestJobs.isEmpty {
+            let job = requestJobs.popLast()
+            job?()
+        }
     }
 }
 
@@ -153,7 +207,6 @@ private extension SocketClient {
             Logging.log("SDK connected to server")
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
-            self.store.save(string: channelId, key: self.CHANNEL_ID_KEY)
 
             if !self.isConnected {
                 self.deeplinkToMetaMask()
@@ -198,6 +251,8 @@ private extension SocketClient {
 
             if !self.connectionPaused {
                 self.resetClient()
+                self.connectionPaused = true
+                self.restartedConnection = true
             }
         }
     }
@@ -219,30 +274,16 @@ private extension SocketClient {
         }
     }
 
-    func handleMessage(_ message: [String: Any]) {
-        if
-            KeyExchange.isHandshakeRestartMessage(message) {
-            keyExchange.restart()
-            isConnected = true
-            connectionPaused = false
-            restartedConnection = true
+    func handleMessage(_ msg: [String: Any]) {
+        guard let message = Message<String>.message(from: msg) else {
+            Logging.error("Could not parse message \(msg)")
+            return
+        }
 
-            if
-                let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
-                let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) {
-                sendMessage(nextKeyExchangeMessage, encrypt: false)
-            }
-        } else {
-            guard let message = Message<String>.message(from: message) else {
-                Logging.error("Could not handle message")
-                return
-            }
-
-            do {
-                try handleEncryptedMessage(message)
-            } catch {
-                Logging.error(error.localizedDescription)
-            }
+        do {
+            try handleEncryptedMessage(message)
+        } catch {
+            Logging.error(error.localizedDescription)
         }
     }
 
@@ -261,11 +302,10 @@ private extension SocketClient {
         } else if json["type"] as? String == "ready" {
             Logging.log("Connection is ready")
             connectionPaused = false
-            onClientsReady?()
+            runJobs()
         } else if json["type"] as? String == "wallet_info" {
             Logging.log("Received wallet info")
             isConnected = true
-            onClientsReady?()
             connectionPaused = false
         } else if let data = json["data"] as? [String: Any] {
             if let id = data["id"] as? String {
@@ -312,49 +352,67 @@ extension SocketClient {
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
-            Logging.error("Attempting to send encrypted message without exchanging encryption keys")
-            return
-        }
-
-        if encrypt {
-            do {
-                var encryptedMessage: String = try keyExchange.encryptMessage(message)
-
-                if connectionPaused {
-                    Logging.log("Connection paused. Will send once wallet is open again")
-                    onClientsReady = { [weak self] in
-                        guard let self = self else { return }
-                        Logging.log("Resuming sending requests")
-
-                        if self.restartedConnection {
-                            // their public key has changed, encrypt message again
-                            do {
-                                encryptedMessage = try self.keyExchange.encryptMessage(message)
-                            } catch {
-                                Logging.error("\(error.localizedDescription)")
-                            }
-                            self.restartedConnection = false
-                        }
+            addRequest { [weak self] in
+                guard let self = self else { return }
+                Logging.log("Resuming sending requests after reconnection")
+                
+                do {
+                    let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
+                    // debug code
+                    let data = try! JSONEncoder().encode(message)
+                    let message: Message = .init(
+                        id: self.channelId,
+                        message: encryptedMessage,
+                        plainText: String(data: data, encoding: .utf8)
+                    )
+                    self.channel.emit(ClientEvent.message, message)
+                } catch {
+                    Logging.error("Could not encrypt message")
+                }
+            }
+        } else if encrypt {
+            if connectionPaused {
+                Logging.log("Connection paused. Will send once wallet is open again")
+                addRequest { [weak self] in
+                    guard let self = self else { return }
+                    Logging.log("Resuming sending requests after connection pause")
+                    
+                    do {
+                        let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
+                        // debug code
+                        let data = try! JSONEncoder().encode(message)
                         let message: Message = .init(
                             id: self.channelId,
-                            message: encryptedMessage
+                            message: encryptedMessage,
+                            plainText: String(data: data, encoding: .utf8)
                         )
                         self.channel.emit(ClientEvent.message, message)
+                        
+                    } catch {
+                        Logging.error("\(error.localizedDescription)")
                     }
-                } else {
+                }
+            } else {
+                do {
+                    let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
+                    let data = try! JSONEncoder().encode(message)
                     let message: Message = .init(
                         id: channelId,
-                        message: encryptedMessage
+                        message: encryptedMessage,
+                        plainText: String(data: data, encoding: .utf8)
                     )
                     channel.emit(ClientEvent.message, message)
+                    
+                } catch {
+                    Logging.error("\(error.localizedDescription)")
                 }
-            } catch {
-                Logging.error("\(error.localizedDescription)")
             }
         } else {
+            let data = try! JSONEncoder().encode(message)
             let message = Message(
                 id: channelId,
-                message: message
+                message: message,
+                plainText: String(data: data, encoding: .utf8)
             )
 
             channel.emit(ClientEvent.message, message)

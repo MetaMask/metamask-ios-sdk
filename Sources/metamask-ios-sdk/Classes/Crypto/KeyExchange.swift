@@ -65,12 +65,9 @@ public class KeyExchange {
     }
 
     func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
-        if message.type == .synack || message.type == .ack {
-            keysExchanged = true
-        }
-
         if let publicKey = message.pubkey {
             setTheirPublicKey(publicKey)
+            keysExchanged = true
         }
 
         guard let nextStep = nextStep(message.type) else {

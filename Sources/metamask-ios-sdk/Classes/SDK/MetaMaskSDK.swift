@@ -9,10 +9,10 @@ protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
     var enableDebug: Bool { get set }
     var networkUrl: String { get set }
-    var onClientsReady: (() -> Void)? { get set }
-
+    
     func connect()
     func disconnect()
+    func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
 
@@ -35,6 +35,18 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
     public var isConnected: Bool {
         client.isConnected
     }
+    
+    public var hasValidSession: Bool {
+        client.hasValidSession
+    }
+    
+    public var sessionDuration: TimeInterval {
+        get {
+            client.sessionDuration
+        } set {
+            client.sessionDuration = newValue
+        }
+    }
 
     var networkUrl: String {
         get {
@@ -49,14 +61,12 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
             client.dapp = dapp
         }
     }
-
-    var onClientsReady: (() -> Void)? {
-        didSet {
-            client.onClientsReady = onClientsReady
-        }
+    
+    func addRequest(_ job: @escaping RequestJob) {
+        client.addRequest(job)
     }
     
-    public convenience init(store: SecureStore = Keychain()) {
+    public convenience init(store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)) {
         self.init(client: SocketClient(store: store, tracker: Analytics(debug: true)))
     }
 
