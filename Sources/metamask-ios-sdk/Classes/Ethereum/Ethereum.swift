@@ -96,10 +96,10 @@ extension Ethereum {
         var request = request
         request.id = id
         delegate?.sendMessage(request, encrypt: true)
-
+        
         if
-            openDeeplink,
-            let url = URL(string: "https://metamask.app.link") {
+            let deeplink = delegate?.deeplinkUrl,
+            let url = URL(string: deeplink) {
             DispatchQueue.main.async {
                 UIApplication.shared.open(url)
             }

@@ -7,9 +7,9 @@ import Combine
 
 protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
+    var deeplinkUrl: String { get }
     var enableDebug: Bool { get set }
     var networkUrl: String { get set }
-    
     func connect()
     func disconnect()
     func addRequest(_ job: @escaping RequestJob)
@@ -54,6 +54,10 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
         } set {
             client.serverUrl = newValue
         }
+    }
+    
+    var deeplinkUrl: String {
+        client.deeplinkUrl
     }
 
     var dapp: Dapp? {

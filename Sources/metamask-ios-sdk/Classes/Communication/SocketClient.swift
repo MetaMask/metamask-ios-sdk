@@ -13,6 +13,7 @@ typealias RequestJob = () -> Void
 protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
+    var deeplinkUrl: String { get }
     var isConnected: Bool { get set }
     var serverUrl: String { get set }
     var hasValidSession: Bool { get }
@@ -189,6 +190,8 @@ private extension SocketClient {
             if !self.keyExchange.keysExchanged {
                 let keyExchangeSync = self.keyExchange.message(type: .syn)
                 self.sendMessage(keyExchangeSync, encrypt: false)
+            } else if self.connectionPaused {
+                self.runJobs()
             }
         }
 
@@ -223,6 +226,12 @@ private extension SocketClient {
                 let message = data.first as? [String: Any]
             else { return }
 
+            if
+                let message = message["message"] as? [String: Any],
+                message["type"] as? String == KeyExchangeType.start.rawValue {
+                self.keyExchange.restart()
+            }
+            
             if !self.keyExchange.keysExchanged {
                 // Exchange keys
                 self.handleReceiveKeyExchange(message)
@@ -296,7 +305,9 @@ private extension SocketClient {
         )
             as? [String: Any] ?? [:]
 
-        if json["type"] as? String == "pause" {
+        if json["type"] as? String == "terminate" {
+            keyExchange.restart()
+        } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
             connectionPaused = true
         } else if json["type"] as? String == "ready" {

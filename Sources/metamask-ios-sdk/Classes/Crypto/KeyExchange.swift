@@ -46,9 +46,9 @@ public struct KeyExchangeMessage: CodableData {
  */
 
 public class KeyExchange {
-    private let privateKey: String
+    private var privateKey: String
 
-    public let pubkey: String
+    public var pubkey: String
     public private(set) var theirPublicKey: String?
 
     private let encyption: Crypto.Type
