@@ -190,9 +190,7 @@ private extension SocketClient {
             if !self.keyExchange.keysExchanged {
                 let keyExchangeSync = self.keyExchange.message(type: .syn)
                 self.sendMessage(keyExchangeSync, encrypt: false)
-            } else if self.connectionPaused {
-                self.runJobs()
-            }
+            } 
         }
 
         // MARK: Socket connected event
