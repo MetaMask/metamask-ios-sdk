@@ -5,7 +5,7 @@
 import Foundation
 
 enum Endpoint {
-    static var SERVER_URL = "http://192.168.0.101:4000"//"https://metamask-sdk-socket.metafi.codefi.network/"
+    static var SERVER_URL = "http://192.168.0.101:4000/"//"https://metamask-sdk-socket.metafi.codefi.network/"
 
     case analytics
 

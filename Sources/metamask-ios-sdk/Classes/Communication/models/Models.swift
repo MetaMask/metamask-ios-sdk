@@ -26,13 +26,15 @@ struct OriginatorInfo: CodableData {
 struct Message<T: CodableData>: CodableData {
     let id: String
     let message: T
-    var plainText: String? // debug code
+    let plaintext: String?
+    let context = "ios-sdk"
 
     func socketRepresentation() -> NetworkData {
         [
             "id": id,
             "message": try? message.socketRepresentation(),
-            "plainText": plainText
+            "plaintext": plaintext,
+            "context": context
         ]
     }
 

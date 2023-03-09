@@ -186,13 +186,6 @@ private extension SocketClient {
                 object: nil,
                 userInfo: ["value": "Clients Connected"]
             )
-
-            if !self.keyExchange.keysExchanged {
-                let keyExchangeSync = self.keyExchange.message(type: .syn)
-                self.sendMessage(keyExchangeSync, encrypt: false)
-            } else if self.connectionPaused {
-                self.runJobs()
-            }
         }
 
         // MARK: Socket connected event
@@ -374,7 +367,7 @@ extension SocketClient {
                     let message: Message = .init(
                         id: self.channelId,
                         message: encryptedMessage,
-                        plainText: String(data: data, encoding: .utf8)
+                        plaintext: String(data: data, encoding: .utf8)
                     )
                     self.channel.emit(ClientEvent.message, message)
                 } catch {
@@ -395,7 +388,7 @@ extension SocketClient {
                         let message: Message = .init(
                             id: self.channelId,
                             message: encryptedMessage,
-                            plainText: String(data: data, encoding: .utf8)
+                            plaintext: String(data: data, encoding: .utf8)
                         )
                         self.channel.emit(ClientEvent.message, message)
                         
@@ -410,7 +403,7 @@ extension SocketClient {
                     let message: Message = .init(
                         id: channelId,
                         message: encryptedMessage,
-                        plainText: String(data: data, encoding: .utf8)
+                        plaintext: String(data: data, encoding: .utf8)
                     )
                     channel.emit(ClientEvent.message, message)
                     
@@ -423,7 +416,7 @@ extension SocketClient {
             let message = Message(
                 id: channelId,
                 message: message,
-                plainText: String(data: data, encoding: .utf8)
+                plaintext: String(data: data, encoding: .utf8)
             )
 
             channel.emit(ClientEvent.message, message)
