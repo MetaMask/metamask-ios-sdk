@@ -305,6 +305,7 @@ private extension SocketClient {
             connectionPaused = true
         } else if json["type"] as? String == "ready" {
             Logging.log("Connection is ready")
+            isConnected = true
             connectionPaused = false
             runJobs()
         } else if json["type"] as? String == "wallet_info" {

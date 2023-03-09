@@ -98,6 +98,7 @@ extension Ethereum {
         delegate?.sendMessage(request, encrypt: true)
         
         if
+            openDeeplink,
             let deeplink = delegate?.deeplinkUrl,
             let url = URL(string: deeplink) {
             DispatchQueue.main.async {
