@@ -10,7 +10,7 @@ public typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
 public class Ethereum: ObservableObject {
     weak var delegate: SDKDelegate?
-    private let CONNECTION_ID = "connection-id"
+    private let CONNECTION_ID = UUID().uuidString
     private var submittedRequests: [String: SubmittedRequest] = [:]
 
     /// The active/selected MetaMask account chain

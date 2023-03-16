@@ -51,6 +51,8 @@ struct RequestInfo: CodableData {
     let originator: OriginatorInfo
 
     func socketRepresentation() -> NetworkData {
-        ["type": type, "originator": originator.socketRepresentation()]
+        ["type": type,
+         "originator": originator.socketRepresentation(), // Backward compatibility with MetaMask mobile
+         "originatorInfo": originator.socketRepresentation()]
     }
 }
