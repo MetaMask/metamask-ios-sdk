@@ -288,7 +288,8 @@ extension SocketClient {
 
         let requestInfo = RequestInfo(
             type: "originator_info",
-            originator: originatorInfo
+            originator: originatorInfo,
+            originatorInfo: originatorInfo
         )
 
         sendMessage(requestInfo, encrypt: true)
