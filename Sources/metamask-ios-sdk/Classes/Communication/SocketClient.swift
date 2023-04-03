@@ -131,11 +131,11 @@ class SocketClient: CommunicationClient {
         updateSessionConfig()
     }
     
-func clearSession() {
-    store.deleteData(for: SESSION_KEY)
-    channelId = UUID().uuidString
-    updateSessionConfig()
-}
+    func clearSession() {
+        store.deleteData(for: SESSION_KEY)
+        channelId = UUID().uuidString
+        updateSessionConfig()
+    }
     
     private func updateSessionConfig() {
         // update session expiry date
