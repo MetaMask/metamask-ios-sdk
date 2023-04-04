@@ -27,7 +27,7 @@ public struct EthereumRequest<T: CodableData>: CodableData {
 
     public func socketRepresentation() -> NetworkData {
         [
-            "id": id ?? "",
+            "id": (id ?? "") as String,
             "method": method,
             "parameters": try? params.socketRepresentation()
         ]
