@@ -53,8 +53,11 @@ struct Message<T: CodableData>: CodableData {
 struct RequestInfo: CodableData {
     let type: String
     let originator: OriginatorInfo
+    let originatorInfo: OriginatorInfo
 
     func socketRepresentation() -> NetworkData {
-        ["type": type, "originator": originator.socketRepresentation()]
+        ["type": type,
+         "originator": originator.socketRepresentation(), // Backward compatibility with MetaMask mobile
+         "originatorInfo": originatorInfo.socketRepresentation()]
     }
 }
