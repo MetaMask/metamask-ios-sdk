@@ -12,6 +12,7 @@ protocol SDKDelegate: AnyObject {
     var networkUrl: String { get set }
     func connect()
     func disconnect()
+    func clearSession()
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
@@ -124,6 +125,10 @@ extension MetaMaskSDK {
 
     func disconnect() {
         client.disconnect()
+    }
+    
+    func clearSession() {
+        client.clearSession()
     }
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {

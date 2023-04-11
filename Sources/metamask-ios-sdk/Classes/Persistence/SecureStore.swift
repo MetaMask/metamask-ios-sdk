@@ -23,7 +23,7 @@ public struct Keychain: SecureStore {
     private let service: String
     
     public init(service: String) {
-        self.service = service + "butawsddsaahashastheny"
+        self.service = service
     }
     
     public func string(for key: String) -> String? {

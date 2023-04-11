@@ -72,6 +72,10 @@ public extension Ethereum {
     func disconnect() {
         connected = false
     }
+    
+    func clearSession() {
+        delegate?.clearSession()
+    }
 }
 
 // MARK: Deeplinking

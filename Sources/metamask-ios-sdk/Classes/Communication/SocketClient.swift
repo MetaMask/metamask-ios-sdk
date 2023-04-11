@@ -25,6 +25,7 @@ protocol CommunicationClient: AnyObject {
 
     func connect()
     func disconnect()
+    func clearSession()
     func enableTracking(_ enable: Bool)
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
@@ -133,8 +134,8 @@ class SocketClient: CommunicationClient {
     
     func clearSession() {
         store.deleteData(for: SESSION_KEY)
-        channelId = UUID().uuidString
-        updateSessionConfig()
+        resetClient()
+        setupClient()
     }
     
     private func updateSessionConfig() {

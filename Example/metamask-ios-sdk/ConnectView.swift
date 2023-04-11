@@ -74,6 +74,15 @@ struct ConnectView: View {
                             NavigationLink("Switch chain") {
                                 SwitchChainView()
                             }
+                            
+                            Button {
+                                ethereum.clearSession()
+                            } label: {
+                                Text("Clear Session")
+                                    .modifier(TextButton())
+                                    .frame(maxWidth: .infinity, maxHeight: 32)
+                            }
+                            .modifier(ButtonStyle())
                         }
                     }
                 }
