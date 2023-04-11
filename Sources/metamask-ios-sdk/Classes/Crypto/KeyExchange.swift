@@ -62,6 +62,9 @@ public class KeyExchange {
 
     func restart() {
         keysExchanged = false
+        theirPublicKey = nil
+        privateKey = encyption.generatePrivateKey()
+        pubkey = encyption.publicKey(from: privateKey)
     }
 
     func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {

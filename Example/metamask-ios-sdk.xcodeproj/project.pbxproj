@@ -21,6 +21,9 @@
 		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
 		D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1494FEA2970149B002D36D6 /* SwitchChainView.swift */; };
+		D14FA2F429E576EB00F3A059 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */; };
+		D14FA2F629E578B200F3A059 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F529E578B200F3A059 /* ViewExtension.swift */; };
+		D14FA2F829E57B6900F3A059 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F729E57B6900F3A059 /* ToastView.swift */; };
 		D1896062296C3F9500216307 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1896061296C3F9500216307 /* NetworkView.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
 /* End PBXBuildFile section */
@@ -57,6 +60,9 @@
 		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
 		D1494FEA2970149B002D36D6 /* SwitchChainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchChainView.swift; sourceTree = "<group>"; };
+		D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
+		D14FA2F529E578B200F3A059 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
+		D14FA2F729E57B6900F3A059 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		D1896061296C3F9500216307 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -184,6 +190,9 @@
 				D107588E293F385700D6C66B /* TransactionView.swift */,
 				D1896061296C3F9500216307 /* NetworkView.swift */,
 				D1494FEA2970149B002D36D6 /* SwitchChainView.swift */,
+				D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */,
+				D14FA2F529E578B200F3A059 /* ViewExtension.swift */,
+				D14FA2F729E57B6900F3A059 /* ToastView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -380,7 +389,10 @@
 				D107588F293F385700D6C66B /* TransactionView.swift in Sources */,
 				D1EA931D29538C570078F088 /* TextStyle.swift in Sources */,
 				D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */,
+				D14FA2F629E578B200F3A059 /* ViewExtension.swift in Sources */,
+				D14FA2F829E57B6900F3A059 /* ToastView.swift in Sources */,
 				D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */,
+				D14FA2F429E576EB00F3A059 /* ToastOverlay.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
