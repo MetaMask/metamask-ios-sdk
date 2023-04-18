@@ -352,7 +352,7 @@ extension SocketClient {
             title: dapp?.name,
             url: dapp?.url,
             platform: SDKInfo.platform,
-            apiVersion: "0.1.1"
+            apiVersion: SDKInfo.version
         )
 
         let requestInfo = RequestInfo(
