@@ -351,7 +351,8 @@ extension SocketClient {
         let originatorInfo = OriginatorInfo(
             title: dapp?.name,
             url: dapp?.url,
-            platform: SDKInfo.platform
+            platform: SDKInfo.platform,
+            apiVersion: "0.1.1"
         )
 
         let requestInfo = RequestInfo(
