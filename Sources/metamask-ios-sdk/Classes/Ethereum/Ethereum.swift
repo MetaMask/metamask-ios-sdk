@@ -180,13 +180,23 @@ extension Ethereum {
     private func updateAccount(_ account: String) {
         selectedAddress = account
     }
+    
+    func sendResponseData(id: String, value: Any) {
+        submittedRequests[id]?.send(value)
+        submittedRequests.removeValue(forKey: id)
+    }
+    
+    func sendResponseError(id: String, value: RequestError) {
+        submittedRequests[id]?.error(value)
+        submittedRequests.removeValue(forKey: id)
+    }
 
     func receiveResponse(id: String, data: [String: Any]) {
         guard let request = submittedRequests[id] else { return }
 
         if let error = data["error"] as? [String: Any] {
-            let RequestError = RequestError(from: error)
-            submittedRequests[id]?.error(RequestError)
+            let requestError = RequestError(from: error)
+            sendResponseError(id: id, value: requestError)
             return
         }
 
@@ -194,9 +204,9 @@ extension Ethereum {
             let method = EthereumMethod(rawValue: request.method),
             EthereumMethod.isResultMethod(method) else {
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResponseData(id: id, value: result)
             } else {
-                submittedRequests[id]?.send(data)
+                sendResponseData(id: id, value: data)
             }
             return
         }
@@ -208,37 +218,37 @@ extension Ethereum {
 
             if let account = accounts.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResponseData(id: id, value: account)
             }
 
             if let chainId = result["chainId"] as? String {
                 updateChainId(chainId)
-                submittedRequests[id]?.send(chainId)
+                sendResponseData(id: id, value: chainId)
             }
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResponseData(id: id, value: account)
             } else {
                 Logging.error("Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
                 updateChainId(result)
-                submittedRequests[id]?.send(result)
+                sendResponseData(id: id, value: result)
             }
         case .ethSignTypedDataV4,
              .ethSignTypedDataV3,
              .ethSendTransaction:
             if let result: String = data["result"] as? String {
-                submittedRequests[id]?.send(result)
+                sendResponseData(id: id, value: result)
             } else {
                 Logging.error("Unexpected response \(data)")
             }
         default:
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResponseData(id: id, value: result)
             } else {
                 Logging.error("Unknown response: \(data)")
             }
