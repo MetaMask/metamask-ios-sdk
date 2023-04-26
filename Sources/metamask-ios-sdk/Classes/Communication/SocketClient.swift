@@ -19,6 +19,7 @@ protocol CommunicationClient: AnyObject {
     var hasValidSession: Bool { get }
     var sessionDuration: TimeInterval { get set }
 
+    var connectionTerminated: (() -> Void)? { get set }
     var tearDownConnection: (() -> Void)? { get set }
     var receiveEvent: (([String: Any]) -> Void)? { get set }
     var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
@@ -70,7 +71,7 @@ class SocketClient: CommunicationClient {
 
     var isConnected: Bool = false
     var tearDownConnection: (() -> Void)?
-    var onClientsDisconnected: (() -> Void)?
+    var connectionTerminated: (() -> Void)?
 
     var receiveEvent: (([String: Any]) -> Void)?
     var receiveResponse: ((String, [String: Any]) -> Void)?
@@ -136,6 +137,7 @@ class SocketClient: CommunicationClient {
         store.deleteData(for: SESSION_KEY)
         resetClient()
         setupClient()
+        disconnect()
     }
     
     private func updateSessionConfig() {
@@ -302,11 +304,12 @@ private extension SocketClient {
         let json: [String: Any] = try JSONSerialization.jsonObject(
             with: Data(decryptedText.utf8),
             options: []
-        )
-            as? [String: Any] ?? [:]
+        ) as? [String: Any] ?? [:]
 
         if json["type"] as? String == "terminate" {
-            keyExchange.restart()
+            Logging.log("Connection terminated")
+            clearSession()
+            connectionTerminated?()
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
             connectionPaused = true

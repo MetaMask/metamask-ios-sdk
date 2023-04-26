@@ -76,6 +76,14 @@ public extension Ethereum {
     func clearSession() {
         delegate?.clearSession()
     }
+    
+    func connectionTerminated() {
+        let error = RequestError(from: ["message": "The Provider is terminated."])
+        submittedRequests.forEach { key, value in
+            submittedRequests[key]?.error(error)
+        }
+        submittedRequests.removeAll()
+    }
 }
 
 // MARK: Deeplinking
