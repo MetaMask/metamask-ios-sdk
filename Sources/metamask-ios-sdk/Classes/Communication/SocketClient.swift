@@ -95,6 +95,7 @@ class SocketClient: CommunicationClient {
     }
     
     func setupClient() {
+        channel.socket.removeAllHandlers()
         configureSession()
         handleReceiveMessages()
         handleConnection()
