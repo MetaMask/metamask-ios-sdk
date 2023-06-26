@@ -309,7 +309,7 @@ private extension SocketClient {
             as? [String: Any] ?? [:]
 
         if json["type"] as? String == "terminate" {
-            keyExchange.reset()
+            disconnect()
             onClientsTerminated?()
             Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
