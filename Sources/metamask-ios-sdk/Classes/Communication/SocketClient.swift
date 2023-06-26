@@ -91,11 +91,9 @@ class SocketClient: CommunicationClient {
     init(store: SecureStore, tracker: Tracking) {
         self.store = store
         self.tracker = tracker
-        setupClient()
     }
     
     func setupClient() {
-        disconnect()
         configureSession()
         handleReceiveMessages()
         handleConnection()
@@ -109,14 +107,17 @@ class SocketClient: CommunicationClient {
     }
 
     func connect() {
+        guard !channel.isConnected else { return }
+        
+        setupClient()
         trackEvent(.connectionRequest)
         channel.connect()
     }
 
     func disconnect() {
         isConnected = false
-        channel.terminateHandlers()
         channel.disconnect()
+        channel.terminateHandlers()
     }
     
     private func fetchSessionConfig() -> SessionConfig? {

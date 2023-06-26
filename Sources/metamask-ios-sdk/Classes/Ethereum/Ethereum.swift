@@ -71,6 +71,7 @@ public extension Ethereum {
     /// Disconnect dapp
     func disconnect() {
         connected = false
+        delegate?.disconnect()
     }
     
     func clearSession() {
@@ -78,11 +79,12 @@ public extension Ethereum {
     }
     
     func terminateConnection() {
-        let error = RequestError(from: ["message": "The provider has been terminated."])
+        let error = RequestError(from: ["message": "The connection request has been rejected"])
         submittedRequests.forEach { key, value in
             submittedRequests[key]?.error(error)
         }
         submittedRequests.removeAll()
+        disconnect()
     }
 }
 
@@ -150,23 +152,35 @@ extension Ethereum {
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
-
-            if let method = EthereumMethod(rawValue: request.method) {
-                sendRequest(
-                    request,
-                    id: id,
-                    openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
-                )
+            
+            if !connected {
+                delegate?.connect()
+                delegate?.addRequest {
+                    self.makeRequest(request, id: id)
+                }
             } else {
-                sendRequest(
-                    request,
-                    id: id,
-                    openDeeplink: connected ? false : true
-                )
+                makeRequest(request, id: id)
             }
+            
         }
 
         return publisher
+    }
+    
+    private func makeRequest<T: CodableData>(_ request: EthereumRequest<T>, id: String) {
+        if let method = EthereumMethod(rawValue: request.method) {
+            sendRequest(
+                request,
+                id: id,
+                openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
+            )
+        } else {
+            sendRequest(
+                request,
+                id: id,
+                openDeeplink: connected ? false : true
+            )
+        }
     }
 }
 
