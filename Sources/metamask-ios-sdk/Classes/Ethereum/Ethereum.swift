@@ -76,6 +76,14 @@ public extension Ethereum {
     func clearSession() {
         delegate?.clearSession()
     }
+    
+    func terminateConnection() {
+        let error = RequestError(from: ["message": "The provider has been terminated."])
+        submittedRequests.forEach { key, value in
+            submittedRequests[key]?.error(error)
+        }
+        submittedRequests.removeAll()
+    }
 }
 
 // MARK: Deeplinking
@@ -172,13 +180,23 @@ extension Ethereum {
     private func updateAccount(_ account: String) {
         selectedAddress = account
     }
+    
+    func sendResult(_ result: Any, id: String) {
+        submittedRequests[id]?.send(result)
+        submittedRequests.removeValue(forKey: id)
+    }
+
+    func sendError(_ error: RequestError, id: String) {
+        submittedRequests[id]?.error(error)
+        submittedRequests.removeValue(forKey: id)
+    }
 
     func receiveResponse(id: String, data: [String: Any]) {
         guard let request = submittedRequests[id] else { return }
 
         if let error = data["error"] as? [String: Any] {
-            let RequestError = RequestError(from: error)
-            submittedRequests[id]?.error(RequestError)
+            let requestError = RequestError(from: error)
+            sendError(requestError, id: id)
             return
         }
 
@@ -186,9 +204,9 @@ extension Ethereum {
             let method = EthereumMethod(rawValue: request.method),
             EthereumMethod.isResultMethod(method) else {
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
-                submittedRequests[id]?.send(data)
+                sendResult(data, id: id)
             }
             return
         }
@@ -200,37 +218,37 @@ extension Ethereum {
 
             if let account = accounts.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResult(account, id: id)
             }
 
             if let chainId = result["chainId"] as? String {
                 updateChainId(chainId)
-                submittedRequests[id]?.send(chainId)
+                sendResult(chainId, id: id)
             }
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResult(account, id: id)
             } else {
                 Logging.error("Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
                 updateChainId(result)
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             }
         case .ethSignTypedDataV4,
              .ethSignTypedDataV3,
              .ethSendTransaction:
             if let result: String = data["result"] as? String {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Unexpected response \(data)")
             }
         default:
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Unknown response: \(data)")
             }
@@ -259,7 +277,7 @@ extension Ethereum {
                 updateChainId(chainId)
             }
         default:
-            break
+            Logging.error("Unhandled case: \(event)")
         }
     }
 }

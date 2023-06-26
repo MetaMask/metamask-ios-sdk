@@ -55,6 +55,10 @@ extension SocketChannel {
     func disconnect() {
         socket.disconnect()
     }
+    
+    func terminateHandlers() {
+        socket.removeAllHandlers()
+    }
 }
 
 // MARK: Events

@@ -20,6 +20,7 @@ protocol CommunicationClient: AnyObject {
     var sessionDuration: TimeInterval { get set }
 
     var tearDownConnection: (() -> Void)? { get set }
+    var onClientsTerminated: (() -> Void)? { get set }
     var receiveEvent: (([String: Any]) -> Void)? { get set }
     var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
 
@@ -70,7 +71,7 @@ class SocketClient: CommunicationClient {
 
     var isConnected: Bool = false
     var tearDownConnection: (() -> Void)?
-    var onClientsDisconnected: (() -> Void)?
+    var onClientsTerminated: (() -> Void)?
 
     var receiveEvent: (([String: Any]) -> Void)?
     var receiveResponse: ((String, [String: Any]) -> Void)?
@@ -94,6 +95,7 @@ class SocketClient: CommunicationClient {
     }
     
     func setupClient() {
+        disconnect()
         configureSession()
         handleReceiveMessages()
         handleConnection()
@@ -102,7 +104,7 @@ class SocketClient: CommunicationClient {
 
     func resetClient() {
         isConnected = false
-        self.keyExchange.restart()
+        self.keyExchange.reset()
         tearDownConnection?()
     }
 
@@ -113,6 +115,7 @@ class SocketClient: CommunicationClient {
 
     func disconnect() {
         isConnected = false
+        channel.terminateHandlers()
         channel.disconnect()
     }
     
@@ -229,7 +232,7 @@ private extension SocketClient {
             if
                 let message = message["message"] as? [String: Any],
                 message["type"] as? String == KeyExchangeType.start.rawValue {
-                self.keyExchange.restart()
+                self.keyExchange.reset()
             }
             
             if !self.keyExchange.keysExchanged {
@@ -306,7 +309,9 @@ private extension SocketClient {
             as? [String: Any] ?? [:]
 
         if json["type"] as? String == "terminate" {
-            keyExchange.restart()
+            keyExchange.reset()
+            onClientsTerminated?()
+            Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
             connectionPaused = true

@@ -89,6 +89,7 @@ private extension MetaMaskSDK {
         client.receiveEvent = ethereum.receiveEvent
         client.tearDownConnection = ethereum.disconnect
         client.receiveResponse = ethereum.receiveResponse
+        client.onClientsTerminated = ethereum.terminateConnection
     }
 
     func setupAppLifeCycleObservers() {

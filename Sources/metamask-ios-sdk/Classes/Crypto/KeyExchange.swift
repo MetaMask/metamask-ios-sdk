@@ -60,7 +60,7 @@ public class KeyExchange {
         pubkey = encyption.publicKey(from: privateKey)
     }
 
-    func restart() {
+    func reset() {
         keysExchanged = false
         theirPublicKey = nil
         privateKey = encyption.generatePrivateKey()
