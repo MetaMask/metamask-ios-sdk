@@ -24,7 +24,7 @@ To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `Fil
     dependencies: [
         .package(
             url: "https://github.com/MetaMask/metamask-ios-sdk",
-            from: "0.1.0"
+            from: "0.2.0"
         )
     ]
 ```

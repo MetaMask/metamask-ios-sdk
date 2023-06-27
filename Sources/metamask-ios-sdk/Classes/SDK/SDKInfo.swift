@@ -5,19 +5,24 @@
 import UIKit
 import Foundation
 
-enum SDKInfo {
+public enum SDKInfo {
     /// Bundle with SDK plist
-    static var sdkBundle: [String: Any] {
+    public static var sdkBundle: [String: Any] {
         Bundle(for: MetaMaskSDK.self).infoDictionary ?? [:]
     }
 
     /// The version number of the SDK e.g `1.0.0`
-    static var version: String {
+    public static var version: String {
         sdkBundle["CFBundleShortVersionString"] as? String ?? ""
     }
     
+    /// The bundle identifier of the dapp
+    public static var bundleIdentifier: String {
+        Bundle.main.bundleIdentifier ?? UUID().uuidString
+    }
+    
     /// The platform OS on which the SDK is run e.g `ios, ipados`
-    static var platform: String {
+    public static var platform: String {
         UIDevice.current.systemName.lowercased()
     }
 }

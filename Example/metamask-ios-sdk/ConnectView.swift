@@ -25,6 +25,7 @@ struct ConnectView: View {
     @State private var showError = false
 
     @State private var showProgressView = false
+    @State private var showToast = false
 
     var body: some View {
         NavigationView {
@@ -74,29 +75,22 @@ struct ConnectView: View {
                             NavigationLink("Switch chain") {
                                 SwitchChainView()
                             }
+                            
+                            Button {
+                                ethereum.clearSession()
+                                showToast = true
+                            } label: {
+                                Text("Clear Session")
+                                    .modifier(TextButton())
+                                    .frame(maxWidth: .infinity, maxHeight: 32)
+                            }
+                            .toast(isPresented: $showToast) {
+                                ToastView(message: "Session cleared")
+                            }
+                            .modifier(ButtonStyle())
                         }
                     }
                 }
-
-                /* Hide this until changing network url is fully supported by MM
-                 if ethereum.selectedAddress.isEmpty {
-                     Section {
-                         // Silly ZStack hack to hide disclosure indicator on NavigationLink
-                         ZStack() {
-                             NavigationLink {
-                                 NetworkView()
-                             } label: {
-                                 Text(" ")
-                             }
-                             .opacity(0)
-                             Text("Change network url")
-                                 .modifier(TextButton())
-                                 .frame(maxWidth: .infinity, maxHeight: 32)
-                                 .modifier(ButtonStyle())
-                         }
-                     }
-                 }
-                 */
 
                 if ethereum.selectedAddress.isEmpty {
                     Section {

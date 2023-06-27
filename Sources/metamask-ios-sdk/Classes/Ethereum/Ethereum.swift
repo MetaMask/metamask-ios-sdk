@@ -71,6 +71,20 @@ public extension Ethereum {
     /// Disconnect dapp
     func disconnect() {
         connected = false
+        delegate?.disconnect()
+    }
+    
+    func clearSession() {
+        delegate?.clearSession()
+    }
+    
+    func terminateConnection() {
+        let error = RequestError(from: ["message": "The connection request has been rejected"])
+        submittedRequests.forEach { key, value in
+            submittedRequests[key]?.error(error)
+        }
+        submittedRequests.removeAll()
+        disconnect()
     }
 }
 
@@ -96,10 +110,11 @@ extension Ethereum {
         var request = request
         request.id = id
         delegate?.sendMessage(request, encrypt: true)
-
+        
         if
             openDeeplink,
-            let url = URL(string: "https://metamask.app.link") {
+            let deeplink = delegate?.deeplinkUrl,
+            let url = URL(string: deeplink) {
             DispatchQueue.main.async {
                 UIApplication.shared.open(url)
             }
@@ -131,29 +146,41 @@ extension Ethereum {
             submittedRequests[CONNECTION_ID] = submittedRequest
             publisher = submittedRequests[CONNECTION_ID]?.publisher
 
-            delegate?.onClientsReady = requestAccounts
+            delegate?.addRequest(requestAccounts)
         } else {
             let id = UUID().uuidString
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
-
-            if let method = EthereumMethod(rawValue: request.method) {
-                sendRequest(
-                    request,
-                    id: id,
-                    openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
-                )
+            
+            if !connected {
+                delegate?.connect()
+                delegate?.addRequest {
+                    self.makeRequest(request, id: id)
+                }
             } else {
-                sendRequest(
-                    request,
-                    id: id,
-                    openDeeplink: connected ? false : true
-                )
+                makeRequest(request, id: id)
             }
+            
         }
 
         return publisher
+    }
+    
+    private func makeRequest<T: CodableData>(_ request: EthereumRequest<T>, id: String) {
+        if let method = EthereumMethod(rawValue: request.method) {
+            sendRequest(
+                request,
+                id: id,
+                openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
+            )
+        } else {
+            sendRequest(
+                request,
+                id: id,
+                openDeeplink: connected ? false : true
+            )
+        }
     }
 }
 
@@ -167,13 +194,23 @@ extension Ethereum {
     private func updateAccount(_ account: String) {
         selectedAddress = account
     }
+    
+    func sendResult(_ result: Any, id: String) {
+        submittedRequests[id]?.send(result)
+        submittedRequests.removeValue(forKey: id)
+    }
+
+    func sendError(_ error: RequestError, id: String) {
+        submittedRequests[id]?.error(error)
+        submittedRequests.removeValue(forKey: id)
+    }
 
     func receiveResponse(id: String, data: [String: Any]) {
         guard let request = submittedRequests[id] else { return }
 
         if let error = data["error"] as? [String: Any] {
-            let RequestError = RequestError(from: error)
-            submittedRequests[id]?.error(RequestError)
+            let requestError = RequestError(from: error)
+            sendError(requestError, id: id)
             return
         }
 
@@ -181,9 +218,9 @@ extension Ethereum {
             let method = EthereumMethod(rawValue: request.method),
             EthereumMethod.isResultMethod(method) else {
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
-                submittedRequests[id]?.send(data)
+                sendResult(data, id: id)
             }
             return
         }
@@ -195,37 +232,37 @@ extension Ethereum {
 
             if let account = accounts.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResult(account, id: id)
             }
 
             if let chainId = result["chainId"] as? String {
                 updateChainId(chainId)
-                submittedRequests[id]?.send(chainId)
+                sendResult(chainId, id: id)
             }
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 updateAccount(account)
-                submittedRequests[id]?.send(account)
+                sendResult(account, id: id)
             } else {
                 Logging.error("Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
                 updateChainId(result)
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             }
         case .ethSignTypedDataV4,
              .ethSignTypedDataV3,
              .ethSendTransaction:
             if let result: String = data["result"] as? String {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Unexpected response \(data)")
             }
         default:
             if let result = data["result"] {
-                submittedRequests[id]?.send(result)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Unknown response: \(data)")
             }
@@ -254,7 +291,7 @@ extension Ethereum {
                 updateChainId(chainId)
             }
         default:
-            break
+            Logging.error("Unhandled case: \(event)")
         }
     }
 }

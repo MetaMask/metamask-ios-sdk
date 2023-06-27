@@ -17,6 +17,10 @@ class SocketChannel {
 
     var socket: SocketIOClient!
     private var socketManager: SocketManager!
+    
+    var isConnected: Bool {
+        socket.status == .connected
+    }
 
     init() {
         configureSocket(url: Endpoint.SERVER_URL)
@@ -54,6 +58,10 @@ extension SocketChannel {
 
     func disconnect() {
         socket.disconnect()
+    }
+    
+    func terminateHandlers() {
+        socket.removeAllHandlers()
     }
 }
 

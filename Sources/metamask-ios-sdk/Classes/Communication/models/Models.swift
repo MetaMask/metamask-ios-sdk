@@ -13,12 +13,14 @@ struct OriginatorInfo: CodableData {
     let title: String?
     let url: String?
     let platform: String?
+    let apiVersion: String?
 
     func socketRepresentation() -> NetworkData {
         [
             "title": title,
             "url": url,
-            "platform": platform
+            "platform": platform,
+            "apiVersion": apiVersion,
         ]
     }
 }
@@ -30,7 +32,7 @@ struct Message<T: CodableData>: CodableData {
     func socketRepresentation() -> NetworkData {
         [
             "id": id,
-            "message": try? message.socketRepresentation()
+            "message": try? message.socketRepresentation(),
         ]
     }
 

@@ -28,25 +28,25 @@ public enum ErrorType: Int {
     var message: String {
         switch self {
         case .userRejectedRequest:
-            return "Ethereum Provider User Rejected Request"
+            return "User rejected the request"
         case .unauthorisedRequest:
-            return "Ethereum Provider User Rejected Request"
+            return "User rejected the request"
         case .unsupportedMethod:
-            return "Ethereum Provider Unsupported Method"
+            return "Unsupported method"
         case .disconnected:
-            return "Ethereum Provider Not Connected"
+            return "Not connected"
         case .chainDisconnected:
-            return "Ethereum Provider Chain Not Connected"
+            return "Chain not connected"
         case .unrecognizedChainId:
             return "Unrecognized chain ID. Try adding the chain using addEthereumChain first"
         case .invalidInput:
-            return "JSON RPC 2.0 Server error"
+            return "JSON RPC server error"
         case .transactionRejected:
-            return "Ethereum Transaction Rejected"
+            return "Transaction rejected"
         case .invalidRequest:
-            return "Invalid Request"
+            return "Invalid request"
         case .invalidMethodParameters:
-            return "Invalid Method Parameters"
+            return "Invalid method parameters"
         case .serverError:
             return "Server error"
         case .parseError:

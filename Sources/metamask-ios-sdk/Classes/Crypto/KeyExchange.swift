@@ -46,9 +46,9 @@ public struct KeyExchangeMessage: CodableData {
  */
 
 public class KeyExchange {
-    private let privateKey: String
+    private var privateKey: String
 
-    public let pubkey: String
+    public var pubkey: String
     public private(set) var theirPublicKey: String?
 
     private let encyption: Crypto.Type
@@ -60,17 +60,17 @@ public class KeyExchange {
         pubkey = encyption.publicKey(from: privateKey)
     }
 
-    func restart() {
+    func reset() {
         keysExchanged = false
+        theirPublicKey = nil
+        privateKey = encyption.generatePrivateKey()
+        pubkey = encyption.publicKey(from: privateKey)
     }
 
     func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
-        if message.type == .synack || message.type == .ack {
-            keysExchanged = true
-        }
-
         if let publicKey = message.pubkey {
             setTheirPublicKey(publicKey)
+            keysExchanged = true
         }
 
         guard let nextStep = nextStep(message.type) else {
