@@ -380,8 +380,7 @@ extension SocketClient {
                     let data = try! JSONEncoder().encode(message)
                     let message: Message = .init(
                         id: self.channelId,
-                        message: encryptedMessage,
-                        plaintext: String(data: data, encoding: .utf8)
+                        message: encryptedMessage
                     )
                     self.channel.emit(ClientEvent.message, message)
                 } catch {
@@ -401,8 +400,7 @@ extension SocketClient {
                         let data = try! JSONEncoder().encode(message)
                         let message: Message = .init(
                             id: self.channelId,
-                            message: encryptedMessage,
-                            plaintext: String(data: data, encoding: .utf8)
+                            message: encryptedMessage
                         )
                         self.channel.emit(ClientEvent.message, message)
                         
@@ -416,8 +414,7 @@ extension SocketClient {
                     let data = try! JSONEncoder().encode(message)
                     let message: Message = .init(
                         id: channelId,
-                        message: encryptedMessage,
-                        plaintext: String(data: data, encoding: .utf8)
+                        message: encryptedMessage
                     )
                     channel.emit(ClientEvent.message, message)
                     
@@ -429,8 +426,7 @@ extension SocketClient {
             let data = try! JSONEncoder().encode(message)
             let message = Message(
                 id: channelId,
-                message: message,
-                plaintext: String(data: data, encoding: .utf8)
+                message: message
             )
 
             channel.emit(ClientEvent.message, message)
