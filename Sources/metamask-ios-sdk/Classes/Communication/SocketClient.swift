@@ -49,8 +49,8 @@ class SocketClient: CommunicationClient {
         "socket"
     }
     
-    // 24 hours default
-    var sessionDuration: TimeInterval = 24 * 3600 {
+    // 7 days default, configurable
+    var sessionDuration: TimeInterval = 24 * 3600 * 7 {
         didSet {
             updateSessionConfig()
         }
