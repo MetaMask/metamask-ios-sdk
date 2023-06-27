@@ -42,7 +42,6 @@ class SocketClient: CommunicationClient {
     private var channelId: String = ""
     
     private var connectionPaused: Bool = false
-    private var restartedConnection = false
     
     private let SESSION_KEY = "session_id"
 
@@ -265,7 +264,6 @@ private extension SocketClient {
             if !self.connectionPaused {
                 self.resetClient()
                 self.connectionPaused = true
-                self.restartedConnection = true
             }
         }
     }
