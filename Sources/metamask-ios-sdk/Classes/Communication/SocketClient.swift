@@ -266,7 +266,6 @@ private extension SocketClient {
             let msg = message["message"] as? [String: Any],
             let type = msg["type"] as? String,
             type.contains("key_handshake") {
-            handleReceiveKeyExchange(message)
             return true
         }
         
@@ -315,6 +314,7 @@ private extension SocketClient {
 
     func handleMessage(_ msg: [String: Any]) {
         if isKeyExchangeMessage(msg) {
+            handleReceiveKeyExchange(msg)
             return
         }
         
