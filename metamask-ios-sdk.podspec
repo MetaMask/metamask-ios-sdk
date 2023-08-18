@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'metamask-ios-sdk'
-  s.version          = '0.2.0'
+  s.version          = '0.2.1'
   s.summary          = 'Enable users to easily connect with their MetaMask Mobile wallet.'
   s.swift_version    = '5.0'
 
