@@ -229,10 +229,8 @@ private extension SocketClient {
                 let message = data.first as? [String: Any]
             else { return }
 
-            if
-                let message = message["message"] as? [String: Any],
-                message["type"] as? String == KeyExchangeType.start.rawValue {
-                self.keyExchange.reset()
+            if !self.isValidMessage(message: message) {
+                return
             }
             
             if !self.keyExchange.keysExchanged {
@@ -243,6 +241,36 @@ private extension SocketClient {
                 self.handleMessage(message)
             }
         }
+    }
+    
+    func isValidMessage(message: [String: Any]) -> Bool {
+        if
+            let message = message["message"] as? [String: Any],
+            let type = message["type"] as? String {
+            if type == "ping" {
+                return false
+            }
+            
+            if type.contains("key_handshake") {
+                return true
+            } else if !keyExchange.keysExchanged {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func isKeyExchangeMessage(_ message: [String: Any]) -> Bool {
+        if
+            let msg = message["message"] as? [String: Any],
+            let type = msg["type"] as? String,
+            type.contains("key_handshake") {
+            handleReceiveKeyExchange(message)
+            return true
+        }
+        
+        return false
     }
 
     // MARK: Socket disconnected event
@@ -286,6 +314,10 @@ private extension SocketClient {
     }
 
     func handleMessage(_ msg: [String: Any]) {
+        if isKeyExchangeMessage(msg) {
+            return
+        }
+        
         guard let message = Message<String>.message(from: msg) else {
             Logging.error("Could not parse message \(msg)")
             return
@@ -376,8 +408,6 @@ extension SocketClient {
                 
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                    // debug code
-                    let data = try! JSONEncoder().encode(message)
                     let message: Message = .init(
                         id: self.channelId,
                         message: encryptedMessage
@@ -396,8 +426,6 @@ extension SocketClient {
                     
                     do {
                         let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                        // debug code
-                        let data = try! JSONEncoder().encode(message)
                         let message: Message = .init(
                             id: self.channelId,
                             message: encryptedMessage
@@ -411,7 +439,6 @@ extension SocketClient {
             } else {
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                    let data = try! JSONEncoder().encode(message)
                     let message: Message = .init(
                         id: channelId,
                         message: encryptedMessage
@@ -423,7 +450,6 @@ extension SocketClient {
                 }
             }
         } else {
-            let data = try! JSONEncoder().encode(message)
             let message = Message(
                 id: channelId,
                 message: message
