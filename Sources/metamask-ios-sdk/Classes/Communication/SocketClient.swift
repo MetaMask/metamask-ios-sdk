@@ -99,12 +99,6 @@ class SocketClient: CommunicationClient {
         handleDisconnection()
     }
 
-    func resetClient() {
-        isConnected = false
-        self.keyExchange.reset()
-        tearDownConnection?()
-    }
-
     func connect() {
         guard !channel.isConnected else { return }
         
@@ -137,7 +131,6 @@ class SocketClient: CommunicationClient {
     
     func clearSession() {
         store.deleteData(for: SESSION_KEY)
-        resetClient()
         setupClient()
     }
     
@@ -289,7 +282,6 @@ private extension SocketClient {
             )
 
             if !self.connectionPaused {
-                self.resetClient()
                 self.connectionPaused = true
             }
         }
