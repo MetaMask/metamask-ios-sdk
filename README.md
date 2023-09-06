@@ -197,7 +197,7 @@ You will need to have MetaMask Mobile wallet installed on your target i.e physic
 
 ## Requirements
 ### iOS
-This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0.
+This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0. We have not tested the SDK on beta versions of iOS 17 yet, it is possible that compatibility issues may be experienced therefore we advise against running it on iOS 17 for best results.
 
 ### Xcode
 This SDK has been tested on up to version Xcode 14.3. Some compatibility issues may exist with beta versions of Xcode 15, therefore we advise against using Xcode 15 for best results.
