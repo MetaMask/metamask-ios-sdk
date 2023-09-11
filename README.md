@@ -24,7 +24,7 @@ To add MetaMask iOS SDK as an SPM package to your project, in Xcode select: `Fil
     dependencies: [
         .package(
             url: "https://github.com/MetaMask/metamask-ios-sdk",
-            from: "0.2.0"
+            from: "0.2.1"
         )
     ]
 ```
@@ -196,8 +196,4 @@ To run the example project, clone this repository, change directory to `metamask
 You will need to have MetaMask Mobile wallet installed on your target i.e physical device or simulator, so you can either have it installed from the [App Store](https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202), or clone and compile MetaMask Mobile wallet from [source](https://github.com/MetaMask/metamask-mobile) and build to your target device. 
 
 ## Requirements
-### iOS
-This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0. We have not tested the SDK on beta versions of iOS 17 yet, it is possible that compatibility issues may be experienced therefore we advise against running it on iOS 17 for best results.
-
-### Xcode
-This SDK has been tested on up to version Xcode 14.3. Some compatibility issues may exist with beta versions of Xcode 15, therefore we advise against using Xcode 15 for best results.
+This SDK has an iOS minimum version requirement of 14.0. You need your app to have an iOS minimum deployment of no less than 14.0.
