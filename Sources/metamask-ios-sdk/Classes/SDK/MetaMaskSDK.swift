@@ -13,6 +13,7 @@ protocol SDKDelegate: AnyObject {
     func connect()
     func disconnect()
     func clearSession()
+    func trackEvent(_ event: Event)
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
@@ -134,5 +135,11 @@ extension MetaMaskSDK {
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         client.sendMessage(message, encrypt: encrypt)
+    }
+}
+
+extension MetaMaskSDK {
+    func trackEvent(_ event: Event) {
+        client.trackEvent(event)
     }
 }

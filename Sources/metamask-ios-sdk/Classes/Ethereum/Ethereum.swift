@@ -210,6 +210,13 @@ extension Ethereum {
 
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
+            let method = EthereumMethod(rawValue: request.method)
+            if 
+                method == .ethRequestAccounts,
+                requestError.codeType == .userRejectedRequest
+            {
+                delegate?.trackEvent(.connectionRejected)
+            }
             sendError(requestError, id: id)
             return
         }
@@ -242,6 +249,7 @@ extension Ethereum {
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
+                delegate?.trackEvent(.connectionAuthorised)
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {

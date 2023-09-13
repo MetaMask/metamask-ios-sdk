@@ -27,6 +27,7 @@ protocol CommunicationClient: AnyObject {
     func connect()
     func disconnect()
     func clearSession()
+    func trackEvent(_ event: Event)
     func enableTracking(_ enable: Bool)
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
@@ -460,7 +461,10 @@ extension SocketClient {
         var parameters: [String: Any] = ["id": id]
 
         switch event {
-        case .connected, .disconnected:
+        case .connected,
+                .disconnected,
+                .connectionAuthorised,
+                .connectionRejected:
             break
         case .connectionRequest:
             let additionalParams: [String: Any] = [
