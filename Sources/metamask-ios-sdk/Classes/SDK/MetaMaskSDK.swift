@@ -9,6 +9,7 @@ protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
     var deeplinkUrl: String { get }
     var enableDebug: Bool { get set }
+    var useDeeplinks: Bool { get set }
     var networkUrl: String { get set }
     func connect()
     func disconnect()
@@ -31,6 +32,12 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
     public var enableDebug: Bool = true {
         didSet {
             client.enableTracking(enableDebug)
+        }
+    }
+    
+    public var useDeeplinks: Bool = false {
+        didSet {
+            client.useDeeplinks = useDeeplinks
         }
     }
 
