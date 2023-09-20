@@ -9,10 +9,12 @@ protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
     var deeplinkUrl: String { get }
     var enableDebug: Bool { get set }
+    var useDeeplinks: Bool { get set }
     var networkUrl: String { get set }
     func connect()
     func disconnect()
     func clearSession()
+    func trackEvent(_ event: Event)
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
@@ -30,6 +32,12 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
     public var enableDebug: Bool = true {
         didSet {
             client.enableTracking(enableDebug)
+        }
+    }
+    
+    public var useDeeplinks: Bool = false {
+        didSet {
+            client.useDeeplinks = useDeeplinks
         }
     }
 
@@ -134,5 +142,11 @@ extension MetaMaskSDK {
 
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         client.sendMessage(message, encrypt: encrypt)
+    }
+}
+
+extension MetaMaskSDK {
+    func trackEvent(_ event: Event) {
+        client.trackEvent(event)
     }
 }

@@ -29,6 +29,14 @@ public class Ethereum: ObservableObject {
             delegate?.enableDebug = newValue
         }
     }
+    
+    public var useDeeplinks: Bool {
+        get {
+            delegate?.useDeeplinks ?? false
+        } set {
+            delegate?.useDeeplinks = newValue
+        }
+    }
 
     /// Set and use a custom network url. Currently fully supported
     public var networkUrl: String {
@@ -79,6 +87,7 @@ public extension Ethereum {
     }
     
     func terminateConnection() {
+        delegate?.trackEvent(.connectionRejected)
         let error = RequestError(from: ["message": "The connection request has been rejected"])
         submittedRequests.forEach { key, value in
             submittedRequests[key]?.error(error)
@@ -210,6 +219,13 @@ extension Ethereum {
 
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
+            let method = EthereumMethod(rawValue: request.method)
+            if 
+                method == .ethRequestAccounts,
+                requestError.codeType == .userRejectedRequest
+            {
+                delegate?.trackEvent(.connectionRejected)
+            }
             sendError(requestError, id: id)
             return
         }
@@ -242,6 +258,7 @@ extension Ethereum {
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
+                delegate?.trackEvent(.connectionAuthorised)
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {

@@ -14,6 +14,7 @@ protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
     var deeplinkUrl: String { get }
+    var useDeeplinks: Bool { get set }
     var isConnected: Bool { get set }
     var serverUrl: String { get set }
     var hasValidSession: Bool { get }
@@ -27,6 +28,7 @@ protocol CommunicationClient: AnyObject {
     func connect()
     func disconnect()
     func clearSession()
+    func trackEvent(_ event: Event)
     func enableTracking(_ enable: Bool)
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
@@ -76,9 +78,15 @@ class SocketClient: CommunicationClient {
     var receiveResponse: ((String, [String: Any]) -> Void)?
     
     var requestJobs: [RequestJob] = []
+    
+    var useDeeplinks: Bool = false
+    
+    private var _deeplinkUrl: String {
+        useDeeplinks ? "metamask:/" : "https://metamask.app.link"
+    }
 
     var deeplinkUrl: String {
-        "https://metamask.app.link/connect?channelId="
+        "\(_deeplinkUrl)/connect?channelId="
             + channelId
             + "&comm=socket"
             + "&pubkey="
@@ -460,7 +468,10 @@ extension SocketClient {
         var parameters: [String: Any] = ["id": id]
 
         switch event {
-        case .connected, .disconnected:
+        case .connected,
+                .disconnected,
+                .connectionAuthorised,
+                .connectionRejected:
             break
         case .connectionRequest:
             let additionalParams: [String: Any] = [
