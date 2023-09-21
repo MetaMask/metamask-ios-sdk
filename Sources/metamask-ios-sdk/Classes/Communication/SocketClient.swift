@@ -186,10 +186,7 @@ private extension SocketClient {
         // MARK: Clients connected event
 
         channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
-            guard let self = self else { return }
             Logging.log("Clients connected: \(data)")
-
-            self.trackEvent(.connected)
 
             // for debug purposes only
             NotificationCenter.default.post(
@@ -303,7 +300,10 @@ private extension SocketClient {
         guard
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
-        else { return }
+        else {
+            trackEvent(.connected)
+            return
+        }
 
         sendMessage(nextKeyExchangeMessage, encrypt: false)
 
@@ -470,6 +470,7 @@ extension SocketClient {
         switch event {
         case .connected,
                 .disconnected,
+                .reconnectionRequest,
                 .connectionAuthorised,
                 .connectionRejected:
             break

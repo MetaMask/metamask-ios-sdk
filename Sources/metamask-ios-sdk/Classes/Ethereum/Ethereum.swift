@@ -87,7 +87,10 @@ public extension Ethereum {
     }
     
     func terminateConnection() {
-        delegate?.trackEvent(.connectionRejected)
+        if connected {
+            delegate?.trackEvent(.connectionRejected)
+        }
+        
         let error = RequestError(from: ["message": "The connection request has been rejected"])
         submittedRequests.forEach { key, value in
             submittedRequests[key]?.error(error)
