@@ -71,6 +71,7 @@ class SocketClient: CommunicationClient {
     }
 
     var isConnected: Bool = false
+    private var isReconnection = false
     var tearDownConnection: (() -> Void)?
     var onClientsTerminated: (() -> Void)?
 
@@ -111,7 +112,11 @@ class SocketClient: CommunicationClient {
         guard !channel.isConnected else { return }
         
         setupClient()
-        trackEvent(.connectionRequest)
+        if isReconnection {
+            trackEvent(.reconnectionRequest)
+        } else {
+            trackEvent(.connectionRequest)
+        }
         channel.connect()
     }
 
@@ -129,6 +134,7 @@ class SocketClient: CommunicationClient {
     private func configureSession() {
         if let config = fetchSessionConfig(), config.isValid {
             channelId = config.sessionId
+            isReconnection = true
         } else {
             // purge any existing session info
             store.deleteData(for: SESSION_KEY)
@@ -185,11 +191,8 @@ private extension SocketClient {
 
         // MARK: Clients connected event
 
-        channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
-            guard let self = self else { return }
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { data in
             Logging.log("Clients connected: \(data)")
-
-            self.trackEvent(.connected)
 
             // for debug purposes only
             NotificationCenter.default.post(
@@ -303,7 +306,10 @@ private extension SocketClient {
         guard
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
-        else { return }
+        else {
+            trackEvent(.connected)
+            return
+        }
 
         sendMessage(nextKeyExchangeMessage, encrypt: false)
 
@@ -470,6 +476,7 @@ extension SocketClient {
         switch event {
         case .connected,
                 .disconnected,
+                .reconnectionRequest,
                 .connectionAuthorised,
                 .connectionRejected:
             break
