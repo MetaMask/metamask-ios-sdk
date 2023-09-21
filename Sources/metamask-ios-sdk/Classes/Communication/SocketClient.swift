@@ -71,6 +71,7 @@ class SocketClient: CommunicationClient {
     }
 
     var isConnected: Bool = false
+    private var isReconnection = false
     var tearDownConnection: (() -> Void)?
     var onClientsTerminated: (() -> Void)?
 
@@ -111,7 +112,11 @@ class SocketClient: CommunicationClient {
         guard !channel.isConnected else { return }
         
         setupClient()
-        trackEvent(.connectionRequest)
+        if isReconnection {
+            trackEvent(.reconnectionRequest)
+        } else {
+            trackEvent(.connectionRequest)
+        }
         channel.connect()
     }
 
@@ -129,6 +134,7 @@ class SocketClient: CommunicationClient {
     private func configureSession() {
         if let config = fetchSessionConfig(), config.isValid {
             channelId = config.sessionId
+            isReconnection = true
         } else {
             // purge any existing session info
             store.deleteData(for: SESSION_KEY)
@@ -185,7 +191,7 @@ private extension SocketClient {
 
         // MARK: Clients connected event
 
-        channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] data in
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { data in
             Logging.log("Clients connected: \(data)")
 
             // for debug purposes only
