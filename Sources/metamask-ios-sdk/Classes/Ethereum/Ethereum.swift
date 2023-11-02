@@ -75,6 +75,68 @@ public extension Ethereum {
 
         return request(accountsRequest)
     }
+    
+    func connectAndSign(message: String) -> EthereumPublisher? {
+        let connectSignRequest = EthereumRequest(
+            method: .metaMaskConnectSign,
+            params: [message]
+        )
+        
+        return request(connectSignRequest)
+    }
+
+//    func connectAndSign(message: String) -> EthereumPublisher? {
+//        let accountsRequest = EthereumRequest(
+//            id: nil,
+//            method: .ethRequestAccounts
+//        )
+//
+//        return Future<Any, RequestError> { [weak self] promise in
+//            var cancellables: Set<AnyCancellable> = []
+//
+//            guard let connectPublisher = self?.request(accountsRequest) else {
+//                return promise(.failure(RequestError.init(from: [:])))
+//            }
+//
+//            connectPublisher
+//                .sink(receiveCompletion: { connectCompletion in
+//                    switch connectCompletion {
+//                    case .finished:
+//                        // The connection completed, now call the sign method.
+//                        Logging.log("Mpendulo:: connect successful receiveCompletion")
+//                        break
+//
+//                    case .failure(let error):
+//                        promise(.failure(error))
+//                    }
+//                }, receiveValue: { [weak self] result in
+//                    let address = self?.selectedAddress ?? ""
+//                    let params: [String] = [address, message]
+//                    let signRequest = EthereumRequest(
+//                        method: .ethSignTypedDataV4,
+//                        params: params
+//                    )
+//                    guard let signPublisher = self?.request(signRequest) else {
+//                        return promise(.failure(RequestError.init(from: [:])))
+//                    }
+//
+//                    signPublisher
+//                        .sink(receiveCompletion: { signCompletion in
+//                            switch signCompletion {
+//                            case .finished:
+//                                break
+//                            case .failure(let error):
+//                                promise(.failure(error))
+//                            }
+//                        }, receiveValue: { result in
+//                            promise(.success(result))
+//                        })
+//                        .store(in: &cancellables)
+//                })
+//                .store(in: &cancellables)
+//        }
+//        .eraseToAnyPublisher()
+//    }
 
     /// Disconnect dapp
     func disconnect() {
@@ -164,13 +226,17 @@ extension Ethereum {
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             publisher = submittedRequests[id]?.publisher
+            Logging.log("Mpendulo:: Sending request for \(request.method), id: \(id)")
             
             if !connected {
+                Logging.log("Mpendulo:: Connectingng delegate")
                 delegate?.connect()
+                connected = true
                 delegate?.addRequest {
                     self.makeRequest(request, id: id)
                 }
             } else {
+                Logging.log("Mpendulo:: Delegate already connected")
                 makeRequest(request, id: id)
             }
             
@@ -250,11 +316,13 @@ extension Ethereum {
             let accounts = result["accounts"] as? [String] ?? []
 
             if let account = accounts.first {
+                Logging.log("Mpendulo:: Got account: \(account)")
                 updateAccount(account)
                 sendResult(account, id: id)
             }
 
             if let chainId = result["chainId"] as? String {
+                Logging.log("Mpendulo:: Got chainId: \(chainId)")
                 updateChainId(chainId)
                 sendResult(chainId, id: id)
             }
@@ -262,6 +330,7 @@ extension Ethereum {
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 delegate?.trackEvent(.connectionAuthorised)
+                Logging.log("Mpendulo:: Got ethRequestAccounts: \(account)")
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {
@@ -269,6 +338,7 @@ extension Ethereum {
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
+                Logging.log("Mpendulo:: Got ethChainId: \(result)")
                 updateChainId(result)
                 sendResult(result, id: id)
             }
@@ -280,8 +350,11 @@ extension Ethereum {
             } else {
                 Logging.error("Unexpected response \(data)")
             }
+        case .metaMaskConnectSign:
+            Logging.log("Mpendulo:: Got metaMaskConnectSign: \(data)")
         default:
             if let result = data["result"] {
+                Logging.log("Mpendulo:: Got default: \(data)")
                 sendResult(result, id: id)
             } else {
                 Logging.error("Unknown response: \(data)")

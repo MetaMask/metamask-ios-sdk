@@ -13,10 +13,15 @@ struct SignView: View {
     @State var message = ""
 
     @State private var cancellables: Set<AnyCancellable> = []
+    @State private var showProgressView = false
 
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
+    @State var isConnectAndSign = false
+    
+    private let signButtonTitle = "Sign"
+    private let connectAndSignButtonTitle = "Connect & Sign"
 
     var body: some View {
         GeometryReader { geometry in
@@ -40,20 +45,27 @@ struct SignView: View {
                 }
 
                 Section {
-                    Button {
-                        signInput()
-                    } label: {
-                        Text("Sign message")
-                            .modifier(TextButton())
-                            .frame(maxWidth: .infinity, maxHeight: 32)
+                    ZStack {
+                        Button {
+                            isConnectAndSign ? connectAndSign(): signInput()
+                        } label: {
+                            Text(isConnectAndSign ? connectAndSignButtonTitle : signButtonTitle)
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                        }
+                        .alert(isPresented: $showError) {
+                            Alert(
+                                title: Text("Error"),
+                                message: Text(errorMessage)
+                            )
+                        }
+                        .modifier(ButtonStyle())
                     }
-                    .alert(isPresented: $showError) {
-                        Alert(
-                            title: Text("Error"),
-                            message: Text(errorMessage)
-                        )
+                    if showProgressView && !ethereum.connected {
+                        ProgressView()
+                            .scaleEffect(1.5, anchor: .center)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .black))
                     }
-                    .modifier(ButtonStyle())
                 }
             }
         }
@@ -86,6 +98,24 @@ struct SignView: View {
             default: break
             }
         }, receiveValue: { value in
+            self.result = value as? String ?? ""
+        }).store(in: &cancellables)
+    }
+    
+    func connectAndSign() {
+        showProgressView = true
+        ethereum.connectAndSign(message: "Data to sign")?.sink(receiveCompletion: { completion in
+            switch completion {
+            case let .failure(error):
+                showProgressView = false
+                errorMessage = error.localizedDescription
+                showError = true
+                print("Connection error: \(error)")
+            default: break
+            }
+        }, receiveValue: { value in
+            showProgressView = false
+            print("Connect & sign result: \(value)")
             self.result = value as? String ?? ""
         }).store(in: &cancellables)
     }

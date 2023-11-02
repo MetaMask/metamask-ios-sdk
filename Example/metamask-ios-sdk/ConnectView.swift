@@ -23,6 +23,10 @@ struct ConnectView: View {
 
     @State private var errorMessage = ""
     @State private var showError = false
+    
+    @State private var connectAndSignResult = ""
+    @State private var isConnect = true
+    @State private var isConnectAndSign = false
 
     @State private var showProgressView = false
     @State private var showToast = false
@@ -75,29 +79,30 @@ struct ConnectView: View {
                             NavigationLink("Switch chain") {
                                 SwitchChainView()
                             }
-                            
-                            Button {
-                                ethereum.clearSession()
-                                showToast = true
-                            } label: {
-                                Text("Clear Session")
-                                    .modifier(TextButton())
-                                    .frame(maxWidth: .infinity, maxHeight: 32)
-                            }
-                            .toast(isPresented: $showToast) {
-                                ToastView(message: "Session cleared")
-                            }
-                            .modifier(ButtonStyle())
                         }
                     }
                 }
 
                 if ethereum.selectedAddress.isEmpty {
                     Section {
+                        Button {
+                            isConnectAndSign = true
+                        } label: {
+                            Text("Connect & Sign")
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                        }
+                        .sheet(isPresented: $isConnectAndSign, onDismiss: {
+                            isConnectAndSign = false
+                        }) {
+                            SignView(isConnectAndSign: true)
+                        }
+                        
+                        .modifier(ButtonStyle())
                         ZStack {
                             Button {
                                 showProgressView = true
-
+                                
                                 ethereum.connect(dapp)?.sink(receiveCompletion: { completion in
                                     switch completion {
                                     case let .failure(error):
@@ -131,8 +136,25 @@ struct ConnectView: View {
                             )
                         }
                     } footer: {
-                        Text("This will open the MetaMask app. Please sign in and accept the connection prompt.")
+                        Text(connectAndSignResult)
                             .modifier(TextCaption())
+                    }
+                }
+                
+                if !ethereum.selectedAddress.isEmpty {
+                    Section {
+                        Button {
+                            ethereum.clearSession()
+                            showToast = true
+                        } label: {
+                            Text("Clear Session")
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                        }
+                        .toast(isPresented: $showToast) {
+                            ToastView(message: "Session cleared")
+                        }
+                        .modifier(ButtonStyle())
                     }
                 }
             }

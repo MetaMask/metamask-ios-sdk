@@ -80,7 +80,7 @@ class SocketClient: CommunicationClient {
     
     var requestJobs: [RequestJob] = []
     
-    var useDeeplinks: Bool = false
+    var useDeeplinks: Bool = true
     
     private var _deeplinkUrl: String {
         useDeeplinks ? "metamask:/" : "https://metamask.app.link"
