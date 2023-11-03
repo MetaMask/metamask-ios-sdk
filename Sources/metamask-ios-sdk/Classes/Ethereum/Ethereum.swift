@@ -239,7 +239,6 @@ extension Ethereum {
                 Logging.log("Mpendulo:: Delegate already connected")
                 makeRequest(request, id: id)
             }
-            
         }
 
         return publisher
