@@ -7,6 +7,7 @@ import Combine
 
 protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
+    var isConnected: Bool { get }
     var enableDebug: Bool { get set }
     var useDeeplinks: Bool { get set }
     var networkUrl: String { get set }

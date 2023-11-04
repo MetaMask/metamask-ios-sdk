@@ -145,11 +145,13 @@ extension Ethereum {
         
         let publisher = submittedRequests[CONNECTION_ID]?.publisher
 
-        sendRequest(
-            requestAccountsRequest,
-            authorise: false,
-            encrypt: false
-        )
+        delegate?.addRequest { [weak self] in
+            self?.sendRequest(
+                requestAccountsRequest,
+                authorise: false,
+                encrypt: false
+            )
+        }
         
         return publisher
     }
