@@ -52,9 +52,8 @@ public class Ethereum: ObservableObject {
 
 public extension Ethereum {
     @discardableResult
-    private func initialise() -> EthereumPublisher? {
+    private func getMetamaskProviderState() -> EthereumPublisher? {
         let providerRequest = EthereumRequest(
-            id: nil,
             method: .getMetamaskProviderState
         )
 
@@ -67,16 +66,14 @@ public extension Ethereum {
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect(_ dapp: Dapp) -> EthereumPublisher? {
         delegate?.dapp = dapp
-
-        let accountsRequest = EthereumRequest(
-            id: nil,
-            method: .ethRequestAccounts
-        )
-
-        return request(accountsRequest)
+        delegate?.connect()
+        
+        return requestAccounts()
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
+        delegate?.connect()
+        
         let connectSignRequest = EthereumRequest(
             method: .metaMaskConnectSign,
             params: [message]
@@ -84,59 +81,6 @@ public extension Ethereum {
         
         return request(connectSignRequest)
     }
-
-//    func connectAndSign(message: String) -> EthereumPublisher? {
-//        let accountsRequest = EthereumRequest(
-//            id: nil,
-//            method: .ethRequestAccounts
-//        )
-//
-//        return Future<Any, RequestError> { [weak self] promise in
-//            var cancellables: Set<AnyCancellable> = []
-//
-//            guard let connectPublisher = self?.request(accountsRequest) else {
-//                return promise(.failure(RequestError.init(from: [:])))
-//            }
-//
-//            connectPublisher
-//                .sink(receiveCompletion: { connectCompletion in
-//                    switch connectCompletion {
-//                    case .finished:
-//                        // The connection completed, now call the sign method.
-//                        Logging.log("Mpendulo:: connect successful receiveCompletion")
-//                        break
-//
-//                    case .failure(let error):
-//                        promise(.failure(error))
-//                    }
-//                }, receiveValue: { [weak self] result in
-//                    let address = self?.selectedAddress ?? ""
-//                    let params: [String] = [address, message]
-//                    let signRequest = EthereumRequest(
-//                        method: .ethSignTypedDataV4,
-//                        params: params
-//                    )
-//                    guard let signPublisher = self?.request(signRequest) else {
-//                        return promise(.failure(RequestError.init(from: [:])))
-//                    }
-//
-//                    signPublisher
-//                        .sink(receiveCompletion: { signCompletion in
-//                            switch signCompletion {
-//                            case .finished:
-//                                break
-//                            case .failure(let error):
-//                                promise(.failure(error))
-//                            }
-//                        }, receiveValue: { result in
-//                            promise(.success(result))
-//                        })
-//                        .store(in: &cancellables)
-//                })
-//                .store(in: &cancellables)
-//        }
-//        .eraseToAnyPublisher()
-//    }
 
     /// Disconnect dapp
     func disconnect() {
@@ -165,7 +109,7 @@ public extension Ethereum {
 // MARK: Deeplinking
 
 private extension Ethereum {
-    func shouldOpenMetaMask(method: EthereumMethod) -> Bool {
+    func requiresAuthorisation(method: EthereumMethod) -> Bool {
         switch method {
         case .ethRequestAccounts:
             return selectedAddress.isEmpty ? true : false
@@ -179,31 +123,35 @@ private extension Ethereum {
 
 extension Ethereum {
     func sendRequest<T: CodableData>(_ request: EthereumRequest<T>,
-                                     id: String,
-                                     openDeeplink: Bool) {
-        var request = request
-        request.id = id
-        delegate?.sendMessage(request, encrypt: true)
-        
-        if
-            openDeeplink,
-            let deeplink = delegate?.deeplinkUrl,
-            let url = URL(string: deeplink) {
-            DispatchQueue.main.async {
-                UIApplication.shared.open(url)
-            }
+                                     authorise: Bool,
+                                     encrypt: Bool = true) {
+        delegate?.sendMessage(request, encrypt: encrypt)
+        if authorise {
+            delegate?.requestAuthorisation()
         }
     }
 
-    func requestAccounts() {
-        connected = true
-        initialise()
+    @discardableResult
+    func requestAccounts() -> EthereumPublisher? {
+        //getMetamaskProviderState()
+        
+        let requestAccountsRequest = EthereumRequest(
+            id: CONNECTION_ID,
+            method: .ethRequestAccounts
+        )
+        
+        let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
+        submittedRequests[CONNECTION_ID] = submittedRequest
+        
+        let publisher = submittedRequests[CONNECTION_ID]?.publisher
 
         sendRequest(
-            EthereumRequest(method: .ethRequestAccounts),
-            id: CONNECTION_ID,
-            openDeeplink: false
+            requestAccountsRequest,
+            authorise: false,
+            encrypt: false
         )
+        
+        return publisher
     }
 
     @discardableResult
@@ -211,21 +159,22 @@ extension Ethereum {
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
     public func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
-        var publisher: EthereumPublisher?
 
-        if request.methodType == .ethRequestAccounts && !connected {
-            delegate?.connect()
+        if request.methodType == .ethRequestAccounts {
 
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[CONNECTION_ID] = submittedRequest
-            publisher = submittedRequests[CONNECTION_ID]?.publisher
+            let publisher = submittedRequests[CONNECTION_ID]?.publisher
 
-            delegate?.addRequest(requestAccounts)
+            delegate?.addRequest { [weak self] in
+                self?.requestAccounts()
+            }
+            return publisher
         } else {
-            let id = UUID().uuidString
+            let id = request.id
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
-            publisher = submittedRequests[id]?.publisher
+            let publisher = submittedRequests[id]?.publisher
             Logging.log("Mpendulo:: Sending request for \(request.method), id: \(id)")
             
             if !connected {
@@ -233,29 +182,26 @@ extension Ethereum {
                 delegate?.connect()
                 connected = true
                 delegate?.addRequest {
-                    self.makeRequest(request, id: id)
+                    self.makeRequest(request)
                 }
             } else {
                 Logging.log("Mpendulo:: Delegate already connected")
-                makeRequest(request, id: id)
+                makeRequest(request)
             }
+            return publisher
         }
-
-        return publisher
     }
     
-    private func makeRequest<T: CodableData>(_ request: EthereumRequest<T>, id: String) {
+    private func makeRequest<T: CodableData>(_ request: EthereumRequest<T>) {
         if let method = EthereumMethod(rawValue: request.method) {
             sendRequest(
                 request,
-                id: id,
-                openDeeplink: connected ? shouldOpenMetaMask(method: method) : true
+                authorise: connected ? requiresAuthorisation(method: method) : true
             )
         } else {
             sendRequest(
                 request,
-                id: id,
-                openDeeplink: connected ? false : true
+                authorise: connected ? false : true
             )
         }
     }

@@ -7,7 +7,6 @@ import Combine
 
 protocol SDKDelegate: AnyObject {
     var dapp: Dapp? { get set }
-    var deeplinkUrl: String { get }
     var enableDebug: Bool { get set }
     var useDeeplinks: Bool { get set }
     var networkUrl: String { get set }
@@ -15,6 +14,7 @@ protocol SDKDelegate: AnyObject {
     func disconnect()
     func clearSession()
     func trackEvent(_ event: Event)
+    func requestAuthorisation()
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
 }
@@ -64,10 +64,6 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
             client.serverUrl = newValue
         }
     }
-    
-    var deeplinkUrl: String {
-        client.deeplinkUrl
-    }
 
     var dapp: Dapp? {
         didSet {
@@ -77,6 +73,10 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
     
     func addRequest(_ job: @escaping RequestJob) {
         client.addRequest(job)
+    }
+    
+    func requestAuthorisation() {
+        client.requestAuthorisation()
     }
     
     public convenience init(store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)) {
