@@ -178,6 +178,7 @@ extension Ethereum {
                 sendRequest(request)
             } else {
                 delegate?.connect()
+                connected = true
                 delegate?.addRequest { [weak self] in
                     self?.sendRequest(request)
                 }
