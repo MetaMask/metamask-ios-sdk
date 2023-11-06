@@ -33,6 +33,11 @@ public enum KeyExchangeError: Error {
 public struct KeyExchangeMessage: CodableData {
     public let type: KeyExchangeType
     public let pubkey: String?
+    
+    public init(type: KeyExchangeType, pubkey: String?) {
+        self.type = type
+        self.pubkey = pubkey
+    }
 
     public func socketRepresentation() -> NetworkData {
         ["type": type.rawValue, "pubkey": pubkey]
@@ -52,7 +57,7 @@ public class KeyExchange {
     public private(set) var theirPublicKey: String?
 
     private let encyption: Crypto.Type
-    var keysExchanged: Bool = false
+    public private(set) var keysExchanged: Bool = false
 
     public init(encryption: Crypto.Type = Ecies.self) {
         encyption = encryption
@@ -60,14 +65,14 @@ public class KeyExchange {
         pubkey = encyption.publicKey(from: privateKey)
     }
 
-    func reset() {
+    public func reset() {
         keysExchanged = false
         theirPublicKey = nil
         privateKey = encyption.generatePrivateKey()
         pubkey = encyption.publicKey(from: privateKey)
     }
 
-    func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
+    public func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
         if let publicKey = message.pubkey {
             setTheirPublicKey(publicKey)
             keysExchanged = true
@@ -83,7 +88,7 @@ public class KeyExchange {
         )
     }
 
-    func nextStep(_ step: KeyExchangeType) -> KeyExchangeType? {
+    public func nextStep(_ step: KeyExchangeType) -> KeyExchangeType? {
         switch step {
         case .start: return .syn
         case .syn: return .synack
@@ -92,18 +97,18 @@ public class KeyExchange {
         }
     }
 
-    func message(type: KeyExchangeType) -> KeyExchangeMessage {
+    public func message(type: KeyExchangeType) -> KeyExchangeMessage {
         KeyExchangeMessage(
             type: type,
             pubkey: pubkey
         )
     }
 
-    func setTheirPublicKey(_ publicKey: String?) {
+    public func setTheirPublicKey(_ publicKey: String?) {
         theirPublicKey = publicKey
     }
 
-    static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
+    public static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
         guard
             let message = message["message"] as? [String: Any],
             let type = message["type"] as? String,

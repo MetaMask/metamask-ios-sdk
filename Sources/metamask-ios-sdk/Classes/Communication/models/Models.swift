@@ -7,15 +7,15 @@ import Foundation
 
 public typealias NetworkData = SocketData
 public typealias RequestTask = Task<Any, Never>
-public typealias CodableData = Codable & SocketData
+public typealias CodableData = Codable & SocketData & Equatable
 
-struct OriginatorInfo: CodableData {
-    let title: String?
-    let url: String?
-    let platform: String?
-    let apiVersion: String?
+public struct OriginatorInfo: CodableData {
+    public let title: String?
+    public let url: String?
+    public let platform: String?
+    public let apiVersion: String?
 
-    func socketRepresentation() -> NetworkData {
+    public func socketRepresentation() -> NetworkData {
         [
             "title": title,
             "url": url,
@@ -25,18 +25,23 @@ struct OriginatorInfo: CodableData {
     }
 }
 
-struct Message<T: CodableData>: CodableData {
+public struct Message<T: CodableData>: CodableData {
     let id: String
     let message: T
+    
+    public init(id: String, message: T) {
+        self.id = id
+        self.message = message
+    }
 
-    func socketRepresentation() -> NetworkData {
+    public func socketRepresentation() -> NetworkData {
         [
             "id": id,
             "message": try? message.socketRepresentation(),
         ]
     }
 
-    static func message(from message: [String: Any]) -> Message<T>? {
+    public static func message(from message: [String: Any]) -> Message<T>? {
         do {
             let json = try JSONSerialization.data(withJSONObject: message)
             let message = try JSONDecoder().decode(Message<T>.self, from: json)
@@ -48,12 +53,12 @@ struct Message<T: CodableData>: CodableData {
     }
 }
 
-struct RequestInfo: CodableData {
-    let type: String
-    let originator: OriginatorInfo
-    let originatorInfo: OriginatorInfo
+public struct RequestInfo: CodableData {
+    public let type: String
+    public let originator: OriginatorInfo
+    public let originatorInfo: OriginatorInfo
 
-    func socketRepresentation() -> NetworkData {
+    public func socketRepresentation() -> NetworkData {
         ["type": type,
          "originator": originator.socketRepresentation(), // Backward compatibility with MetaMask mobile
          "originatorInfo": originatorInfo.socketRepresentation()]
