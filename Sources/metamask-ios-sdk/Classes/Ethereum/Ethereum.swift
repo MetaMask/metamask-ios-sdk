@@ -52,21 +52,13 @@ public class Ethereum: ObservableObject {
 
 public extension Ethereum {
     @discardableResult
-    private func getMetamaskProviderState() -> EthereumPublisher? {
-        let providerRequest = EthereumRequest(
-            method: .getMetamaskProviderState
-        )
-
-        return request(providerRequest)
-    }
-
-    @discardableResult
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Parameter dapp: A struct describing the dapp making the request
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect(_ dapp: Dapp) -> EthereumPublisher? {
         delegate?.dapp = dapp
         delegate?.connect()
+        connected = true
         
         return requestAccounts()
     }
@@ -84,11 +76,16 @@ public extension Ethereum {
 
     /// Disconnect dapp
     func disconnect() {
+        chainId = ""
+        selectedAddress = ""
         connected = false
         delegate?.disconnect()
     }
     
     func clearSession() {
+        chainId = ""
+        selectedAddress = ""
+        connected = false
         delegate?.clearSession()
     }
     
@@ -122,19 +119,17 @@ private extension Ethereum {
 // MARK: Request Sending
 
 extension Ethereum {
-    func sendRequest<T: CodableData>(_ request: EthereumRequest<T>,
-                                     authorise: Bool,
-                                     encrypt: Bool = true) {
-        delegate?.sendMessage(request, encrypt: encrypt)
+    func sendRequest<T: CodableData>(_ request: EthereumRequest<T>) {
+        delegate?.sendMessage(request, encrypt: true)
+        let authorise = requiresAuthorisation(method: request.methodType)
+        
         if authorise {
             delegate?.requestAuthorisation()
         }
     }
 
     @discardableResult
-    func requestAccounts() -> EthereumPublisher? {
-        //getMetamaskProviderState()
-        
+    private func requestAccounts() -> EthereumPublisher? {
         let requestAccountsRequest = EthereumRequest(
             id: CONNECTION_ID,
             method: .ethRequestAccounts
@@ -142,15 +137,10 @@ extension Ethereum {
         
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
         submittedRequests[CONNECTION_ID] = submittedRequest
-        
         let publisher = submittedRequests[CONNECTION_ID]?.publisher
-
+        
         delegate?.addRequest { [weak self] in
-            self?.sendRequest(
-                requestAccountsRequest,
-                authorise: false,
-                encrypt: false
-            )
+            self?.sendRequest(requestAccountsRequest)
         }
         
         return publisher
@@ -162,49 +152,38 @@ extension Ethereum {
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
     public func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
 
-        if request.methodType == .ethRequestAccounts {
-
-            let submittedRequest = SubmittedRequest(method: request.method)
-            submittedRequests[CONNECTION_ID] = submittedRequest
-            let publisher = submittedRequests[CONNECTION_ID]?.publisher
-
-            delegate?.addRequest { [weak self] in
-                self?.requestAccounts()
+        if !connected && request.methodType != .metaMaskConnectSign {
+            if request.methodType == .ethRequestAccounts {
+                delegate?.connect()
+                connected = true
+                return requestAccounts()
             }
+            
+            let passthroughSubject = PassthroughSubject<Any, RequestError>()
+            let publisher: EthereumPublisher = passthroughSubject
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+
+            let error = RequestError.connectError
+            passthroughSubject.send(completion: .failure(error))
             return publisher
+            
         } else {
             let id = request.id
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             let publisher = submittedRequests[id]?.publisher
-            Logging.log("Mpendulo:: Sending request for \(request.method), id: \(id)")
             
-            if !connected {
-                Logging.log("Mpendulo:: Connectingng delegate")
-                delegate?.connect()
-                connected = true
-                delegate?.addRequest {
-                    self.makeRequest(request)
-                }
+            if connected {
+                sendRequest(request)
             } else {
-                Logging.log("Mpendulo:: Delegate already connected")
-                makeRequest(request)
+                delegate?.connect()
+                delegate?.addRequest { [weak self] in
+                    self?.sendRequest(request)
+                }
             }
+            
             return publisher
-        }
-    }
-    
-    private func makeRequest<T: CodableData>(_ request: EthereumRequest<T>) {
-        if let method = EthereumMethod(rawValue: request.method) {
-            sendRequest(
-                request,
-                authorise: connected ? requiresAuthorisation(method: method) : true
-            )
-        } else {
-            sendRequest(
-                request,
-                authorise: connected ? false : true
-            )
         }
     }
 }
@@ -263,13 +242,11 @@ extension Ethereum {
             let accounts = result["accounts"] as? [String] ?? []
 
             if let account = accounts.first {
-                Logging.log("Mpendulo:: Got account: \(account)")
                 updateAccount(account)
                 sendResult(account, id: id)
             }
 
             if let chainId = result["chainId"] as? String {
-                Logging.log("Mpendulo:: Got chainId: \(chainId)")
                 updateChainId(chainId)
                 sendResult(chainId, id: id)
             }
@@ -277,7 +254,6 @@ extension Ethereum {
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
                 delegate?.trackEvent(.connectionAuthorised)
-                Logging.log("Mpendulo:: Got ethRequestAccounts: \(account)")
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {
@@ -285,7 +261,6 @@ extension Ethereum {
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
-                Logging.log("Mpendulo:: Got ethChainId: \(result)")
                 updateChainId(result)
                 sendResult(result, id: id)
             }
@@ -297,11 +272,8 @@ extension Ethereum {
             } else {
                 Logging.error("Unexpected response \(data)")
             }
-        case .metaMaskConnectSign:
-            Logging.log("Mpendulo:: Got metaMaskConnectSign: \(data)")
         default:
             if let result = data["result"] {
-                Logging.log("Mpendulo:: Got default: \(data)")
                 sendResult(result, id: id)
             } else {
                 Logging.error("Unknown response: \(data)")

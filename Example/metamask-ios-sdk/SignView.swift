@@ -54,19 +54,18 @@ struct SignView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        .alert(isPresented: $showError) {
-                            Alert(
-                                title: Text("Error"),
-                                message: Text(errorMessage)
-                            )
-                        }
                         
-                        
-                        if showProgressView && !ethereum.connected {
+                        if showProgressView {
                             ProgressView()
                                 .scaleEffect(1.5, anchor: .center)
                                 .progressViewStyle(CircularProgressViewStyle(tint: .black))
                         }
+                    }
+                    .alert(isPresented: $showError) {
+                        Alert(
+                            title: Text("Error"),
+                            message: Text(errorMessage)
+                        )
                     }
                 }
             }

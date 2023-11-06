@@ -29,7 +29,6 @@ struct ConnectView: View {
     @State private var isConnectAndSign = false
 
     @State private var showProgressView = false
-    @State private var showToast = false
 
     var body: some View {
         NavigationView {
@@ -123,7 +122,7 @@ struct ConnectView: View {
                             }
                             .modifier(ButtonStyle())
 
-                            if showProgressView && !ethereum.connected {
+                            if showProgressView {
                                 ProgressView()
                                     .scaleEffect(1.5, anchor: .center)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
@@ -145,14 +144,19 @@ struct ConnectView: View {
                     Section {
                         Button {
                             ethereum.clearSession()
-                            showToast = true
                         } label: {
                             Text("Clear Session")
                                 .modifier(TextButton())
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
-                        .toast(isPresented: $showToast) {
-                            ToastView(message: "Session cleared")
+                        .modifier(ButtonStyle())
+                        
+                        Button {
+                            ethereum.disconnect()
+                        } label: {
+                            Text("Disconnect")
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
                     }
@@ -163,6 +167,9 @@ struct ConnectView: View {
                 status = notification.userInfo?["value"] as? String ?? "Offline"
             }
             .navigationTitle("Dub Dapp")
+            .onAppear {
+                showProgressView = false
+            }
         }
     }
 }

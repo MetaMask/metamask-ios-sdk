@@ -128,8 +128,6 @@ public class KeyExchange {
         ) else {
             throw KeyExchangeError.encodingError
         }
-        
-        Logging.log("Mpendulo:: Sending message: \(jsonString)")
 
         return try encyption.encrypt(
             jsonString,
@@ -146,8 +144,6 @@ public class KeyExchange {
             message,
             privateKey: privateKey
         )
-        
-        Logging.log("Mpendulo:: Received message: \(decryted)")
         return decryted
     }
 }

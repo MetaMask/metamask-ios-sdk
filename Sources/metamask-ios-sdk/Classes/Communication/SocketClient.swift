@@ -146,10 +146,10 @@ class SocketClient: CommunicationClient {
     }
     
     func clearSession() {
+        channelId = ""
         store.deleteData(for: SESSION_KEY)
         disconnect()
-        connect()
-        initiateKeyExchange()
+        keyExchange.reset()
     }
     
     private func initiateKeyExchange() {
@@ -337,6 +337,7 @@ private extension SocketClient {
         
         guard let message = Message<String>.message(from: msg) else {
             Logging.error("Could not parse message \(msg)")
+            initiateKeyExchange()
             return
         }
 
@@ -431,6 +432,9 @@ extension SocketClient {
                 } catch {
                     Logging.error("Could not encrypt message")
                 }
+            }
+            if channelId.isEmpty {
+                initiateKeyExchange()
             }
         } else if encrypt {
             if !isReady {
