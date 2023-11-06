@@ -13,9 +13,8 @@ typealias RequestJob = () -> Void
 protocol CommunicationClient: AnyObject {
     var clientName: String { get }
     var dapp: Dapp? { get set }
-    var deeplinkUrl: String { get }
     var useDeeplinks: Bool { get set }
-    var isConnected: Bool { get set }
+    var isConnected: Bool { get }
     var serverUrl: String { get set }
     var hasValidSession: Bool { get }
     var sessionDuration: TimeInterval { get set }
@@ -28,6 +27,7 @@ protocol CommunicationClient: AnyObject {
     func connect()
     func disconnect()
     func clearSession()
+    func requestAuthorisation()
     func trackEvent(_ event: Event)
     func enableTracking(_ enable: Bool)
     func addRequest(_ job: @escaping RequestJob)
@@ -42,8 +42,6 @@ class SocketClient: CommunicationClient {
     private let channel = SocketChannel()
 
     private var channelId: String = ""
-    
-    private var connectionPaused: Bool = false
     
     private let SESSION_KEY = "session_id"
 
@@ -70,7 +68,11 @@ class SocketClient: CommunicationClient {
         sessionConfig?.isValid ?? false
     }
 
-    var isConnected: Bool = false
+    var isConnected: Bool {
+        channel.isConnected
+    }
+    
+    private var isReady: Bool = false
     private var isReconnection = false
     var tearDownConnection: (() -> Void)?
     var onClientsTerminated: (() -> Void)?
@@ -80,7 +82,7 @@ class SocketClient: CommunicationClient {
     
     var requestJobs: [RequestJob] = []
     
-    var useDeeplinks: Bool = false
+    var useDeeplinks: Bool = true
     
     private var _deeplinkUrl: String {
         useDeeplinks ? "metamask:/" : "https://metamask.app.link"
@@ -109,7 +111,7 @@ class SocketClient: CommunicationClient {
     }
 
     func connect() {
-        guard !channel.isConnected else { return }
+        if channel.isConnected { return }
         
         setupClient()
         if isReconnection {
@@ -121,7 +123,7 @@ class SocketClient: CommunicationClient {
     }
 
     func disconnect() {
-        isConnected = false
+        isReady = false
         channel.disconnect()
         channel.terminateHandlers()
     }
@@ -144,8 +146,15 @@ class SocketClient: CommunicationClient {
     }
     
     func clearSession() {
+        channelId = ""
         store.deleteData(for: SESSION_KEY)
-        setupClient()
+        disconnect()
+        keyExchange.reset()
+    }
+    
+    private func initiateKeyExchange() {
+        let keyExchangeStartMessage = KeyExchangeMessage(type: .start, pubkey: nil)
+        sendMessage(keyExchangeStartMessage, encrypt: false)
     }
     
     private func updateSessionConfig() {
@@ -159,6 +168,10 @@ class SocketClient: CommunicationClient {
         if let configData = try? JSONEncoder().encode(config) {
             store.save(data: configData, key: SESSION_KEY)
         }
+    }
+    
+    func requestAuthorisation() {
+        deeplinkToMetaMask()
     }
 }
 
@@ -218,7 +231,7 @@ private extension SocketClient {
 
             self.channel.emit(ClientEvent.joinChannel, channelId)
 
-            if !self.isConnected {
+            if !self.isReady {
                 self.deeplinkToMetaMask()
             }
         }
@@ -292,9 +305,7 @@ private extension SocketClient {
                 userInfo: ["value": "Clients Disconnected"]
             )
 
-            if !self.connectionPaused {
-                self.connectionPaused = true
-            }
+            isReady = false
         }
     }
 }
@@ -326,6 +337,7 @@ private extension SocketClient {
         
         guard let message = Message<String>.message(from: msg) else {
             Logging.error("Could not parse message \(msg)")
+            initiateKeyExchange()
             return
         }
 
@@ -351,16 +363,14 @@ private extension SocketClient {
             Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
-            connectionPaused = true
+            isReady = true
         } else if json["type"] as? String == "ready" {
             Logging.log("Connection is ready")
-            isConnected = true
-            connectionPaused = false
+            isReady = true
             runJobs()
         } else if json["type"] as? String == "wallet_info" {
             Logging.log("Received wallet info")
-            isConnected = true
-            connectionPaused = false
+            isReady = true
         } else if let data = json["data"] as? [String: Any] {
             if let id = data["id"] as? String {
                 receiveResponse?(id, data)
@@ -423,9 +433,12 @@ extension SocketClient {
                     Logging.error("Could not encrypt message")
                 }
             }
+            if channelId.isEmpty {
+                initiateKeyExchange()
+            }
         } else if encrypt {
-            if connectionPaused {
-                Logging.log("Connection paused. Will send once wallet is open again")
+            if !isReady {
+                Logging.log("Connection not ready. Will send once wallet is open again")
                 addRequest { [weak self] in
                     guard let self = self else { return }
                     Logging.log("Resuming sending requests after connection pause")
