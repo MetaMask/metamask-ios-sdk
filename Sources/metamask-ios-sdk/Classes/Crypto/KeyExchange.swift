@@ -140,9 +140,10 @@ public class KeyExchange {
             throw KeyExchangeError.keysNotExchanged
         }
 
-        return try encyption.decrypt(
+        let decryted = try encyption.decrypt(
             message,
             privateKey: privateKey
         )
+        return decryted
     }
 }

@@ -32,6 +32,7 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethSendRawTransaction = "eth_sendRawTransaction"
     case switchEthereumChain = "wallet_switchEthereumChain"
     case ethGetTransactionCount = "eth_getTransactionCount"
+    case metaMaskConnectSign = "metamask_connectSign"
     case metaMaskAccountsChanged = "metamask_accountsChanged"
     case ethGetTransactionByHash = "eth_getTransactionByHash"
     case ethGetTransactionReceipt = "eth_getTransactionReceipt"

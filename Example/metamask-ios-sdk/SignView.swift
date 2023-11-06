@@ -13,10 +13,15 @@ struct SignView: View {
     @State var message = ""
 
     @State private var cancellables: Set<AnyCancellable> = []
+    @State private var showProgressView = false
 
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
+    @State var isConnectAndSign = false
+    
+    private let signButtonTitle = "Sign"
+    private let connectAndSignButtonTitle = "Connect & Sign"
 
     var body: some View {
         GeometryReader { geometry in
@@ -40,12 +45,21 @@ struct SignView: View {
                 }
 
                 Section {
-                    Button {
-                        signInput()
-                    } label: {
-                        Text("Sign message")
-                            .modifier(TextButton())
-                            .frame(maxWidth: .infinity, maxHeight: 32)
+                    ZStack {
+                        Button {
+                            isConnectAndSign ? connectAndSign(): signInput()
+                        } label: {
+                            Text(isConnectAndSign ? connectAndSignButtonTitle : signButtonTitle)
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                        }
+                        .modifier(ButtonStyle())
+                        
+                        if showProgressView {
+                            ProgressView()
+                                .scaleEffect(1.5, anchor: .center)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        }
                     }
                     .alert(isPresented: $showError) {
                         Alert(
@@ -53,12 +67,12 @@ struct SignView: View {
                             message: Text(errorMessage)
                         )
                     }
-                    .modifier(ButtonStyle())
                 }
             }
         }
         .onAppear {
             updateMessage()
+            showProgressView = false
         }
         .onChange(of: ethereum.chainId) { _ in
             updateMessage()
@@ -66,7 +80,9 @@ struct SignView: View {
     }
     
     func updateMessage() {
-        message = "{\"domain\":{\"chainId\":\"\(ethereum.chainId)\",\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
+        message = isConnectAndSign
+        ? "{\"domain\":{\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
+        : "{\"domain\":{\"chainId\":\"\(ethereum.chainId)\",\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
     }
 
     func signInput() {
@@ -86,6 +102,24 @@ struct SignView: View {
             default: break
             }
         }, receiveValue: { value in
+            self.result = value as? String ?? ""
+        }).store(in: &cancellables)
+    }
+    
+    func connectAndSign() {
+        showProgressView = true
+        ethereum.connectAndSign(message: message)?.sink(receiveCompletion: { completion in
+            switch completion {
+            case let .failure(error):
+                showProgressView = false
+                errorMessage = error.localizedDescription
+                showError = true
+                print("Connection error: \(error)")
+            default: break
+            }
+        }, receiveValue: { value in
+            showProgressView = false
+            print("Connect & sign result: \(value)")
             self.result = value as? String ?? ""
         }).store(in: &cancellables)
     }
