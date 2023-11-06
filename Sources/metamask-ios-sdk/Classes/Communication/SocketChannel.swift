@@ -41,7 +41,7 @@ class SocketChannel {
         socketManager = SocketManager(
             socketURL: url,
             config: [
-                .log(true),
+                .log(false),
                 options
             ]
         )
