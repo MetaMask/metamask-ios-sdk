@@ -22,6 +22,7 @@ struct SignView: View {
     
     private let signButtonTitle = "Sign"
     private let connectAndSignButtonTitle = "Connect & Sign"
+    private let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
 
     var body: some View {
         GeometryReader { geometry in
@@ -108,7 +109,7 @@ struct SignView: View {
     
     func connectAndSign() {
         showProgressView = true
-        ethereum.connectAndSign(message: message)?.sink(receiveCompletion: { completion in
+        ethereum.connectAndSign(dapp: dapp, message: message)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
                 showProgressView = false

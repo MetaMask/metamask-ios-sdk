@@ -63,7 +63,8 @@ public extension Ethereum {
         return requestAccounts()
     }
     
-    func connectAndSign(message: String) -> EthereumPublisher? {
+    func connectAndSign(dapp: Dapp, message: String) -> EthereumPublisher? {
+        delegate?.dapp = dapp
         delegate?.connect()
         
         let connectSignRequest = EthereumRequest(
