@@ -7,6 +7,8 @@ import Foundation
 public protocol SecureStore {
     func string(for key: String) -> String?
     
+    func data(for key: String) -> Data?
+    
     @discardableResult
     func deleteData(for key: String) -> Bool
     
@@ -73,7 +75,7 @@ public struct Keychain: SecureStore {
     
     // MARK: Helper functions
     
-    func data(for key: String) -> Data? {
+    public func data(for key: String) -> Data? {
         let request = requestForKey(key)
         var dataTypeRef: CFTypeRef?
         let status: OSStatus = SecItemCopyMatching(request, &dataTypeRef)
