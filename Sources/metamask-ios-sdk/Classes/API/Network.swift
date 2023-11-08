@@ -9,7 +9,7 @@ protocol Networking: ObservableObject {
     func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T
 }
 
-class Network: Networking {
+public class Network: Networking {
     func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl

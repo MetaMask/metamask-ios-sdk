@@ -4,9 +4,10 @@
 
 import SwiftUI
 import Combine
+import Foundation
 
 protocol SDKDelegate: AnyObject {
-    var dapp: Dapp? { get set }
+    var appMetadata: AppMetadata? { get set }
     var isConnected: Bool { get }
     var enableDebug: Bool { get set }
     var useDeeplinks: Bool { get set }
@@ -22,6 +23,7 @@ protocol SDKDelegate: AnyObject {
 
 public class MetaMaskSDK: ObservableObject, SDKDelegate {
     private var client: CommunicationClient!
+    private var tracker: Tracking
 
     /// Shared instance of the SDK through which Ethereum is accessed
     public static let shared = MetaMaskSDK()
@@ -32,7 +34,7 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
     public var enableDebug: Bool = true {
         didSet {
-            client.enableTracking(enableDebug)
+            tracker.enableDebug = enableDebug
         }
     }
     
@@ -44,10 +46,6 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
 
     public var isConnected: Bool {
         client.isConnected
-    }
-    
-    public var hasValidSession: Bool {
-        client.hasValidSession
     }
     
     public var sessionDuration: TimeInterval {
@@ -66,9 +64,9 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
         }
     }
 
-    var dapp: Dapp? {
+    var appMetadata: AppMetadata? {
         didSet {
-            client.dapp = dapp
+            client.appMetadata = appMetadata
         }
     }
     
@@ -80,16 +78,52 @@ public class MetaMaskSDK: ObservableObject, SDKDelegate {
         client.requestAuthorisation()
     }
     
-    public convenience init(store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)) {
-        self.init(client: SocketClient(store: store, tracker: Analytics(debug: true)))
+    public convenience init() {
+        self.init(client: Client(session: SessionManager(
+            store: Keychain(service: SDKInfo.bundleIdentifier),
+            sessionDuration: 24 * 3600 * 7), trackEvent: { event, parameters in
+            Task { //[weak self] in
+                //await self.tracker.trackEvent(event, parameters: parameters)
+            }
+            }), tracker: Analytics(network: Network(), debug: true))
     }
 
-    init(client: CommunicationClient) {
+    public init(client: CommunicationClient, tracker: Tracking) {
         self.client = client
+        self.tracker = tracker
 
         ethereum.delegate = self
         setupClientCommunication()
         setupAppLifeCycleObservers()
+    }
+    
+    public convenience init(builder: Builder) {
+        self.init()
+        self.appMetadata = builder.appMetadata
+        self.enableDebug = builder.enableDebug
+    }
+    
+    public class Builder {
+        var appMetadata: AppMetadata?
+        var enableDebug: Bool = false
+        
+        public func appMetadata(_ metadata: AppMetadata) -> Builder {
+            self.appMetadata = metadata
+            return self
+        }
+        
+        public func enableDebug(_ enableDebug: Bool) -> Builder {
+            self.enableDebug = enableDebug
+            return self
+        }
+        
+        public init() {
+            
+        }
+        
+        public func build() -> MetaMaskSDK {
+            return MetaMaskSDK(builder: self)
+        }
     }
 }
 
@@ -148,6 +182,6 @@ extension MetaMaskSDK {
 
 extension MetaMaskSDK {
     func trackEvent(_ event: Event) {
-        client.trackEvent(event)
+        client.track(event: event)
     }
 }

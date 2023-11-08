@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct Dapp {
+public struct AppMetadata {
     public let name: String
     public let url: String
     var platform: String = "ios"

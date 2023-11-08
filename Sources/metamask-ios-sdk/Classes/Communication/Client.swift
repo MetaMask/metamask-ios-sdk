@@ -5,57 +5,20 @@
 import OSLog
 import UIKit
 import Combine
-import SocketIO
 import Foundation
 
-typealias RequestJob = () -> Void
-
-protocol CommunicationClient: AnyObject {
-    var clientName: String { get }
-    var dapp: Dapp? { get set }
-    var useDeeplinks: Bool { get set }
-    var isConnected: Bool { get }
-    var serverUrl: String { get set }
-    var hasValidSession: Bool { get }
-    var sessionDuration: TimeInterval { get set }
-
-    var tearDownConnection: (() -> Void)? { get set }
-    var onClientsTerminated: (() -> Void)? { get set }
-    var receiveEvent: (([String: Any]) -> Void)? { get set }
-    var receiveResponse: ((String, [String: Any]) -> Void)? { get set }
-
-    func connect()
-    func disconnect()
-    func clearSession()
-    func requestAuthorisation()
-    func trackEvent(_ event: Event)
-    func enableTracking(_ enable: Bool)
-    func addRequest(_ job: @escaping RequestJob)
-    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
-}
-
-class SocketClient: CommunicationClient {
-    var dapp: Dapp?
-    private var tracker: Tracking
-    private let store: SecureStore
+class Client: CommunicationClient {
+    var appMetadata: AppMetadata?
+    private let session: SessionManager
     private var keyExchange = KeyExchange()
-    private let channel = SocketChannel()
+    private let channel = Channel()
 
     private var channelId: String = ""
-    
-    private let SESSION_KEY = "session_id"
 
-    var clientName: String {
-        "socket"
+    var isConnected: Bool {
+        channel.isConnected
     }
     
-    // 7 days default, configurable
-    var sessionDuration: TimeInterval = 24 * 3600 * 7 {
-        didSet {
-            updateSessionConfig()
-        }
-    }
-
     var serverUrl: String {
         get {
             channel.serverUrl
@@ -64,12 +27,12 @@ class SocketClient: CommunicationClient {
         }
     }
     
-    var hasValidSession: Bool {
-        sessionConfig?.isValid ?? false
-    }
-
-    var isConnected: Bool {
-        channel.isConnected
+    var sessionDuration: TimeInterval {
+        get {
+            session.sessionDuration
+        } set {
+            session.sessionDuration = newValue
+        }
     }
     
     private var isReady: Bool = false
@@ -79,6 +42,8 @@ class SocketClient: CommunicationClient {
 
     var receiveEvent: (([String: Any]) -> Void)?
     var receiveResponse: ((String, [String: Any]) -> Void)?
+    
+    var trackEvent: ((Event, [String: Any]) -> Void)?
     
     var requestJobs: [RequestJob] = []
     
@@ -95,16 +60,16 @@ class SocketClient: CommunicationClient {
             + "&pubkey="
             + keyExchange.pubkey
     }
-    
-    private var sessionConfig: SessionConfig?
 
-    init(store: SecureStore, tracker: Tracking) {
-        self.store = store
-        self.tracker = tracker
+    init(session: SessionManager, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
+        self.session = session
+        self.trackEvent = trackEvent
     }
     
     func setupClient() {
-        configureSession()
+        let sessionInfo = session.fetchSessionConfig()
+        channelId = sessionInfo.0.sessionId
+        isReconnection = sessionInfo.1
         handleReceiveMessages()
         handleConnection()
         handleDisconnection()
@@ -115,9 +80,9 @@ class SocketClient: CommunicationClient {
         
         setupClient()
         if isReconnection {
-            trackEvent(.reconnectionRequest)
+            track(event: .reconnectionRequest)
         } else {
-            trackEvent(.connectionRequest)
+            track(event: .connectionRequest)
         }
         channel.connect()
     }
@@ -125,29 +90,12 @@ class SocketClient: CommunicationClient {
     func disconnect() {
         isReady = false
         channel.disconnect()
-        channel.terminateHandlers()
-    }
-    
-    private func fetchSessionConfig() -> SessionConfig? {
-        let config: SessionConfig? = store.model(for: SESSION_KEY)
-        return config
-    }
-    
-    private func configureSession() {
-        if let config = fetchSessionConfig(), config.isValid {
-            channelId = config.sessionId
-            isReconnection = true
-        } else {
-            // purge any existing session info
-            store.deleteData(for: SESSION_KEY)
-            channelId = UUID().uuidString
-        }
-        updateSessionConfig()
+        channel.tearDown()
     }
     
     func clearSession() {
         channelId = ""
-        store.deleteData(for: SESSION_KEY)
+        session.clear()
         disconnect()
         keyExchange.reset()
     }
@@ -157,19 +105,6 @@ class SocketClient: CommunicationClient {
         sendMessage(keyExchangeStartMessage, encrypt: false)
     }
     
-    private func updateSessionConfig() {
-        // update session expiry date
-        let config = SessionConfig(sessionId: channelId,
-                                   expiry: Date(timeIntervalSinceNow: sessionDuration))
-        
-        sessionConfig = config
-        
-        // persist session config
-        if let configData = try? JSONEncoder().encode(config) {
-            store.save(data: configData, key: SESSION_KEY)
-        }
-    }
-    
     func requestAuthorisation() {
         deeplinkToMetaMask()
     }
@@ -177,7 +112,7 @@ class SocketClient: CommunicationClient {
 
 // MARK: Request jobs
 
-extension SocketClient {
+extension Client {
     func addRequest(_ job: @escaping RequestJob) {
         requestJobs.append(job)
     }
@@ -192,13 +127,13 @@ extension SocketClient {
 
 // MARK: Event handling
 
-private extension SocketClient {
+private extension Client {
     func handleConnection() {
         let channelId = channelId
 
         // MARK: Connection error event
 
-        channel.on(clientEvent: .error) { data in
+        channel.on(.error) { data in
             Logging.error("Client connection error: \(data)")
         }
 
@@ -217,7 +152,7 @@ private extension SocketClient {
 
         // MARK: Socket connected event
 
-        channel.on(clientEvent: .connect) { [weak self] _ in
+        channel.on(.connect) { [weak self] _ in
             guard let self = self else { return }
 
             // for debug purposes only
@@ -296,7 +231,7 @@ private extension SocketClient {
             guard let self = self else { return }
             Logging.log("SDK disconnected")
 
-            self.trackEvent(.disconnected)
+            track(event: .disconnected)
 
             // for debug purposes only
             NotificationCenter.default.post(
@@ -312,13 +247,13 @@ private extension SocketClient {
 
 // MARK: Message handling
 
-private extension SocketClient {
+private extension Client {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         guard
             let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
             let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
         else {
-            trackEvent(.connected)
+            track(event: .connected)
             return
         }
 
@@ -383,7 +318,7 @@ private extension SocketClient {
 
 // MARK: Deeplinking
 
-private extension SocketClient {
+private extension Client {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -398,11 +333,11 @@ private extension SocketClient {
 
 // MARK: Message sending
 
-extension SocketClient {
+extension Client {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
-            title: dapp?.name,
-            url: dapp?.url,
+            title: appMetadata?.name,
+            url: appMetadata?.url,
             platform: SDKInfo.platform,
             apiVersion: SDKInfo.version
         )
@@ -481,8 +416,8 @@ extension SocketClient {
 
 // MARK: Analytics
 
-extension SocketClient {
-    func trackEvent(_ event: Event) {
+extension Client {
+    func track(event: Event) {
         let id = channelId
         var parameters: [String: Any] = ["id": id]
 
@@ -497,22 +432,13 @@ extension SocketClient {
             let additionalParams: [String: Any] = [
                 "commLayer": "socket",
                 "sdkVersion": SDKInfo.version,
-                "url": dapp?.url ?? "",
-                "title": dapp?.name ?? "",
+                "url": appMetadata?.url ?? "",
+                "title": appMetadata?.name ?? "",
                 "platform": SDKInfo.platform
             ]
             parameters.merge(additionalParams) { current, _ in current }
         }
-
-        Task { [parameters] in
-            await self.tracker.trackEvent(
-                event,
-                parameters: parameters
-            )
-        }
-    }
-
-    func enableTracking(_ enable: Bool) {
-        tracker.enableDebug = enable
+        
+        trackEvent?(event, parameters)
     }
 }

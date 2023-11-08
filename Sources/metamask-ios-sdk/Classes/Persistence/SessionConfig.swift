@@ -10,8 +10,8 @@ public class SessionConfig: Codable, Equatable {
         lhs.sessionId == rhs.sessionId && lhs.expiry == rhs.expiry
     }
     
-    let sessionId: String
-    let expiry: Date
+    public let sessionId: String
+    public let expiry: Date
     
     public var isValid: Bool {
         expiry > Date()

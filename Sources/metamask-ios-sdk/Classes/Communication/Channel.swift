@@ -5,28 +5,34 @@
 import SocketIO
 import Foundation
 
-class SocketChannel {
-    var serverUrl: String {
+public class Channel: CommunicationChannel {
+    public typealias ChannelData = SocketData
+    public typealias EventType = SocketClientEvent
+    
+    public var serverUrl: String {
         get {
-            Endpoint.SERVER_URL
+            _serverUrl
         } set {
-            Endpoint.SERVER_URL = newValue
-            configureSocket(url: newValue)
+            _serverUrl = newValue
         }
     }
-
-    var socket: SocketIOClient!
-    private var socketManager: SocketManager!
     
-    var isConnected: Bool {
+    public var isConnected: Bool {
         socket.status == .connected
     }
+    
+    private var _serverUrl: String
 
-    init() {
-        configureSocket(url: Endpoint.SERVER_URL)
+    private var socket: SocketIOClient!
+    private var socketManager: SocketManager!
+    
+
+    public init(url: String = Endpoint.SERVER_URL) {
+        _serverUrl = url
+        configure(url: url)
     }
 
-    func configureSocket(url: String) {
+    private func configure(url: String) {
         guard let url = URL(string: url) else {
             Logging.error("Socket url is invalid")
             return
@@ -41,7 +47,7 @@ class SocketChannel {
         socketManager = SocketManager(
             socketURL: url,
             config: [
-                .log(false),
+                .log(true),
                 options
             ]
         )
@@ -51,32 +57,32 @@ class SocketChannel {
 
 // MARK: Session
 
-extension SocketChannel {
-    func connect() {
+extension Channel {
+    public func connect() {
         socket.connect()
     }
 
-    func disconnect() {
+    public func disconnect() {
         socket.disconnect()
     }
     
-    func terminateHandlers() {
+    public func tearDown() {
         socket.removeAllHandlers()
     }
 }
 
 // MARK: Events
 
-extension SocketChannel {
-    func on(clientEvent: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
-        socket.on(clientEvent: clientEvent, callback: { data, _ in
+extension Channel {
+    public func on(_ event: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
+        socket.on(clientEvent: event, callback: { data, _ in
             DispatchQueue.main.async {
                 completion(data)
             }
         })
     }
 
-    func on(_ event: String, completion: @escaping ([Any]) -> Void) {
+    public func on(_ event: String, completion: @escaping ([Any]) -> Void) {
         socket.on(event, callback: { data, _ in
             DispatchQueue.main.async {
                 completion(data)
@@ -84,7 +90,7 @@ extension SocketChannel {
         })
     }
 
-    func emit(_ event: String, _ item: SocketData) {
+    public func emit(_ event: String, _ item: SocketData) {
         socket.emit(event, item)
     }
 }

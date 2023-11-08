@@ -53,18 +53,18 @@ public class Ethereum: ObservableObject {
 public extension Ethereum {
     @discardableResult
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
-    /// - Parameter dapp: A struct describing the dapp making the request
+    /// - Parameter appMetadata: A struct describing the dapp making the request
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
-    func connect(_ dapp: Dapp) -> EthereumPublisher? {
-        delegate?.dapp = dapp
+    func connect(_ appMetadata: AppMetadata) -> EthereumPublisher? {
+        delegate?.appMetadata = appMetadata
         delegate?.connect()
         connected = true
         
         return requestAccounts()
     }
     
-    func connectAndSign(dapp: Dapp, message: String) -> EthereumPublisher? {
-        delegate?.dapp = dapp
+    func connectAndSign(appMetadata: AppMetadata, message: String) -> EthereumPublisher? {
+        delegate?.appMetadata = appMetadata
         delegate?.connect()
         
         let connectSignRequest = EthereumRequest(
