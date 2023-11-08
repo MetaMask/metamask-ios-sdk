@@ -13,12 +13,12 @@ extension Notification.Name {
 }
 
 struct ConnectView: View {
-    @ObservedObject var ethereum = MetaMaskSDK.Builder()
-        .enableDebug(true)
+    @ObservedObject var ethereum = MetaMaskSDK.Builder(metadata: appMetadata)
         .build()
+        .ethereum
     @State private var cancellables: Set<AnyCancellable> = []
 
-    private let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
+    private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
@@ -70,15 +70,15 @@ struct ConnectView: View {
                     Section {
                         Group {
                             NavigationLink("Sign") {
-                                SignView()
+                                SignView().environmentObject(ethereum)
                             }
 
                             NavigationLink("Transact") {
-                                TransactionView()
+                                TransactionView().environmentObject(ethereum)
                             }
 
                             NavigationLink("Switch chain") {
-                                SwitchChainView()
+                                SwitchChainView().environmentObject(ethereum)
                             }
                         }
                     }
@@ -104,7 +104,7 @@ struct ConnectView: View {
                             Button {
                                 showProgressView = true
                                 
-                                ethereum.connect(appMetadata)?.sink(receiveCompletion: { completion in
+                                ethereum.connect()?.sink(receiveCompletion: { completion in
                                     switch completion {
                                     case let .failure(error):
                                         showProgressView = false

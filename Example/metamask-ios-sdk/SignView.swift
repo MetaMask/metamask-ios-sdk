@@ -8,7 +8,7 @@ import Combine
 import metamask_ios_sdk
 
 struct SignView: View {
-    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
+    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
 
     @State var message = ""
 
@@ -22,7 +22,7 @@ struct SignView: View {
     
     private let signButtonTitle = "Sign"
     private let connectAndSignButtonTitle = "Connect & Sign"
-    private let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
+    private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
     var body: some View {
         GeometryReader { geometry in
@@ -109,7 +109,7 @@ struct SignView: View {
     
     func connectAndSign() {
         showProgressView = true
-        ethereum.connectAndSign(appMetadata: appMetadata, message: message)?.sink(receiveCompletion: { completion in
+        ethereum.connectAndSign(message: message)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
                 showProgressView = false

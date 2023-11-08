@@ -9,7 +9,7 @@ import metamask_ios_sdk
 
 struct SwitchChainView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
+    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
 
     @State private var cancellables: Set<AnyCancellable> = []
     @State private var alert: AlertInfo?

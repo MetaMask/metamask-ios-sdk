@@ -8,7 +8,7 @@ import Combine
 import metamask_ios_sdk
 
 struct TransactionView: View {
-    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
+    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
 
     @State private var amount = ""
     @State var result: String = ""
@@ -81,10 +81,12 @@ struct TransactionView: View {
             from: ethereum.selectedAddress,
             value: amount
         )
+        
+        let parameters: [Transaction] = [transaction]
 
         let transactionRequest = EthereumRequest(
             method: .ethSendTransaction,
-            params: [transaction] // eth_sendTransaction rpc call expects an array parameters object
+            params: parameters // eth_sendTransaction rpc call expects an array parameters object
         )
 
         ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
