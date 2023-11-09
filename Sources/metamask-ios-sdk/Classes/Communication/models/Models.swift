@@ -7,7 +7,7 @@ import Foundation
 
 public typealias NetworkData = SocketData
 public typealias RequestTask = Task<Any, Never>
-public typealias CodableData = Codable & SocketData & Equatable
+public typealias CodableData = Codable & SocketData
 
 public struct OriginatorInfo: CodableData {
     public let title: String?
@@ -26,8 +26,8 @@ public struct OriginatorInfo: CodableData {
 }
 
 public struct Message<T: CodableData>: CodableData {
-    let id: String
-    let message: T
+    public let id: String
+    public let message: T
     
     public init(id: String, message: T) {
         self.id = id

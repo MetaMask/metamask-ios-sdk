@@ -9,11 +9,11 @@ public class Channel: CommunicationChannel {
     public typealias ChannelData = SocketData
     public typealias EventType = SocketClientEvent
     
-    public var serverUrl: String {
+    public var networkUrl: String {
         get {
-            _serverUrl
+            _networkUrl
         } set {
-            _serverUrl = newValue
+            _networkUrl = newValue
         }
     }
     
@@ -21,14 +21,14 @@ public class Channel: CommunicationChannel {
         socket.status == .connected
     }
     
-    private var _serverUrl: String
+    private var _networkUrl: String
 
     private var socket: SocketIOClient!
     private var socketManager: SocketManager!
     
 
     public init(url: String = Endpoint.SERVER_URL) {
-        _serverUrl = url
+        _networkUrl = url
         configure(url: url)
     }
 

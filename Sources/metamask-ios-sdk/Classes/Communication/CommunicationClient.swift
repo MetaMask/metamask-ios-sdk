@@ -7,11 +7,11 @@ import Foundation
 
 public typealias RequestJob = () -> Void
 
-public protocol CommunicationClient: AnyObject {
+protocol CommunicationClient: AnyObject {
     var appMetadata: AppMetadata? { get set }
     var useDeeplinks: Bool { get set }
     var isConnected: Bool { get }
-    var serverUrl: String { get set }
+    var networkUrl: String { get set }
     var sessionDuration: TimeInterval { get set }
 
     var tearDownConnection: (() -> Void)? { get set }

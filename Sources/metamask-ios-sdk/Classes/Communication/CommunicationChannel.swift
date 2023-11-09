@@ -8,7 +8,7 @@ public protocol CommunicationChannel {
     associatedtype EventType
     
     var isConnected: Bool { get }
-    var serverUrl: String { get set }
+    var networkUrl: String { get set }
     
     func connect()
     func disconnect()

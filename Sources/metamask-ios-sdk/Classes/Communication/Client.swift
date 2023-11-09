@@ -7,7 +7,7 @@ import UIKit
 import Combine
 import Foundation
 
-class Client: CommunicationClient {
+public class Client: CommunicationClient {
     var appMetadata: AppMetadata?
     private let session: SessionManager
     private var keyExchange = KeyExchange()
@@ -19,11 +19,11 @@ class Client: CommunicationClient {
         channel.isConnected
     }
     
-    var serverUrl: String {
+    var networkUrl: String {
         get {
-            channel.serverUrl
+            channel.networkUrl
         } set {
-            channel.serverUrl = newValue
+            channel.networkUrl = newValue
         }
     }
     
@@ -441,4 +441,8 @@ extension Client {
         
         trackEvent?(event, parameters)
     }
+}
+
+public extension Client {
+    internal static let live: CommunicationClient = Dependencies.shared.client
 }

@@ -10,7 +10,7 @@ public protocol Tracking {
 }
 
 public class Analytics: Tracking {
-    private let network: Network
+    private let network: any Networking
     private var debug: Bool!
 
     public var enableDebug: Bool {
@@ -22,7 +22,7 @@ public class Analytics: Tracking {
         self.init(network: Network(), debug: debug)
     }
 
-    public init(network: Network, debug: Bool) {
+    public init(network: any Networking, debug: Bool) {
         self.debug = debug
         self.network = network
     }
@@ -39,4 +39,8 @@ public class Analytics: Tracking {
             Logging.error("tracking error: \(error.localizedDescription)")
         }
     }
+}
+
+extension Analytics {
+    static let live = Dependencies.shared.tracker
 }
