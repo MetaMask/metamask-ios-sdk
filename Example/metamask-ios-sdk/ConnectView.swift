@@ -13,9 +13,7 @@ extension Notification.Name {
 }
 
 struct ConnectView: View {
-    @ObservedObject var ethereum = MetaMaskSDK.Builder(metadata: appMetadata)
-        .build()
-        .ethereum
+    @ObservedObject var ethereum = MetaMaskSDK.shared(appMetadata: appMetadata)
     @State private var cancellables: Set<AnyCancellable> = []
 
     private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
@@ -97,6 +95,7 @@ struct ConnectView: View {
                             isConnectAndSign = false
                         }) {
                             SignView(isConnectAndSign: true)
+                                .environmentObject(ethereum)
                         }
                         
                         .modifier(ButtonStyle())

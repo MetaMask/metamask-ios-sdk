@@ -7,7 +7,7 @@ import SwiftUI
 import metamask_ios_sdk
 
 struct NetworkView: View {
-    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
+    @EnvironmentObject var metamaskSDK: MetaMaskSDK
     @Environment(\.presentationMode) var presentationMode
     @State var networkUrl: String = ""
 
@@ -16,7 +16,7 @@ struct NetworkView: View {
             Section {
                 Text("Current network URL")
                     .modifier(TextCallout())
-                TextField("Network url", text: $ethereum.networkUrl)
+                TextField("Network url", text: $metamaskSDK.networkUrl)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -55,7 +55,7 @@ struct NetworkView: View {
     }
 
     func changeNetwork() {
-        ethereum.networkUrl = networkUrl
+        metamaskSDK.networkUrl = networkUrl
         presentationMode.wrappedValue.dismiss()
     }
 }

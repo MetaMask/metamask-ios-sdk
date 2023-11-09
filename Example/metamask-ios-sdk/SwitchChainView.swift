@@ -9,7 +9,7 @@ import metamask_ios_sdk
 
 struct SwitchChainView: View {
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
+    @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State private var cancellables: Set<AnyCancellable> = []
     @State private var alert: AlertInfo?
@@ -71,7 +71,7 @@ struct SwitchChainView: View {
                     Text("Current chain:")
                         .modifier(TextCallout())
                     Spacer()
-                    Text("\(Network.chain(for: ethereum.chainId)) (\(ethereum.chainId))")
+                    Text("\(Network.chain(for: metamaskSDK.chainId)) (\(metamaskSDK.chainId))")
                         .modifier(TextCalloutLight())
                 }
                 Picker("Switch to:", selection: $networkSelection) {
@@ -109,7 +109,7 @@ struct SwitchChainView: View {
             }
         }
         .onAppear {
-            networkSelection = ethereum.chainId == networkSelection.rawValue
+            networkSelection = metamaskSDK.chainId == networkSelection.rawValue
                 ? .ethereum
             : .goerli
         }
@@ -126,7 +126,7 @@ struct SwitchChainView: View {
             params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
         )
 
-        ethereum.request(switchChainRequest)?.sink(receiveCompletion: { completion in
+        metamaskSDK.request(switchChainRequest)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
                 if error.codeType == .unrecognizedChainId || error.codeType == .serverError {
@@ -175,7 +175,7 @@ struct SwitchChainView: View {
             params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
         )
 
-        ethereum.request(addChainRequest)?.sink(receiveCompletion: { completion in
+        metamaskSDK.request(addChainRequest)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
                 alert = AlertInfo(
@@ -190,7 +190,7 @@ struct SwitchChainView: View {
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
-                message: ethereum.chainId == networkSelection.chainId
+                message: metamaskSDK.chainId == networkSelection.chainId
                     ? "Successfully switched to \(networkSelection.name)"
                     : "Successfully added \(networkSelection.name)",
                 dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {

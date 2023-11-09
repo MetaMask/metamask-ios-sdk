@@ -8,7 +8,7 @@ import Combine
 import metamask_ios_sdk
 
 struct TransactionView: View {
-    @EnvironmentObject var ethereum: MetaMaskSDK.Ethereum
+    @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State private var amount = ""
     @State var result: String = ""
@@ -22,7 +22,7 @@ struct TransactionView: View {
             Section {
                 Text("From")
                     .modifier(TextCallout())
-                TextField("Enter sender address", text: $ethereum.selectedAddress)
+                TextField("Enter sender address", text: $metamaskSDK.selectedAddress)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -78,7 +78,7 @@ struct TransactionView: View {
     func sendTransaction() {
         let transaction = Transaction(
             to: to,
-            from: ethereum.selectedAddress,
+            from: metamaskSDK.selectedAddress,
             value: amount
         )
         
@@ -89,7 +89,7 @@ struct TransactionView: View {
             params: parameters // eth_sendTransaction rpc call expects an array parameters object
         )
 
-        ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
+        metamaskSDK.request(transactionRequest)?.sink(receiveCompletion: { completion in
             switch completion {
             case let .failure(error):
                 errorMessage = error.localizedDescription
