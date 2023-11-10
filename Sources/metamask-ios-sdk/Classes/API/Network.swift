@@ -4,13 +4,13 @@
 
 import SwiftUI
 
-protocol Networking: ObservableObject {
+public protocol Networking: ObservableObject {
     func post(_ parameters: [String: Any], endpoint: Endpoint) async throws
     func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T
 }
 
-class Network: Networking {
-    func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
+public class Network: Networking {
+    public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
         }
@@ -21,7 +21,7 @@ class Network: Networking {
         return response
     }
 
-    func post(_ parameters: [String: Any], endpoint: Endpoint) async throws {
+    public func post(_ parameters: [String: Any], endpoint: Endpoint) async throws {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
         }

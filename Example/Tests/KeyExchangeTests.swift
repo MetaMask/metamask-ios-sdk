@@ -68,8 +68,14 @@ class KeyExchangeTests: XCTestCase {
                 options: []
             )
                 as? [String: Any] ?? [:]
-            let message = Message<String>.message(from: json)
-            XCTAssertEqual(message, originalMessage)
+            do {
+                let message = try Message<String>.message(from: json)
+                XCTAssertEqual(message.id, originalMessage.id)
+                XCTAssertEqual(message.message, originalMessage.message)
+            } catch {
+                XCTFail("Message could not be decoded: \(error)")
+            }
+            
         } catch {
             XCTFail("Encryption or decryption failed with error: \(error)")
         }

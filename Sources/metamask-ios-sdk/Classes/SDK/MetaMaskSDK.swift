@@ -4,103 +4,110 @@
 
 import SwiftUI
 import Combine
+import Foundation
 
-protocol SDKDelegate: AnyObject {
-    var dapp: Dapp? { get set }
-    var isConnected: Bool { get }
-    var enableDebug: Bool { get set }
-    var useDeeplinks: Bool { get set }
-    var networkUrl: String { get set }
-    func connect()
-    func disconnect()
-    func clearSession()
-    func trackEvent(_ event: Event)
-    func requestAuthorisation()
-    func addRequest(_ job: @escaping RequestJob)
-    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
+class SDKWrapper {
+    var sdk: MetaMaskSDK?
+    static let shared = SDKWrapper()
 }
 
-public class MetaMaskSDK: ObservableObject, SDKDelegate {
-    private var client: CommunicationClient!
-
-    /// Shared instance of the SDK through which Ethereum is accessed
-    public static let shared = MetaMaskSDK()
-
-    /// Ethereum abstraction via which all requests should be done
-    @ObservedObject public var ethereum = Ethereum()
+public class MetaMaskSDK: ObservableObject {
+    private var tracker: Tracking = Analytics.live
+    private let ethereum: Ethereum = .live
+    
+    /// The active/selected MetaMask account chain
+    @Published public var chainId: String = ""
+    /// Indicated whether connected to MetaMask
+    @Published public var connected: Bool = false
+    
+    /// The active/selected MetaMask account address
+    @Published public var account: String = ""
+    
+    private var sharedInstance: MetaMaskSDK?
 
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
     public var enableDebug: Bool = true {
         didSet {
-            client.enableTracking(enableDebug)
+            tracker.enableDebug = enableDebug
         }
     }
     
+    public var networkUrl: String {
+        get {
+            ethereum.commClient.networkUrl
+        } set {
+            ethereum.commClient.networkUrl = newValue
+        }
+    }
+
     public var useDeeplinks: Bool = false {
         didSet {
-            client.useDeeplinks = useDeeplinks
+            ethereum.commClient.useDeeplinks = useDeeplinks
         }
     }
 
-    public var isConnected: Bool {
-        client.isConnected
-    }
-    
-    public var hasValidSession: Bool {
-        client.hasValidSession
-    }
-    
     public var sessionDuration: TimeInterval {
         get {
-            client.sessionDuration
+            ethereum.commClient.sessionDuration
         } set {
-            client.sessionDuration = newValue
+            ethereum.commClient.sessionDuration = newValue
         }
     }
 
-    var networkUrl: String {
-        get {
-            client.serverUrl
-        } set {
-            client.serverUrl = newValue
-        }
-    }
-
-    var dapp: Dapp? {
-        didSet {
-            client.dapp = dapp
-        }
-    }
-    
-    func addRequest(_ job: @escaping RequestJob) {
-        client.addRequest(job)
-    }
-    
-    func requestAuthorisation() {
-        client.requestAuthorisation()
-    }
-    
-    public convenience init(store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)) {
-        self.init(client: SocketClient(store: store, tracker: Analytics(debug: true)))
-    }
-
-    init(client: CommunicationClient) {
-        self.client = client
-
-        ethereum.delegate = self
-        setupClientCommunication()
+    private init(appMetadata: AppMetadata, enableDebug: Bool) {
+        self.ethereum.delegate = self
+        self.ethereum.updateMetadata(appMetadata)
+        self.tracker.enableDebug = enableDebug
         setupAppLifeCycleObservers()
+    }
+    
+    public static func shared(_ appMetadata: AppMetadata, enableDebug: Bool = true) -> MetaMaskSDK {
+        guard let sdk = SDKWrapper.shared.sdk else {
+            let metamaskSdk = MetaMaskSDK(appMetadata: appMetadata, enableDebug: enableDebug)
+            SDKWrapper.shared.sdk = metamaskSdk
+            return metamaskSdk
+        }
+        return sdk
+    }
+}
+
+public extension MetaMaskSDK {
+    func connect() async -> Result<String, RequestError> {
+        await ethereum.connect()
+    }
+    
+    func connectAndSign(message: String) async -> Result<String, RequestError>  {
+       await ethereum.connectAndSign(message: message)
+    }
+
+    func disconnect() {
+        ethereum.disconnect()
+    }
+    
+    func clearSession() {
+        ethereum.clearSession()
+    }
+    
+    func terminateConnection() {
+        ethereum.terminateConnection()
+    }
+    
+    func request<T: CodableData>(_ request: EthereumRequest<T>) async -> Result<String, RequestError>  {
+       await ethereum.request(request)
+    }
+}
+
+extension MetaMaskSDK: EthereumEventsDelegate {
+    func chainIdChanged(_ chainId: String) {
+        self.chainId = chainId
+    }
+    
+    func accountChanged(_ account: String) {
+        self.account = account
     }
 }
 
 private extension MetaMaskSDK {
-    func setupClientCommunication() {
-        client.receiveEvent = ethereum.receiveEvent
-        client.tearDownConnection = ethereum.disconnect
-        client.receiveResponse = ethereum.receiveResponse
-        client.onClientsTerminated = ethereum.terminateConnection
-    }
-
     func setupAppLifeCycleObservers() {
         NotificationCenter.default.addObserver(
             self,
@@ -125,29 +132,5 @@ private extension MetaMaskSDK {
     @objc
     func stopBackgroundTask() {
         BackgroundTaskManager.stop()
-    }
-}
-
-extension MetaMaskSDK {
-    func connect() {
-        client.connect()
-    }
-
-    func disconnect() {
-        client.disconnect()
-    }
-    
-    func clearSession() {
-        client.clearSession()
-    }
-
-    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
-        client.sendMessage(message, encrypt: encrypt)
-    }
-}
-
-extension MetaMaskSDK {
-    func trackEvent(_ event: Event) {
-        client.trackEvent(event)
     }
 }

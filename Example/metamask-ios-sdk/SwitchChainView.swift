@@ -7,11 +7,11 @@ import SwiftUI
 import Combine
 import metamask_ios_sdk
 
+@MainActor
 struct SwitchChainView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var ethereum: Ethereum = MetaMaskSDK.shared.ethereum
+    @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
-    @State private var cancellables: Set<AnyCancellable> = []
     @State private var alert: AlertInfo?
     @State var networkSelection: Network = .goerli
 
@@ -71,7 +71,7 @@ struct SwitchChainView: View {
                     Text("Current chain:")
                         .modifier(TextCallout())
                     Spacer()
-                    Text("\(Network.chain(for: ethereum.chainId)) (\(ethereum.chainId))")
+                    Text("\(Network.chain(for: metamaskSDK.chainId)) (\(metamaskSDK.chainId))")
                         .modifier(TextCalloutLight())
                 }
                 Picker("Switch to:", selection: $networkSelection) {
@@ -83,7 +83,9 @@ struct SwitchChainView: View {
 
             Section {
                 Button {
-                    switchEthereumChain()
+                    Task {
+                        await switchEthereumChain()
+                    }
                 } label: {
                     Text("Switch Chain ID")
                         .modifier(TextButton())
@@ -109,14 +111,14 @@ struct SwitchChainView: View {
             }
         }
         .onAppear {
-            networkSelection = ethereum.chainId == networkSelection.rawValue
+            networkSelection = metamaskSDK.chainId == networkSelection.rawValue
                 ? .ethereum
             : .goerli
         }
         .background(Color.blue.grayscale(0.5))
     }
 
-    func switchEthereumChain() {
+    func switchEthereumChain() async {
         let switchChainParams: [String: String] = [
             "chainId": networkSelection.chainId
         ]
@@ -125,32 +127,11 @@ struct SwitchChainView: View {
             method: .switchEthereumChain,
             params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
         )
-
-        ethereum.request(switchChainRequest)?.sink(receiveCompletion: { completion in
-            switch completion {
-            case let .failure(error):
-                if error.codeType == .unrecognizedChainId || error.codeType == .serverError {
-                    alert = AlertInfo(
-                        id: .chainDoesNotExist,
-                        title: "Error",
-                        message: "\(networkSelection.name) (\(networkSelection.chainId)) has not been added to your MetaMask wallet. Add chain?",
-                        primaryButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
-                            addEthereumChain()
-                        }),
-                        secondarButton: SwiftUI.Alert.Button.default(Text("Cancel"))
-                    )
-                } else {
-                    alert = AlertInfo(
-                        id: .error,
-                        title: "Error",
-                        message: error.localizedDescription,
-                        dismissButton: SwiftUI.Alert.Button.default(Text("OK"))
-                    )
-                    print("Switch chain error: \(error.localizedDescription)")
-                }
-            default: break
-            }
-        }, receiveValue: { value in
+        
+        let switchChainResult = await metamaskSDK.request(switchChainRequest)
+        
+        switch switchChainResult {
+        case .success(_):
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
@@ -159,11 +140,31 @@ struct SwitchChainView: View {
                     presentationMode.wrappedValue.dismiss()
                 })
             )
-            print("Switch chain result: \(value)")
-        }).store(in: &cancellables)
+        case let .failure(error):
+            if error.codeType == .unrecognizedChainId || error.codeType == .serverError {
+                alert = AlertInfo(
+                    id: .chainDoesNotExist,
+                    title: "Error",
+                    message: "\(networkSelection.name) (\(networkSelection.chainId)) has not been added to your MetaMask wallet. Add chain?",
+                    primaryButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
+                        Task {
+                            await addEthereumChain()
+                        }
+                    }),
+                    secondarButton: SwiftUI.Alert.Button.default(Text("Cancel"))
+                )
+            } else {
+                alert = AlertInfo(
+                    id: .error,
+                    title: "Error",
+                    message: error.localizedDescription,
+                    dismissButton: SwiftUI.Alert.Button.default(Text("OK"))
+                )
+            }
+        }
     }
 
-    func addEthereumChain() {
+    func addEthereumChain() async {
         let addChainParams = AddChainRequest(
             chainId: networkSelection.chainId,
             chainName: networkSelection.name,
@@ -174,31 +175,28 @@ struct SwitchChainView: View {
             method: .addEthereumChain,
             params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
         )
-
-        ethereum.request(addChainRequest)?.sink(receiveCompletion: { completion in
-            switch completion {
-            case let .failure(error):
-                alert = AlertInfo(
-                    id: .error,
-                    title: "Error",
-                    message: error.localizedDescription
-                )
-                print("Add chain error: \(error.localizedDescription)")
-            default: break
-            }
-        }, receiveValue: { value in
+        
+        let addChainResult = await metamaskSDK.request(addChainRequest)
+        
+        switch addChainResult {
+        case .success:
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
-                message: ethereum.chainId == networkSelection.chainId
+                message: metamaskSDK.chainId == networkSelection.chainId
                     ? "Successfully switched to \(networkSelection.name)"
                     : "Successfully added \(networkSelection.name)",
                 dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
                     presentationMode.wrappedValue.dismiss()
                 })
             )
-            print("Add chain result: \(value)")
-        }).store(in: &cancellables)
+        case let .failure(error):
+            alert = AlertInfo(
+                id: .error,
+                title: "Error",
+                message: error.localizedDescription
+            )
+        }
     }
 }
 

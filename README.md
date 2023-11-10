@@ -52,7 +52,7 @@ Alternatively, you can add the URL directly in your project's package file:
 dependencies: [
     .package(
         url: "https://github.com/MetaMask/metamask-ios-sdk",
-        from: "0.2.2"
+        from: "0.3.0"
     )
 ]
 ```
@@ -70,30 +70,21 @@ import metamask_ios_sdk
 Connect your dapp to MetaMask by adding the following code to your project file:
 
 ```swift
-@ObservedObject var ethereum = MetaMaskSDK.shared.ethereum
+let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
-let dapp = Dapp(name: "Dub Dapp", url: "https://dubdapp.com")
+@ObservedObject var metamaskSDK = MetaMaskSDK.shared(appMetadata)
 
-// This is the same as calling eth_requestAccounts
-ethereum.connect(dapp)
+metamaskSDK.connect()
 ```
 
 By default, MetaMask logs three SDK events: `connectionRequest`, `connected`, and `disconnected`.
 This allows MetaMask to monitor any SDK connection issues.
-To disable this, set `MetaMaskSDK.shared.enableDebug = false` or `ethereum.enableDebug = false`.
+To disable this, set `metamaskSDK.enableDebug = false`.
 
 ### 4. Call methods
 
 You can now call any [JSON-RPC API method](https://docs.metamask.io/wallet/reference/eth_subscribe/)
-using `ethereum.request()`.
-
-The SDK uses [Combine](https://developer.apple.com/documentation/combine) to publish Ethereum
-events, so you need to define an `AnyCancellable` storage by adding the following line to your
-project file:
-
-```swift
-@State private var cancellables: Set<AnyCancellable> = []
-```
+using `metamaskSDK.request()`.
 
 #### Example: Get chain ID
 
@@ -101,20 +92,8 @@ The following example gets the user's chain ID by calling
 [`eth_chainId`](https://docs.metamask.io/wallet/reference/eth_chainid/).
 
 ```swift
-@State var chainId: String?
-
 let chainIdRequest = EthereumRequest(method: .ethChainId)
-
-ethereum.request(chainIdRequest)?.sink(receiveCompletion: { completion in
-    switch completion {
-    case .failure(let error):
-        print("\(error.localizedDescription)")
-    default: break
-    }
-}, receiveValue: { result in
-    self.chainId = result
-})
-.store(in: &cancellables)
+let chainId = await metamaskSDK.request(chainIdRequest)
 ```
 
 #### Example: Get account balance
@@ -123,11 +102,12 @@ The following example gets the user's account balance by calling
 [`eth_getBalance`](https://docs.metamask.io/wallet/reference/eth_getbalance/).
 
 ```swift
-@State var balance: String?
 
 // Create parameters
+let account = metamaskSDK.account
+
 let parameters: [String] = [
-    ethereum.selectedAddress, // address to check for balance
+    account, // account to check for balance
     "latest" // "latest", "earliest" or "pending" (optional)
   ]
 
@@ -137,16 +117,7 @@ let getBalanceRequest = EthereumRequest(
     params: parameters)
 
 // Make request
-ethereum.request(getBalanceRequest)?.sink(receiveCompletion: { completion in
-    switch completion {
-    case .failure(let error):
-        print("\(error.localizedDescription)")
-    default: break
-    }
-}, receiveValue: { result in
-    self.balance = result
-})
-.store(in: &cancellables)
+let accoutBalance = await metamaskSDK.request(getBalanceRequest)
 ```
 
 #### Example: Send transaction
@@ -162,9 +133,11 @@ Note that `Any` or even `AnyHashable` types aren't supported, since the type mus
 
 ```swift
 // Create parameters
+let account = metamaskSDK.account
+
 let parameters: [String: String] = [
     "to": "0x...", // receiver address
-    "from": ethereum.selectedAddress, // sender address
+    "from": account, // sender address
     "value": "0x..." // amount
   ]
 
@@ -175,16 +148,7 @@ let transactionRequest = EthereumRequest(
     )
 
 // Make a transaction request
-ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
-    switch completion {
-    case .failure(let error):
-        print("\(error.localizedDescription)")
-    default: break
-    }
-}, receiveValue: { result in
-    print(result)
-})
-.store(in: &cancellables)
+let transactionResult = await metamaskSDK.request(transactionRequest)
 ```
 
 **Use a struct**
@@ -223,9 +187,11 @@ struct Transaction: CodableData {
 }
 
 // Create parameters
+let account = metamaskSDK.account
+
 let transaction = Transaction(
     to: "0x...", // receiver address
-    from: ethereum.selectedAddress, // sender address
+    from: account, // sender address
     value: "0x..." // amount
 )
 
@@ -236,14 +202,5 @@ let transactionRequest = EthereumRequest(
     )
 
 // Make a transaction request
-ethereum.request(transactionRequest)?.sink(receiveCompletion: { completion in
-    switch completion {
-    case .failure(let error):
-        print("\(error.localizedDescription)")
-    default: break
-    }
-}, receiveValue: { result in
-    print(result)
-})
-.store(in: &cancellables)
+let result = await metamaskSDK.request(transactionRequest)
 ```

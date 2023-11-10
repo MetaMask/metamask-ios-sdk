@@ -4,16 +4,16 @@
 
 import Foundation
 
-protocol Tracking {
+public protocol Tracking {
     var enableDebug: Bool { get set }
     func trackEvent(_ event: Event, parameters: [String: Any]) async
 }
 
-class Analytics: Tracking {
-    private let network: Network
+public class Analytics: Tracking {
+    private let network: any Networking
     private var debug: Bool!
 
-    var enableDebug: Bool {
+    public var enableDebug: Bool {
         get { debug }
         set { debug = newValue }
     }
@@ -22,12 +22,12 @@ class Analytics: Tracking {
         self.init(network: Network(), debug: debug)
     }
 
-    init(network: Network, debug: Bool) {
+    public init(network: any Networking, debug: Bool) {
         self.debug = debug
         self.network = network
     }
 
-    func trackEvent(_ event: Event, parameters: [String: Any]) async {
+    public func trackEvent(_ event: Event, parameters: [String: Any]) async {
         if !debug { return }
 
         var params = parameters
@@ -39,4 +39,8 @@ class Analytics: Tracking {
             Logging.error("tracking error: \(error.localizedDescription)")
         }
     }
+}
+
+extension Analytics {
+    static let live = Dependencies.shared.tracker
 }
