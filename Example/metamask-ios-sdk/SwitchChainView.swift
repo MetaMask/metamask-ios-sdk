@@ -7,11 +7,11 @@ import SwiftUI
 import Combine
 import metamask_ios_sdk
 
+@MainActor
 struct SwitchChainView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
-    @State private var cancellables: Set<AnyCancellable> = []
     @State private var alert: AlertInfo?
     @State var networkSelection: Network = .goerli
 
@@ -125,9 +125,20 @@ struct SwitchChainView: View {
             method: .switchEthereumChain,
             params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
         )
-
-        metamaskSDK.request(switchChainRequest)?.sink(receiveCompletion: { completion in
-            switch completion {
+        
+        Task {
+            let switchChainResult = await metamaskSDK.request(switchChainRequest)
+            
+            switch switchChainResult {
+            case .success(_):
+                alert = AlertInfo(
+                    id: .success,
+                    title: "Success",
+                    message: "Successfully switched to \(networkSelection.name)",
+                    dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
+                        presentationMode.wrappedValue.dismiss()
+                    })
+                )
             case let .failure(error):
                 if error.codeType == .unrecognizedChainId || error.codeType == .serverError {
                     alert = AlertInfo(
@@ -146,21 +157,9 @@ struct SwitchChainView: View {
                         message: error.localizedDescription,
                         dismissButton: SwiftUI.Alert.Button.default(Text("OK"))
                     )
-                    print("Switch chain error: \(error.localizedDescription)")
                 }
-            default: break
             }
-        }, receiveValue: { value in
-            alert = AlertInfo(
-                id: .success,
-                title: "Success",
-                message: "Successfully switched to \(networkSelection.name)",
-                dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
-                    presentationMode.wrappedValue.dismiss()
-                })
-            )
-            print("Switch chain result: \(value)")
-        }).store(in: &cancellables)
+        }
     }
 
     func addEthereumChain() {
@@ -174,31 +173,30 @@ struct SwitchChainView: View {
             method: .addEthereumChain,
             params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
         )
-
-        metamaskSDK.request(addChainRequest)?.sink(receiveCompletion: { completion in
-            switch completion {
+        
+        Task {
+            let addChainResult = await metamaskSDK.request(addChainRequest)
+            
+            switch addChainResult {
+            case .success:
+                alert = AlertInfo(
+                    id: .success,
+                    title: "Success",
+                    message: metamaskSDK.chainId == networkSelection.chainId
+                        ? "Successfully switched to \(networkSelection.name)"
+                        : "Successfully added \(networkSelection.name)",
+                    dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
+                        presentationMode.wrappedValue.dismiss()
+                    })
+                )
             case let .failure(error):
                 alert = AlertInfo(
                     id: .error,
                     title: "Error",
                     message: error.localizedDescription
                 )
-                print("Add chain error: \(error.localizedDescription)")
-            default: break
             }
-        }, receiveValue: { value in
-            alert = AlertInfo(
-                id: .success,
-                title: "Success",
-                message: metamaskSDK.chainId == networkSelection.chainId
-                    ? "Successfully switched to \(networkSelection.name)"
-                    : "Successfully added \(networkSelection.name)",
-                dismissButton: SwiftUI.Alert.Button.default(Text("OK"), action: {
-                    presentationMode.wrappedValue.dismiss()
-                })
-            )
-            print("Add chain result: \(value)")
-        }).store(in: &cancellables)
+        }
     }
 }
 

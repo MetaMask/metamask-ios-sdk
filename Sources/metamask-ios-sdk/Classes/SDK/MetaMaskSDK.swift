@@ -21,7 +21,7 @@ public class MetaMaskSDK: ObservableObject {
     @Published public var connected: Bool = false
     
     /// The active/selected MetaMask account address
-    @Published public var selectedAddress: String = ""
+    @Published public var account: String = ""
     
     private var sharedInstance: MetaMaskSDK?
 
@@ -61,7 +61,7 @@ public class MetaMaskSDK: ObservableObject {
         setupAppLifeCycleObservers()
     }
     
-    public static func shared(appMetadata: AppMetadata, enableDebug: Bool = true) -> MetaMaskSDK {
+    public static func shared(_ appMetadata: AppMetadata, enableDebug: Bool = true) -> MetaMaskSDK {
         guard let sdk = SDKWrapper.shared.sdk else {
             let metamaskSdk = MetaMaskSDK(appMetadata: appMetadata, enableDebug: enableDebug)
             SDKWrapper.shared.sdk = metamaskSdk
@@ -72,12 +72,12 @@ public class MetaMaskSDK: ObservableObject {
 }
 
 public extension MetaMaskSDK {
-    func connect() -> EthereumPublisher? {
-        ethereum.connect()
+    func connect() async -> Result<String, RequestError> {
+        await ethereum.connect()
     }
     
-    func connectAndSign(message: String) -> EthereumPublisher? {
-        ethereum.connectAndSign(message: message)
+    func connectAndSign(message: String) async -> Result<String, RequestError>  {
+       await ethereum.connectAndSign(message: message)
     }
 
     func disconnect() {
@@ -91,9 +91,9 @@ public extension MetaMaskSDK {
     func terminateConnection() {
         ethereum.terminateConnection()
     }
-
-    func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
-        ethereum.request(request)
+    
+    func request<T: CodableData>(_ request: EthereumRequest<T>) async -> Result<String, RequestError>  {
+       await ethereum.request(request)
     }
 }
 
@@ -103,7 +103,7 @@ extension MetaMaskSDK: EthereumEventsDelegate {
     }
     
     func accountChanged(_ account: String) {
-        self.selectedAddress = account
+        self.account = account
     }
 }
 

@@ -73,6 +73,10 @@ public class KeyExchange {
     }
 
     public func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {
+        if message.type == .start {
+            keysExchanged = false
+        }
+        
         if let publicKey = message.pubkey {
             setTheirPublicKey(publicKey)
             keysExchanged = true

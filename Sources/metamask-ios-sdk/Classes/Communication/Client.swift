@@ -101,6 +101,7 @@ public class Client: CommunicationClient {
     }
     
     private func initiateKeyExchange() {
+        keyExchange.reset()
         let keyExchangeStartMessage = KeyExchangeMessage(type: .start, pubkey: nil)
         sendMessage(keyExchangeStartMessage, encrypt: false)
     }
@@ -140,7 +141,7 @@ private extension Client {
         // MARK: Clients connected event
 
         channel.on(ClientEvent.clientsConnected(on: channelId)) { data in
-            Logging.log("Clients connected: \(data)")
+            Logging.log("Clients connected")
 
             // for debug purposes only
             NotificationCenter.default.post(
@@ -249,10 +250,16 @@ private extension Client {
 
 private extension Client {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
-        guard
-            let keyExchangeMessage = Message<KeyExchangeMessage>.message(from: message),
-            let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message)
-        else {
+        let keyExchangeMessage: Message<KeyExchangeMessage>
+        
+        do {
+            keyExchangeMessage = try Message<KeyExchangeMessage>.message(from: message)
+        } catch {
+            initiateKeyExchange()
+            return
+        }
+        
+        guard let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) else {
             track(event: .connected)
             return
         }
@@ -270,16 +277,19 @@ private extension Client {
             return
         }
         
-        guard let message = Message<String>.message(from: msg) else {
-            Logging.error("Could not parse message \(msg)")
-            initiateKeyExchange()
-            return
-        }
-
         do {
+            let message = try Message<String>.message(from: msg)
             try handleEncryptedMessage(message)
         } catch {
-            Logging.error(error.localizedDescription)
+            switch error {
+            case DecodingError.invalidMessage:
+                Logging.error("Could not parse message \(msg)")
+                initiateKeyExchange()
+            case KeyExchangeError.keysNotExchanged:
+                Logging.error(error.localizedDescription)
+            default:
+                Logging.error(error.localizedDescription)
+            }
         }
     }
 

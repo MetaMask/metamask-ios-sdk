@@ -6,6 +6,7 @@
 import SwiftUI
 import metamask_ios_sdk
 
+@MainActor
 struct NetworkView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
     @Environment(\.presentationMode) var presentationMode

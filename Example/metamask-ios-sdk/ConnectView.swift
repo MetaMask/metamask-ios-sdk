@@ -4,7 +4,6 @@
 //
 
 import SwiftUI
-import Combine
 import metamask_ios_sdk
 
 extension Notification.Name {
@@ -12,9 +11,9 @@ extension Notification.Name {
     static let Connection = Notification.Name("connection")
 }
 
+@MainActor
 struct ConnectView: View {
-    @ObservedObject var ethereum = MetaMaskSDK.shared(appMetadata: appMetadata)
-    @State private var cancellables: Set<AnyCancellable> = []
+    @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(appMetadata)
 
     private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
@@ -49,7 +48,7 @@ struct ConnectView: View {
                                 .bold()
                                 .modifier(TextCallout())
                             Spacer()
-                            Text(ethereum.chainId)
+                            Text(metaMaskSDK.chainId)
                                 .modifier(TextCaption())
                         }
 
@@ -58,31 +57,31 @@ struct ConnectView: View {
                                 .bold()
                                 .modifier(TextCallout())
                             Spacer()
-                            Text(ethereum.selectedAddress)
+                            Text(metaMaskSDK.account)
                                 .modifier(TextCaption())
                         }
                     }
                 }
 
-                if !ethereum.selectedAddress.isEmpty {
+                if !metaMaskSDK.account.isEmpty {
                     Section {
                         Group {
                             NavigationLink("Sign") {
-                                SignView().environmentObject(ethereum)
+                                SignView().environmentObject(metaMaskSDK)
                             }
 
                             NavigationLink("Transact") {
-                                TransactionView().environmentObject(ethereum)
+                                TransactionView().environmentObject(metaMaskSDK)
                             }
 
                             NavigationLink("Switch chain") {
-                                SwitchChainView().environmentObject(ethereum)
+                                SwitchChainView().environmentObject(metaMaskSDK)
                             }
                         }
                     }
                 }
 
-                if ethereum.selectedAddress.isEmpty {
+                if metaMaskSDK.account.isEmpty {
                     Section {
                         Button {
                             isConnectAndSign = true
@@ -95,27 +94,15 @@ struct ConnectView: View {
                             isConnectAndSign = false
                         }) {
                             SignView(isConnectAndSign: true)
-                                .environmentObject(ethereum)
+                                .environmentObject(metaMaskSDK)
                         }
                         
                         .modifier(ButtonStyle())
                         ZStack {
                             Button {
-                                showProgressView = true
-                                
-                                ethereum.connect()?.sink(receiveCompletion: { completion in
-                                    switch completion {
-                                    case let .failure(error):
-                                        showProgressView = false
-                                        errorMessage = error.localizedDescription
-                                        showError = true
-                                        print("Connection error: \(errorMessage)")
-                                    default: break
-                                    }
-                                }, receiveValue: { result in
-                                    showProgressView = false
-                                    print("Connection result: \(result)")
-                                }).store(in: &cancellables)
+                                Task {
+                                    await connectSDK()
+                                }
                             } label: {
                                 Text("Connect to MetaMask")
                                     .modifier(TextButton())
@@ -141,10 +128,10 @@ struct ConnectView: View {
                     }
                 }
                 
-                if !ethereum.selectedAddress.isEmpty {
+                if !metaMaskSDK.account.isEmpty {
                     Section {
                         Button {
-                            ethereum.clearSession()
+                            metaMaskSDK.clearSession()
                         } label: {
                             Text("Clear Session")
                                 .modifier(TextButton())
@@ -153,7 +140,7 @@ struct ConnectView: View {
                         .modifier(ButtonStyle())
                         
                         Button {
-                            ethereum.disconnect()
+                            metaMaskSDK.disconnect()
                         } label: {
                             Text("Disconnect")
                                 .modifier(TextButton())
@@ -171,6 +158,20 @@ struct ConnectView: View {
             .onAppear {
                 showProgressView = false
             }
+        }
+    }
+    
+    func connectSDK() async {
+        showProgressView = true
+        let result = await metaMaskSDK.connect()
+        showProgressView = false
+        
+        switch result {
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
+        default:
+            break
         }
     }
 }

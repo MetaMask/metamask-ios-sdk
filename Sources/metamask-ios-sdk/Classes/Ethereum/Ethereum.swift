@@ -6,16 +6,17 @@ import UIKit
 import Combine
 import Foundation
 
-public typealias EthereumPublisher = AnyPublisher<Any, RequestError>
+typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
 protocol EthereumEventsDelegate: AnyObject {
     func chainIdChanged(_ chainId: String)
     func accountChanged(_ account: String)
 }
 
-public class Ethereum {
+class Ethereum {
     private let CONNECTION_ID = UUID().uuidString
     private var submittedRequests: [String: SubmittedRequest] = [:]
+    private var cancellables: Set<AnyCancellable> = []
     
     weak var delegate: EthereumEventsDelegate?
 
@@ -25,7 +26,7 @@ public class Ethereum {
     private var chainId: String = ""
     
     /// The active/selected MetaMask account address
-    private var selectedAddress: String = ""
+    private var account: String = ""
     
     let commClient: CommunicationClient
     private var trackEvent: ((Event) -> Void)?
@@ -48,14 +49,30 @@ public class Ethereum {
     @discardableResult
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
-    public func connect() -> EthereumPublisher? {
+    func connect() -> EthereumPublisher? {
         commClient.connect()
         connected = true
         
         return requestAccounts()
     }
     
-    public func connectAndSign(message: String) -> EthereumPublisher? {
+    func connect() async -> Result<String, RequestError> {
+        return await withCheckedContinuation { continuation in
+            connect()?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
+        }
+    }
+    
+    func connectAndSign(message: String) -> EthereumPublisher? {
         commClient.connect()
         
         let connectSignRequest = EthereumRequest(
@@ -66,15 +83,31 @@ public class Ethereum {
         return request(connectSignRequest)
     }
     
+    func connectAndSign(message: String) async -> Result<String, RequestError> {
+        return await withCheckedContinuation { continuation in
+            connectAndSign(message: message)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
+        }
+    }
+    
     /// Disconnect dapp
-    public func disconnect() {
+    func disconnect() {
         updateChainId("")
         updateAccount("")
         connected = false
         commClient.disconnect()
     }
     
-    public func clearSession() {
+    func clearSession() {
         updateAccount("")
         updateChainId("")
         connected = false
@@ -99,7 +132,7 @@ public class Ethereum {
     func requiresAuthorisation(method: EthereumMethod) -> Bool {
         switch method {
         case .ethRequestAccounts:
-            return selectedAddress.isEmpty ? true : false
+            return account.isEmpty ? true : false
         default:
             return EthereumMethod.requiresDeeplinking(method)
         }
@@ -138,7 +171,7 @@ public class Ethereum {
     /// Performs and Ethereum remote procedural call (RPC)
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
-    public func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
+    func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
         
         if !connected && request.methodType != .metaMaskConnectSign {
             if request.methodType == .ethRequestAccounts {
@@ -171,8 +204,23 @@ public class Ethereum {
                     self?.sendRequest(request)
                 }
             }
-            
             return publisher
+        }
+    }
+    
+    func request<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+        return await withCheckedContinuation { continuation in
+            request(req)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
         }
     }
     
@@ -183,7 +231,7 @@ public class Ethereum {
     }
     
     private func updateAccount(_ account: String) {
-        selectedAddress = account
+        self.account = account
         delegate?.accountChanged(account)
     }
     
@@ -296,6 +344,6 @@ public class Ethereum {
     }
 }
 
-public extension Ethereum {
+extension Ethereum {
     static let live = Dependencies.shared.ethereum
 }

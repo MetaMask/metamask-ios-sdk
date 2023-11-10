@@ -7,12 +7,11 @@ import SwiftUI
 import Combine
 import metamask_ios_sdk
 
+@MainActor
 struct SignView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State var message = ""
-
-    @State private var cancellables: Set<AnyCancellable> = []
     @State private var showProgressView = false
 
     @State var result: String = ""
@@ -87,42 +86,44 @@ struct SignView: View {
     }
 
     func signInput() {
-        let from = metamaskSDK.selectedAddress
+        let from = metamaskSDK.account
         let params: [String] = [from, message]
         let signRequest = EthereumRequest(
             method: .ethSignTypedDataV4,
             params: params
         )
-
-        metamaskSDK.request(signRequest)?.sink(receiveCompletion: { completion in
-            switch completion {
+        
+        Task {
+            showProgressView = true
+            let requestResult = await metamaskSDK.request(signRequest)
+            showProgressView = false
+            
+            switch requestResult {
+            case let .success(value):
+                result = value
+                errorMessage = ""
             case let .failure(error):
                 errorMessage = error.localizedDescription
                 showError = true
-                print("Error: \(errorMessage)")
-            default: break
             }
-        }, receiveValue: { value in
-            self.result = value as? String ?? ""
-        }).store(in: &cancellables)
+        }
     }
     
     func connectAndSign() {
-        showProgressView = true
-        metamaskSDK.connectAndSign(message: message)?.sink(receiveCompletion: { completion in
-            switch completion {
+        Task {
+            showProgressView = true
+            let connectSignResult = await metamaskSDK.connectAndSign(message: message)
+            showProgressView = false
+            
+            switch connectSignResult {
+            case let .success(value):
+                result = value
+                errorMessage = ""
             case let .failure(error):
-                showProgressView = false
                 errorMessage = error.localizedDescription
                 showError = true
-                print("Connection error: \(error)")
-            default: break
             }
-        }, receiveValue: { value in
-            showProgressView = false
-            print("Connect & sign result: \(value)")
-            self.result = value as? String ?? ""
-        }).store(in: &cancellables)
+        }
     }
 }
 
