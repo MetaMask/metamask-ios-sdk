@@ -286,6 +286,8 @@ private extension Client {
                 Logging.error("Could not parse message \(msg)")
                 initiateKeyExchange()
             case KeyExchangeError.keysNotExchanged:
+                Logging.error("Keys not yet exchanged")
+                initiateKeyExchange()
                 Logging.error(error.localizedDescription)
             default:
                 Logging.error(error.localizedDescription)
