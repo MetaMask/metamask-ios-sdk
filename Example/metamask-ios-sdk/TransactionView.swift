@@ -57,7 +57,9 @@ struct TransactionView: View {
 
             Section {
                 Button {
-                    sendTransaction()
+                    Task {
+                        await sendTransaction()
+                    }
                 } label: {
                     Text("Send transaction")
                         .modifier(TextButton())
@@ -75,7 +77,7 @@ struct TransactionView: View {
         .background(Color.blue.grayscale(0.5))
     }
 
-    func sendTransaction() {
+    func sendTransaction() async {
         let transaction = Transaction(
             to: to,
             from: metamaskSDK.account,
@@ -89,16 +91,14 @@ struct TransactionView: View {
             params: parameters // eth_sendTransaction rpc call expects an array parameters object
         )
         
-        Task {
-            let transactionResult = await metamaskSDK.request(transactionRequest)
-            
-            switch transactionResult {
-            case let .success(value):
-                result = value
-            case let .failure(error):
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+        let transactionResult = await metamaskSDK.request(transactionRequest)
+        
+        switch transactionResult {
+        case let .success(value):
+            result = value
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
         }
     }
 }

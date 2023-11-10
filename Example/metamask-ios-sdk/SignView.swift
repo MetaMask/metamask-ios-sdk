@@ -47,7 +47,9 @@ struct SignView: View {
                 Section {
                     ZStack {
                         Button {
-                            isConnectAndSign ? connectAndSign(): signInput()
+                            Task {
+                                await isConnectAndSign ? connectAndSign(): signInput()
+                            }
                         } label: {
                             Text(isConnectAndSign ? connectAndSignButtonTitle : signButtonTitle)
                                 .modifier(TextButton())
@@ -85,7 +87,7 @@ struct SignView: View {
         : "{\"domain\":{\"chainId\":\"\(metamaskSDK.chainId)\",\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
     }
 
-    func signInput() {
+    func signInput() async {
         let from = metamaskSDK.account
         let params: [String] = [from, message]
         let signRequest = EthereumRequest(
@@ -93,36 +95,32 @@ struct SignView: View {
             params: params
         )
         
-        Task {
-            showProgressView = true
-            let requestResult = await metamaskSDK.request(signRequest)
-            showProgressView = false
-            
-            switch requestResult {
-            case let .success(value):
-                result = value
-                errorMessage = ""
-            case let .failure(error):
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+        showProgressView = true
+        let requestResult = await metamaskSDK.request(signRequest)
+        showProgressView = false
+        
+        switch requestResult {
+        case let .success(value):
+            result = value
+            errorMessage = ""
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
         }
     }
     
-    func connectAndSign() {
-        Task {
-            showProgressView = true
-            let connectSignResult = await metamaskSDK.connectAndSign(message: message)
-            showProgressView = false
-            
-            switch connectSignResult {
-            case let .success(value):
-                result = value
-                errorMessage = ""
-            case let .failure(error):
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+    func connectAndSign() async {
+        showProgressView = true
+        let connectSignResult = await metamaskSDK.connectAndSign(message: message)
+        showProgressView = false
+        
+        switch connectSignResult {
+        case let .success(value):
+            result = value
+            errorMessage = ""
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
         }
     }
 }
