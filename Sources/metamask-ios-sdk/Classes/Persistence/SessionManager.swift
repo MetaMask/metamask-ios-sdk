@@ -8,6 +8,7 @@ import Foundation
 public class SessionManager {
     private let store: SecureStore
     private let SESSION_KEY = "session_id"
+    private let DEFAULT_SESSION_DURATION: TimeInterval = 24 * 7 * 3600
     
     public var sessionDuration: TimeInterval
     
@@ -17,16 +18,19 @@ public class SessionManager {
         self.sessionDuration = sessionDuration
     }
     
-    private func fetchCurrentSessionConfig() -> SessionConfig? {
+    public func fetchCurrentSessionConfig() -> SessionConfig? {
         let config: SessionConfig? = store.model(for: SESSION_KEY)
         return config
     }
     
-    private func updateSession() {
+    public func createNewSessionConfig() {
         // update session expiry date
-        let config = SessionConfig(sessionId: UUID().uuidString,
+        var config = SessionConfig(sessionId: UUID().uuidString,
                                    expiry: Date(timeIntervalSinceNow: sessionDuration))
-        
+        if !config.isValid {
+            sessionDuration = DEFAULT_SESSION_DURATION
+            createNewSessionConfig()
+        }
         // persist session config
         if let configData = try? JSONEncoder().encode(config) {
             store.save(data: configData, key: SESSION_KEY)
@@ -40,7 +44,7 @@ public class SessionManager {
         } else {
             // purge any existing session info
             store.deleteData(for: SESSION_KEY)
-            updateSession()
+            createNewSessionConfig()
             let config = fetchSessionConfig().0
             return (config, false)
         }
