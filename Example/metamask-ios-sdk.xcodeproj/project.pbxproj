@@ -7,14 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		30D97717C9871429000ACED8 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2526D6391DC08940F2BC4E26 /* Pods_metamask_ios_sdk_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
-		8CCB700CB080B829AB2D33E9 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C918C6D3235295BD31E701A /* Pods_metamask_ios_sdk_Example.framework */; };
 		D107588D293F289500D6C66B /* SignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588C293F289500D6C66B /* SignView.swift */; };
 		D107588F293F385700D6C66B /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588E293F385700D6C66B /* TransactionView.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
@@ -27,6 +25,7 @@
 		D1896062296C3F9500216307 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1896061296C3F9500216307 /* NetworkView.swift */; };
 		D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */; };
 		D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */; };
+		D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */; };
 		D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DC2AF42A720019321C /* CryptoTests.swift */; };
 		D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
@@ -43,7 +42,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2526D6391DC08940F2BC4E26 /* Pods_metamask_ios_sdk_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A26C0EE7E7497A9AE0E8703 /* metamask-ios-sdk.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = "metamask-ios-sdk.podspec"; path = "../metamask-ios-sdk.podspec"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		607FACD01AFB9204008FA782 /* metamask-ios-sdk_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "metamask-ios-sdk_Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -57,7 +55,6 @@
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		780C3F18921DAF52E227C55E /* Pods-metamask-ios-sdk_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.release.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		908FC55797DCEA473E596393 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		9C918C6D3235295BD31E701A /* Pods_metamask_ios_sdk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D107588C293F289500D6C66B /* SignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignView.swift; sourceTree = "<group>"; };
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
@@ -70,6 +67,7 @@
 		D1896061296C3F9500216307 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
 		D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStorageTests.swift; sourceTree = "<group>"; };
 		D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfigTests.swift; sourceTree = "<group>"; };
+		D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		D1A258DC2AF42A720019321C /* CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTests.swift; sourceTree = "<group>"; };
 		D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
@@ -83,7 +81,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8CCB700CB080B829AB2D33E9 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,7 +88,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30D97717C9871429000ACED8 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +148,7 @@
 				D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */,
 				D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */,
 				D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */,
+				D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -212,8 +209,6 @@
 		E1776468B410544A8646D99F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9C918C6D3235295BD31E701A /* Pods_metamask_ios_sdk_Example.framework */,
-				2526D6391DC08940F2BC4E26 /* Pods_metamask_ios_sdk_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -419,6 +414,7 @@
 				D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */,
+				D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */,
 				D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
