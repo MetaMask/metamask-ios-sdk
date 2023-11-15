@@ -62,14 +62,22 @@ public class KeyExchange {
     public init(encryption: Crypto.Type = Ecies.self) {
         encyption = encryption
         privateKey = encyption.generatePrivateKey()
-        pubkey = encyption.publicKey(from: privateKey)
+        do {
+            pubkey = try encyption.publicKey(from: privateKey)
+        } catch {
+            pubkey = ""
+        }
     }
 
     public func reset() {
         keysExchanged = false
         theirPublicKey = nil
         privateKey = encyption.generatePrivateKey()
-        pubkey = encyption.publicKey(from: privateKey)
+        do {
+            pubkey = try encyption.publicKey(from: privateKey)
+        } catch {
+            pubkey = ""
+        }
     }
 
     public func nextMessage(_ message: KeyExchangeMessage) -> KeyExchangeMessage? {

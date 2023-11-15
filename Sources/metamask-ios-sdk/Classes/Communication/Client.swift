@@ -289,6 +289,9 @@ private extension Client {
                 Logging.error("Keys not yet exchanged")
                 initiateKeyExchange()
                 Logging.error(error.localizedDescription)
+            case CryptoError.decryptionFailure:
+                Logging.error("Message could not be decrypted: \(error.localizedDescription)")
+                initiateKeyExchange()
             default:
                 Logging.error(error.localizedDescription)
             }
@@ -377,7 +380,7 @@ extension Client {
                     )
                     self.channel.emit(ClientEvent.message, message)
                 } catch {
-                    Logging.error("Could not encrypt message")
+                    Logging.error("Could not encrypt message: \(error.localizedDescription)")
                 }
             }
             if channelId.isEmpty {
