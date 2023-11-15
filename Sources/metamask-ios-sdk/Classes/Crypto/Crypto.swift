@@ -9,7 +9,7 @@ public protocol Crypto {
     /// Computes public key from given private key
     /// - Parameter privateKey: Sender's private key
     /// - Returns: Public key
-    static func publicKey(from privateKey: String) -> String
+    static func publicKey(from privateKey: String) throws -> String
 
     /// Encrypts plain text using provided public key
     /// - Parameters:
@@ -26,9 +26,10 @@ public protocol Crypto {
     static func decrypt(_ message: String, privateKey: String) throws -> String
 }
 
-enum CryptoError: Error {
+public enum CryptoError: Error {
     case encryptionFailure
     case decryptionFailure
+    case publicKeyGenerationFailure
 }
 
 /// Encryption module using ECIES encryption standard
@@ -37,10 +38,13 @@ public enum Ecies: Crypto {
         String(cString: ecies_generate_secret_key())
     }
 
-    public static func publicKey(from privateKey: String) -> String {
+    public static func publicKey(from privateKey: String) throws -> String {
         let privateKey: NSString = privateKey as NSString
         let privateKeyBytes = UnsafeMutablePointer(mutating: privateKey.utf8String)
-        return String(cString: ecies_public_key_from(privateKeyBytes))
+        guard let pubKeyCString = ecies_public_key_from(privateKeyBytes) else {
+            throw CryptoError.publicKeyGenerationFailure
+        }
+        return String(cString: pubKeyCString)
     }
 
     public static func encrypt(_ message: String, publicKey: String) throws -> String {

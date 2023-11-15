@@ -10,11 +10,9 @@ class CryptoTests: XCTestCase {
     //var crypt
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
 
@@ -25,19 +23,19 @@ class CryptoTests: XCTestCase {
 
     func testPublicKeyFromPrivateKey() {
         let privateKey = Ecies.generatePrivateKey()
-        let publicKey = Ecies.publicKey(from: privateKey)
+        let publicKey = try? Ecies.publicKey(from: privateKey)
         XCTAssertNotNil(publicKey)
     }
     
     func testEncryptAndDecrypt() {
         // Generate a private key and corresponding public key
         let privateKey = Ecies.generatePrivateKey()
-        let publicKey = Ecies.publicKey(from: privateKey)
-
+        
         // Define a plaintext message to be encrypted
         let plaintext = "Hello, crypto enthusiasts! :)"
 
         do {
+            let publicKey = try Ecies.publicKey(from: privateKey)
             // Encrypt the plaintext
             let encryptedText = try Ecies.encrypt(plaintext, publicKey: publicKey)
 
@@ -52,6 +50,51 @@ class CryptoTests: XCTestCase {
             }
         } catch {
             XCTFail("CryptoTests:: Encryption failed with error: \(error)")
+        }
+    }
+    
+    func testGeneratePublicKeyWithInvalidPrivateKeyShouldFail() {
+        // Generate a private key and corresponding public key
+        let privateKey = Ecies.generatePrivateKey()
+        let modifiedPrivateKey = privateKey.dropLast().appending("")
+
+        do {
+            let _ = try Ecies.publicKey(from: modifiedPrivateKey)
+            XCTFail("CryptoTests:: Public key generation should fail")
+        } catch {
+            XCTAssert(error as? CryptoError == CryptoError.publicKeyGenerationFailure)
+        }
+    }
+    
+    
+    func testEncryptWithInvalidPublicKeyShouldFail() {
+        let privateKey = Ecies.generatePrivateKey()
+        let plaintext = "Hello, crypto enthusiasts! :)"
+
+        do {
+            let publicKey = try Ecies.publicKey(from: privateKey)
+            
+            let modifiedPublicKey = publicKey.dropLast().appending("")
+            let _ = try Ecies.encrypt(plaintext, publicKey: modifiedPublicKey)
+            XCTFail("CryptoTests:: Encryption with invalid public key should fail")
+        } catch {
+            XCTAssert(error as? CryptoError == CryptoError.encryptionFailure)
+        }
+    }
+    
+    func testDecryptWithInvalidPrivateKeyShouldFail() {
+        let privateKey = Ecies.generatePrivateKey()
+        let plaintext = "Hello, crypto enthusiasts! :)"
+
+        do {
+            let publicKey = try Ecies.publicKey(from: privateKey)
+            
+            let encryptedText = try Ecies.encrypt(plaintext, publicKey: publicKey)
+            let modifiedPrivateKey = privateKey.dropLast().appending("")
+            let _ = try Ecies.decrypt(encryptedText, privateKey: modifiedPrivateKey)
+            XCTFail("CryptoTests:: Decryption with invalid private key should fail")
+        } catch {
+            XCTAssert(error as? CryptoError == CryptoError.decryptionFailure)
         }
     }
 }
