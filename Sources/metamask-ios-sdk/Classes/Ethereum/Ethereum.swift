@@ -31,6 +31,20 @@ class Ethereum {
     let commClient: CommunicationClient
     private var trackEvent: ((Event) -> Void)?
     
+    private var appMetaDataValidationError: EthereumPublisher? {
+        guard
+            let urlString = commClient.appMetadata?.url,
+            let _ = URL(string: urlString)
+        else {
+            return RequestError.failWithError(.invalidUrlError)
+        }
+        
+        if commClient.appMetadata?.name.isEmpty ?? true {
+            return RequestError.failWithError(.invalidTitleError)
+        }
+        return nil
+    }
+    
     init(commClient: CommunicationClient, trackEvent: @escaping ((Event) -> Void)) {
         self.trackEvent = trackEvent
         self.commClient = commClient
@@ -50,6 +64,10 @@ class Ethereum {
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect() -> EthereumPublisher? {
+        if let dappValidationError = appMetaDataValidationError {
+            return dappValidationError
+        }
+        
         commClient.connect()
         connected = true
         
@@ -73,6 +91,10 @@ class Ethereum {
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
+        if let dappValidationError = appMetaDataValidationError {
+            return dappValidationError
+        }
+        
         commClient.connect()
         
         let connectSignRequest = EthereumRequest(
