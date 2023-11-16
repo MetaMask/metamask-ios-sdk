@@ -117,7 +117,7 @@ let getBalanceRequest = EthereumRequest(
     params: parameters)
 
 // Make request
-let accoutBalance = await metamaskSDK.request(getBalanceRequest)
+let accountBalance = await metamaskSDK.request(getBalanceRequest)
 ```
 
 #### Example: Send transaction
@@ -154,7 +154,7 @@ let transactionResult = await metamaskSDK.request(transactionRequest)
 **Use a struct**
 
 For more complex parameter representations, define and use a struct that conforms to `CodableData`,
-that is, implements the following requirement:
+that is, a struct that implements the following requirement:
 
 ```
 func socketRepresentation() -> NetworkData
