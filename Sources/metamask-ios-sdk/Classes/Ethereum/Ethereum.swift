@@ -34,7 +34,9 @@ class Ethereum {
     private var appMetaDataValidationError: EthereumPublisher? {
         guard
             let urlString = commClient.appMetadata?.url,
-            let _ = URL(string: urlString)
+            let url = URL(string: urlString),
+            url.host != nil,
+            url.scheme != nil
         else {
             return RequestError.failWithError(.invalidUrlError)
         }
@@ -201,16 +203,7 @@ class Ethereum {
                 connected = true
                 return requestAccounts()
             }
-            
-            let passthroughSubject = PassthroughSubject<Any, RequestError>()
-            let publisher: EthereumPublisher = passthroughSubject
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            
-            let error = RequestError.connectError
-            passthroughSubject.send(completion: .failure(error))
-            return publisher
-            
+            return RequestError.failWithError(.connectError)
         } else {
             let id = request.id
             let submittedRequest = SubmittedRequest(method: request.method)

@@ -20,17 +20,24 @@ public struct RequestError: Codable, Error {
         message
     }
     
-    public static var invalidUrlError: RequestError {
+    public static var connectError: RequestError {
         RequestError(from: [
             "code": -101,
-            "message": "Please use a valid dapp url in AppMetaData"
+            "message": "Not connected. Please call connect(:Dapp) first"
+        ])
+    }
+    
+    public static var invalidUrlError: RequestError {
+        RequestError(from: [
+            "code": -102,
+            "message": "Please use a valid url in AppMetaData"
         ])
     }
     
     public static var invalidTitleError: RequestError {
         RequestError(from: [
-            "code": -102,
-            "message": "Please add a dapp name in AppMetaData"
+            "code": -103,
+            "message": "Please use a valid name in AppMetaData"
         ])
     }
     
