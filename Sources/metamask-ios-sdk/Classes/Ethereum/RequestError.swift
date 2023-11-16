@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Combine
 
 // MARK: - RequestError
 
@@ -21,9 +22,32 @@ public struct RequestError: Codable, Error {
     
     public static var connectError: RequestError {
         RequestError(from: [
-            "code": -1,
+            "code": -101,
             "message": "Not connected. Please call connect(:Dapp) first"
         ])
+    }
+    
+    public static var invalidUrlError: RequestError {
+        RequestError(from: [
+            "code": -102,
+            "message": "Please use a valid url in AppMetaData"
+        ])
+    }
+    
+    public static var invalidTitleError: RequestError {
+        RequestError(from: [
+            "code": -103,
+            "message": "Please use a valid name in AppMetaData"
+        ])
+    }
+    
+    static func failWithError(_ error: RequestError) -> EthereumPublisher {
+        let passthroughSubject = PassthroughSubject<Any, RequestError>()
+        let publisher: EthereumPublisher = passthroughSubject
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+        passthroughSubject.send(completion: .failure(error))
+        return publisher
     }
 }
 

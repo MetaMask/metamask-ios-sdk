@@ -31,6 +31,22 @@ class Ethereum {
     let commClient: CommunicationClient
     private var trackEvent: ((Event) -> Void)?
     
+    private var appMetaDataValidationError: EthereumPublisher? {
+        guard
+            let urlString = commClient.appMetadata?.url,
+            let url = URL(string: urlString),
+            url.host != nil,
+            url.scheme != nil
+        else {
+            return RequestError.failWithError(.invalidUrlError)
+        }
+        
+        if commClient.appMetadata?.name.isEmpty ?? true {
+            return RequestError.failWithError(.invalidTitleError)
+        }
+        return nil
+    }
+    
     init(commClient: CommunicationClient, trackEvent: @escaping ((Event) -> Void)) {
         self.trackEvent = trackEvent
         self.commClient = commClient
@@ -50,6 +66,10 @@ class Ethereum {
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect() -> EthereumPublisher? {
+        if let dappValidationError = appMetaDataValidationError {
+            return dappValidationError
+        }
+        
         commClient.connect()
         connected = true
         
@@ -73,6 +93,10 @@ class Ethereum {
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
+        if let dappValidationError = appMetaDataValidationError {
+            return dappValidationError
+        }
+        
         commClient.connect()
         
         let connectSignRequest = EthereumRequest(
@@ -179,16 +203,7 @@ class Ethereum {
                 connected = true
                 return requestAccounts()
             }
-            
-            let passthroughSubject = PassthroughSubject<Any, RequestError>()
-            let publisher: EthereumPublisher = passthroughSubject
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            
-            let error = RequestError.connectError
-            passthroughSubject.send(completion: .failure(error))
-            return publisher
-            
+            return RequestError.failWithError(.connectError)
         } else {
             let id = request.id
             let submittedRequest = SubmittedRequest(method: request.method)
