@@ -11,13 +11,14 @@ import metamask_ios_sdk
 struct SignView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
-    @State var message = ""
+    @State var signMessage = ""
     @State private var showProgressView = false
 
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
     @State var isConnectAndSign = false
+    @State var isChainedSigning = false
     
     private let signButtonTitle = "Sign"
     private let connectAndSignButtonTitle = "Connect & Sign"
@@ -29,7 +30,7 @@ struct SignView: View {
                 Section {
                     Text("Message")
                         .modifier(TextCallout())
-                    TextEditor(text: $message)
+                    TextEditor(text: $signMessage)
                         .modifier(TextCaption())
                         .frame(height: geometry.size.height / 2)
                         .modifier(TextCurvature())
@@ -48,7 +49,10 @@ struct SignView: View {
                     ZStack {
                         Button {
                             Task {
-                                await isConnectAndSign ? connectAndSign(): signInput()
+                                await 
+                                if isConnectAndSign { connectAndSign() }
+                                else if isChainedSigning { signChainedMessages() }
+                                else { signMessage() }
                             }
                         } label: {
                             Text(isConnectAndSign ? connectAndSignButtonTitle : signButtonTitle)
@@ -82,19 +86,28 @@ struct SignView: View {
     }
     
     func updateMessage() {
-        message = isConnectAndSign
-        ? "{\"domain\":{\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
-        : "{\"domain\":{\"chainId\":\"\(metamaskSDK.chainId)\",\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
+        if isChainedSigning {
+            let chainedSigningMessages: [String] = [
+                ChainedSigningMessage.helloWorld,
+                ChainedSigningMessage.transactionData,
+                ChainedSigningMessage.byeWorld
+            ]
+            signMessage = chainedSigningMessages.joined(separator: "\n\n")
+        } else if isConnectAndSign {
+            signMessage = "{\"domain\":{\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
+        } else {
+            signMessage = "{\"domain\":{\"chainId\":\"\(metamaskSDK.chainId)\",\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
+        }
     }
 
-    func signInput() async {
+    func signMessage() async {
         let from = metamaskSDK.account
-        let params: [String] = [from, message]
+        let params: [String] = [from, signMessage]
         let signRequest = EthereumRequest(
             method: .ethSignTypedDataV4,
             params: params
         )
-        
+
         showProgressView = true
         let requestResult = await metamaskSDK.request(signRequest)
         showProgressView = false
@@ -109,9 +122,46 @@ struct SignView: View {
         }
     }
     
+    func signChainedMessages() async {
+        let from = metamaskSDK.account
+        let helloWorldParams: [String] = [ChainedSigningMessage.helloWorld, from]
+        let transactionDataParams: [String] = [ChainedSigningMessage.transactionData, from]
+        let byeWorldParams: [String] = [ChainedSigningMessage.byeWorld, from]
+        
+        let helloWorldSignRequest = EthereumRequest(
+            method: .personalSign,
+            params: helloWorldParams
+        )
+        
+        let transactionDataSignRequest = EthereumRequest(
+            method: .personalSign,
+            params: transactionDataParams
+        )
+        
+        let byeWorldSignRequest = EthereumRequest(
+            method: .personalSign,
+            params: byeWorldParams
+        )
+        
+        let requestBatch: [EthereumRequest] = [helloWorldSignRequest, transactionDataSignRequest, byeWorldSignRequest]
+        
+        showProgressView = true
+        let requestResult = await metamaskSDK.batchRequest(requestBatch)
+        showProgressView = false
+        
+        switch requestResult {
+        case let .success(value):
+            result = value
+            errorMessage = ""
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
+        }
+    }
+    
     func connectAndSign() async {
         showProgressView = true
-        let connectSignResult = await metamaskSDK.connectAndSign(message: message)
+        let connectSignResult = await metamaskSDK.connectAndSign(message: signMessage)
         showProgressView = false
         
         switch connectSignResult {
@@ -129,4 +179,10 @@ struct SignView_Previews: PreviewProvider {
     static var previews: some View {
         SignView()
     }
+}
+
+struct ChainedSigningMessage {
+    static let helloWorld = "Hello, world, signing in!"
+    static let transactionData = "{\"data\":\"0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675\",\"from\": \"0x0000000000000000000000000000000000000000\",\"gas\": \"0x76c0\",\"gasPrice\": \"0x9184e72a000\",\"to\": \"0xd46e8dd67c5d32be8058bb8eb970870f07244567\",\"value\": \"0x9184e72a\"}"
+    static let byeWorld = "Last message to sign!"
 }

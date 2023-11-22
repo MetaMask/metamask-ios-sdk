@@ -322,6 +322,7 @@ private extension Client {
             Logging.log("Received wallet info")
             isReady = true
         } else if let data = json["data"] as? [String: Any] {
+            Logging.log("Mpendulo::Got data: \(json)")
             if let id = data["id"] as? String {
                 receiveResponse?(id, data)
             } else {

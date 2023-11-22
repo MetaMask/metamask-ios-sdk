@@ -23,11 +23,11 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethGetBlockByHash = "eth_getBlockByHash"
     case web3ClientVersion = "web3_clientVersion"
     case ethRequestAccounts = "eth_requestAccounts"
-    case ethSignTransaction = "eth_signTransaction"
     case ethSendTransaction = "eth_sendTransaction"
     case ethSignTypedDataV3 = "eth_signTypedData_v3"
     case ethSignTypedDataV4 = "eth_signTypedData_v4"
     case addEthereumChain = "wallet_addEthereumChain"
+    case metamaskBatch = "metamask_batch"
     case metaMaskChainChanged = "metamask_chainChanged"
     case ethSendRawTransaction = "eth_sendRawTransaction"
     case switchEthereumChain = "wallet_switchEthereumChain"
@@ -46,6 +46,7 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
             .ethSign,
             .watchAsset,
             .personalSign,
+            .metamaskBatch,
             .ethSignTypedData,
             .ethRequestAccounts,
             .ethSendTransaction,
@@ -61,12 +62,12 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     static func isResultMethod(_ method: EthereumMethod) -> Bool {
         let resultMethods: [EthereumMethod] = [
             .ethSign,
+            .watchAsset,
             .ethChainId,
             .personalSign,
-            .watchAsset,
+            .metamaskBatch,
             .ethSignTypedData,
             .ethRequestAccounts,
-            .ethSignTransaction,
             .ethSendTransaction,
             .ethSignTypedDataV3,
             .ethSignTypedDataV4,
