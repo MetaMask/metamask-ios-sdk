@@ -14,7 +14,7 @@ protocol EthereumEventsDelegate: AnyObject {
 }
 
 class Ethereum {
-    private let CONNECTION_ID = UUID().uuidString
+    private let CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
     
@@ -188,8 +188,6 @@ class Ethereum {
             id: CONNECTION_ID,
             method: .ethRequestAccounts
         )
-        Logging.log("Mpendulo::requestAccounts: \(requestAccountsRequest)")
-        Logging.log("Mpendulo::CONNECTION_ID: \(CONNECTION_ID)")
         
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
         submittedRequests[CONNECTION_ID] = submittedRequest
@@ -207,7 +205,6 @@ class Ethereum {
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
     func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
-        Logging.log("Mpendulo::Sending normal request: \(request)")
         if !connected && request.methodType != .metaMaskConnectSign {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect()
@@ -235,7 +232,6 @@ class Ethereum {
     }
     
     func request<T: CodableData>(_ request: BatchRequest<T>) -> EthereumPublisher? {
-        Logging.log("Mpendulo::Sending batch request: \(request)")
         if !connected && request.methodType != .metaMaskConnectSign {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect()
@@ -262,20 +258,20 @@ class Ethereum {
         }
     }
     
-    func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<String, RequestError> {
-        let batchRequest = BatchRequest(params: requests)
+    func batchRequest<T: CodableData>(_ params: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
+        let batchRequest = BatchRequest(params: params)
 
         return await withCheckedContinuation { continuation in
             request(batchRequest)?
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
-                        continuation.resume(returning: .success(""))
+                        continuation.resume(returning: .success([]))
                     case .failure(let error):
                         continuation.resume(returning: .failure(error))
                     }
                 }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
+                    continuation.resume(returning: .success(result as? [String] ?? []))
                 }).store(in: &cancellables)
         }
     }
@@ -318,7 +314,6 @@ class Ethereum {
     }
     
     func receiveResponse(id: String, data: [String: Any]) {
-        Logging.log("Mpendulo::Got response: \(data)")
         guard let request = submittedRequests[id] else { return }
         
         if let error = data["error"] as? [String: Any] {

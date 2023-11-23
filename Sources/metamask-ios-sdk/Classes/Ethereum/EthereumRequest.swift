@@ -13,13 +13,17 @@ public struct EthereumRequest<T: CodableData>: CodableData {
         EthereumMethod(rawValue: method) ?? .unknownMethod
     }
 
-    public init(id: String = UUID().uuidString, method: String, params: T = "") {
+    public init(id: String = TimestampGenerator.timestamp(),
+                method: String,
+                params: T = "") {
         self.id = id
         self.method = method
         self.params = params
     }
 
-    public init(id: String = UUID().uuidString, method: EthereumMethod, params: T = "") {
+    public init(id: String = TimestampGenerator.timestamp(), 
+                method: EthereumMethod,
+                params: T = "") {
         self.id = id
         self.method = method.rawValue
         self.params = params
