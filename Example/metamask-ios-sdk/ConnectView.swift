@@ -69,6 +69,10 @@ struct ConnectView: View {
                             NavigationLink("Sign") {
                                 SignView().environmentObject(metaMaskSDK)
                             }
+                            
+                            NavigationLink("Chained signing") {
+                                SignView(isChainedSigning: true).environmentObject(metaMaskSDK)
+                            }
 
                             NavigationLink("Transact") {
                                 TransactionView().environmentObject(metaMaskSDK)

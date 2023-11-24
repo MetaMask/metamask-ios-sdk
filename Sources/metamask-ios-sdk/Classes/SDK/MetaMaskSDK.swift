@@ -95,6 +95,10 @@ public extension MetaMaskSDK {
     func request<T: CodableData>(_ request: EthereumRequest<T>) async -> Result<String, RequestError>  {
        await ethereum.request(request)
     }
+    
+    func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
+        await ethereum.batchRequest(requests)
+    }
 }
 
 extension MetaMaskSDK: EthereumEventsDelegate {

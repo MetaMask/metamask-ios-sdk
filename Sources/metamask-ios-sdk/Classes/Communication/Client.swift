@@ -322,8 +322,13 @@ private extension Client {
             Logging.log("Received wallet info")
             isReady = true
         } else if let data = json["data"] as? [String: Any] {
-            if let id = data["id"] as? String {
-                receiveResponse?(id, data)
+            if let id = data["id"] {
+                if let identifier: Int64 = id as? Int64 {
+                    let id: String = String(identifier)
+                    receiveResponse?(id, data)
+                } else if let identifier: String = id as? String {
+                    receiveResponse?(identifier, data)
+                }
             } else {
                 receiveEvent?(data)
             }

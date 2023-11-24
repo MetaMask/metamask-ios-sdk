@@ -14,7 +14,7 @@ protocol EthereumEventsDelegate: AnyObject {
 }
 
 class Ethereum {
-    private let CONNECTION_ID = UUID().uuidString
+    private let CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
     
@@ -76,6 +76,7 @@ class Ethereum {
         return requestAccounts()
     }
     
+    @discardableResult
     func connect() async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             connect()?
@@ -164,7 +165,7 @@ class Ethereum {
     
     // MARK: Request Sending
     
-    func sendRequest<T: CodableData>(_ request: EthereumRequest<T>) {
+    func sendRequest(_ request: any RPCRequest) {
         commClient.sendMessage(request, encrypt: true)
         let authorise = requiresAuthorisation(method: request.methodType)
         
@@ -195,8 +196,7 @@ class Ethereum {
     /// Performs and Ethereum remote procedural call (RPC)
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
-    func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
-        
+    func request(_ request: any RPCRequest) -> EthereumPublisher? {
         if !connected && request.methodType != .metaMaskConnectSign {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect()
@@ -223,7 +223,7 @@ class Ethereum {
         }
     }
     
-    func request<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+    func request(_ req: any RPCRequest) async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             request(req)?
                 .sink(receiveCompletion: { completion in
@@ -235,6 +235,24 @@ class Ethereum {
                     }
                 }, receiveValue: { result in
                     continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
+        }
+    }
+    
+    func batchRequest<T: CodableData>(_ params: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
+        let batchRequest = BatchRequest(params: params)
+
+        return await withCheckedContinuation { continuation in
+            request(batchRequest)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success([]))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success(result as? [String] ?? []))
                 }).store(in: &cancellables)
         }
     }

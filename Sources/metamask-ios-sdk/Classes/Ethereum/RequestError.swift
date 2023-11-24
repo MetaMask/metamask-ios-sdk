@@ -29,15 +29,22 @@ public struct RequestError: Codable, Error {
     
     public static var invalidUrlError: RequestError {
         RequestError(from: [
-            "code": -102,
+            "code": -101,
             "message": "Please use a valid url in AppMetaData"
         ])
     }
     
     public static var invalidTitleError: RequestError {
         RequestError(from: [
-            "code": -103,
+            "code": -101,
             "message": "Please use a valid name in AppMetaData"
+        ])
+    }
+    
+    public static var invalidBatchRequestError: RequestError {
+        RequestError(from: [
+            "code": -101,
+            "message": "Something went wrong, check that your requests are valid"
         ])
     }
     

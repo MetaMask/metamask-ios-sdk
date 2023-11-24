@@ -25,7 +25,7 @@ public class SessionManager {
     
     public func createNewSessionConfig() {
         // update session expiry date
-        var config = SessionConfig(sessionId: UUID().uuidString,
+        let config = SessionConfig(sessionId: UUID().uuidString.lowercased(),
                                    expiry: Date(timeIntervalSinceNow: sessionDuration))
         if !config.isValid {
             sessionDuration = DEFAULT_SESSION_DURATION

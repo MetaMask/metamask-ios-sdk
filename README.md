@@ -52,7 +52,7 @@ Alternatively, you can add the URL directly in your project's package file:
 dependencies: [
     .package(
         url: "https://github.com/MetaMask/metamask-ios-sdk",
-        from: "0.3.1"
+        from: "0.4.0"
     )
 ]
 ```
@@ -203,4 +203,33 @@ let transactionRequest = EthereumRequest(
 
 // Make a transaction request
 let result = await metamaskSDK.request(transactionRequest)
+```
+#### Example: Send chained rpc (batch) requests
+```swift
+
+// Create parameters
+let account = metamaskSDK.account
+
+let params1: [String] = [account, "Message 1"]
+let params2: [String] = [account, "Message 2"]
+let params3: [String] = [account, "Message 3"]
+
+let signRequest1 = EthereumRequest(
+    method: .personalSign,
+    params: params1
+)
+
+let signRequest2 = EthereumRequest(
+    method: .personalSign,
+    params: params2
+)
+
+let signRequest3 = EthereumRequest(
+    method: .personalSign,
+    params: params3
+)
+
+let requestBatch: [EthereumRequest] = [signRequest1, signRequest2, signRequest3]
+
+let result = await metamaskSDK.batchRequest(requestBatch)
 ```
