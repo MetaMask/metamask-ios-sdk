@@ -76,6 +76,7 @@ class Ethereum {
         return requestAccounts()
     }
     
+    @discardableResult
     func connect() async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             connect()?
@@ -164,16 +165,7 @@ class Ethereum {
     
     // MARK: Request Sending
     
-    func sendRequest<T: CodableData>(_ request: EthereumRequest<T>) {
-        commClient.sendMessage(request, encrypt: true)
-        let authorise = requiresAuthorisation(method: request.methodType)
-        
-        if authorise {
-            commClient.requestAuthorisation()
-        }
-    }
-    
-    func sendBatchRequest<T: CodableData>(_ request: BatchRequest<T>) {
+    func sendRequest(_ request: any RPCRequest) {
         commClient.sendMessage(request, encrypt: true)
         let authorise = requiresAuthorisation(method: request.methodType)
         
@@ -204,7 +196,7 @@ class Ethereum {
     /// Performs and Ethereum remote procedural call (RPC)
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
-    func request<T: CodableData>(_ request: EthereumRequest<T>) -> EthereumPublisher? {
+    func request(_ request: any RPCRequest) -> EthereumPublisher? {
         if !connected && request.methodType != .metaMaskConnectSign {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect()
@@ -231,30 +223,19 @@ class Ethereum {
         }
     }
     
-    func request<T: CodableData>(_ request: BatchRequest<T>) -> EthereumPublisher? {
-        if !connected && request.methodType != .metaMaskConnectSign {
-            if request.methodType == .ethRequestAccounts {
-                commClient.connect()
-                connected = true
-                return requestAccounts()
-            }
-            return RequestError.failWithError(.connectError)
-        } else {
-            let id = request.id
-            let submittedRequest = SubmittedRequest(method: request.method)
-            submittedRequests[id] = submittedRequest
-            let publisher = submittedRequests[id]?.publisher
-            
-            if connected {
-                sendBatchRequest(request)
-            } else {
-                commClient.connect()
-                connected = true
-                commClient.addRequest { [weak self] in
-                    self?.sendBatchRequest(request)
-                }
-            }
-            return publisher
+    func request(_ req: any RPCRequest) async -> Result<String, RequestError> {
+        return await withCheckedContinuation { continuation in
+            request(req)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
         }
     }
     
@@ -272,22 +253,6 @@ class Ethereum {
                     }
                 }, receiveValue: { result in
                     continuation.resume(returning: .success(result as? [String] ?? []))
-                }).store(in: &cancellables)
-        }
-    }
-    
-    func request<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
-        return await withCheckedContinuation { continuation in
-            request(req)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success(""))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
-                    }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
                 }).store(in: &cancellables)
         }
     }

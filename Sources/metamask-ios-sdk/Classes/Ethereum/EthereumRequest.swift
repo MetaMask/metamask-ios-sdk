@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct EthereumRequest<T: CodableData>: CodableData {
+public struct EthereumRequest<T: CodableData>: RPCRequest {
     public var id: String
     public let method: String
     public var params: T

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		025DA1EDDB5295DD406F0E08 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2B1A0B6AF24D27CD8868401 /* Pods_metamask_ios_sdk_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -29,6 +30,7 @@
 		D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DC2AF42A720019321C /* CryptoTests.swift */; };
 		D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
+		F11C6352C0DDAA47A02C88A4 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,7 @@
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		780C3F18921DAF52E227C55E /* Pods-metamask-ios-sdk_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.release.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		908FC55797DCEA473E596393 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		B2B1A0B6AF24D27CD8868401 /* Pods_metamask_ios_sdk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D107588C293F289500D6C66B /* SignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignView.swift; sourceTree = "<group>"; };
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
@@ -72,6 +75,7 @@
 		D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F64C3CE55BBAE4908CF676A7 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		FDD82A6E260BDD7F65DA6D92 /* Pods-metamask-ios-sdk_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.release.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -81,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				025DA1EDDB5295DD406F0E08 /* Pods_metamask_ios_sdk_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F11C6352C0DDAA47A02C88A4 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +215,8 @@
 		E1776468B410544A8646D99F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B2B1A0B6AF24D27CD8868401 /* Pods_metamask_ios_sdk_Example.framework */,
+				E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

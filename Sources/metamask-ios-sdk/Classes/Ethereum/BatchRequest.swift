@@ -4,10 +4,11 @@
 //
 
 import Foundation
+import SocketIO
 
-public struct BatchRequest<T: CodableData>: CodableData {
+public struct BatchRequest<T: CodableData>: RPCRequest {
     public var id: String
-    var method: String = EthereumMethod.metamaskBatch.rawValue
+    public var method: String = EthereumMethod.metamaskBatch.rawValue
     public var params: [EthereumRequest<T>]
     
     public var methodType: EthereumMethod {
