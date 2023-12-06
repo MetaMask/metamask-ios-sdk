@@ -124,6 +124,15 @@ class Ethereum {
         }
     }
     
+    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+        let params: [EthereumRequest] = [req]
+        let connectWithRequest = EthereumRequest(
+            method: EthereumMethod.metamaskConnectWith.rawValue,
+            params: params
+        )
+        return await request(connectWithRequest)
+    }
+    
     /// Disconnect dapp
     func disconnect() {
         updateChainId("")
@@ -197,7 +206,7 @@ class Ethereum {
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
     func request(_ request: any RPCRequest) -> EthereumPublisher? {
-        if !connected && request.methodType != .metaMaskConnectSign {
+        if !connected && !EthereumMethod.isConnectMethod(request.methodType) {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect()
                 connected = true
@@ -240,7 +249,9 @@ class Ethereum {
     }
     
     func batchRequest<T: CodableData>(_ params: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
-        let batchRequest = BatchRequest(params: params)
+        let batchRequest = EthereumRequest(
+            method: EthereumMethod.metamaskBatch.rawValue,
+            params: params)
 
         return await withCheckedContinuation { continuation in
             request(batchRequest)?

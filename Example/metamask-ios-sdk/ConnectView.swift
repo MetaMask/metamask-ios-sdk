@@ -26,6 +26,7 @@ struct ConnectView: View {
     @State private var connectAndSignResult = ""
     @State private var isConnect = true
     @State private var isConnectAndSign = false
+    @State private var isConnectWith = false
 
     @State private var showProgressView = false
 
@@ -88,6 +89,21 @@ struct ConnectView: View {
                 if metaMaskSDK.account.isEmpty {
                     Section {
                         Button {
+                            isConnectWith = true
+                        } label: {
+                            Text("Connect With Request")
+                                .modifier(TextButton())
+                                .frame(maxWidth: .infinity, maxHeight: 32)
+                        }
+                        .sheet(isPresented: $isConnectWith, onDismiss: {
+                            isConnectWith = false
+                        }) {
+                            TransactionView(isConnectWith: true)
+                                .environmentObject(metaMaskSDK)
+                        }
+                        .modifier(ButtonStyle())
+                        
+                        Button {
                             isConnectAndSign = true
                         } label: {
                             Text("Connect & Sign")
@@ -100,8 +116,8 @@ struct ConnectView: View {
                             SignView(isConnectAndSign: true)
                                 .environmentObject(metaMaskSDK)
                         }
-                        
                         .modifier(ButtonStyle())
+                        
                         ZStack {
                             Button {
                                 Task {

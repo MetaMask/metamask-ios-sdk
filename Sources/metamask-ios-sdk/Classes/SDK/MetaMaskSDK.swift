@@ -79,6 +79,10 @@ public extension MetaMaskSDK {
     func connectAndSign(message: String) async -> Result<String, RequestError>  {
        await ethereum.connectAndSign(message: message)
     }
+    
+    func connectWith<T: CodableData>(_ request: EthereumRequest<T>) async -> Result<String, RequestError> {
+        await ethereum.connectWith(request)
+    }
 
     func disconnect() {
         ethereum.disconnect()
