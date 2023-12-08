@@ -358,6 +358,7 @@ extension Client {
         let originatorInfo = OriginatorInfo(
             title: appMetadata?.name,
             url: appMetadata?.url,
+            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
             platform: SDKInfo.platform,
             apiVersion: SDKInfo.version
         )

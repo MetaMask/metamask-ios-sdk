@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import UIKit
 import metamask_ios_sdk
 
 extension Notification.Name {
@@ -15,7 +16,14 @@ extension Notification.Name {
 struct ConnectView: View {
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(appMetadata)
 
-    private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
+    private static let appMetadata = AppMetadata(
+        name: "Dub Dapp",
+        url: "https://dubdapp.com",
+        iconUrl: nil,
+        base64Icon: icon?.convertImageToBase64()
+    )
+    
+    private static let icon = UIImage(named: "stackoverflow")
 
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
@@ -183,5 +191,14 @@ struct ConnectView: View {
 struct ConnectView_Previews: PreviewProvider {
     static var previews: some View {
         ConnectView()
+    }
+}
+
+extension UIImage {
+    func convertImageToBase64() -> String? {
+        if let imageData = pngData() {
+            return imageData.base64EncodedString()
+        }
+        return nil
     }
 }
