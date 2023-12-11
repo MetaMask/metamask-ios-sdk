@@ -22,7 +22,6 @@ struct SignView: View {
     
     private let signButtonTitle = "Sign"
     private let connectAndSignButtonTitle = "Connect & Sign"
-    private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
     var body: some View {
         GeometryReader { geometry in
