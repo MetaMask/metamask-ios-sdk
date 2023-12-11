@@ -18,9 +18,11 @@ You can also see the [JavaScript SDK repository](https://github.com/MetaMask/met
   or clone and compile MetaMask Mobile from [source](https://github.com/MetaMask/metamask-mobile)
   and build to your target device.
 
-- iOS version 14 or later.
+- iOS version 15 or later.
   The SDK supports `ios-arm64` (iOS devices) and `ios-arm64-simulator` (M1 chip simulators).
   It currently doesn't support `ios-ax86_64-simulator` (Intel chip simulators).
+  
+  - Swift 5.5 or later.
 
 ## Get started
 

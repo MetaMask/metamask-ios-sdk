@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name             = 'metamask-ios-sdk'
   s.version          = '0.4.0'
   s.summary          = 'Enable users to easily connect with their MetaMask Mobile wallet.'
-  s.swift_version    = '5.0'
+  s.swift_version    = '5.5'
 
   s.description      = <<-DESC
 The iOS MetaMask SDK enables native iOS apps to interact with the Ethereum blockchain via the MetaMask Mobile wallet.
