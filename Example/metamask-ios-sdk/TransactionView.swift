@@ -18,7 +18,7 @@ struct TransactionView: View {
     @State private var to = "0x0000000000000000000000000000000000000000"
     @State var isConnectWith: Bool = false
     @State private var sendTransactionTitle = "Send Transaction"
-    @State private var connectWithSendTransactionTitle = "Send Transaction"
+    @State private var connectWithSendTransactionTitle = "Connect & Send Transaction"
     
     @State private var showProgressView = false
 
