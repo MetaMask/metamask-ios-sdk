@@ -67,7 +67,7 @@ import metamask_ios_sdk
 
 ### 3. Connect your dapp
 
-Connect your dapp to MetaMask by adding the following code to your project file:
+We have provided a convenient way to make rpc requests without having to first make a connect request. Please refer to [Connect With Request](#5-connect-with-request) for examples. Otherwise you can connect your dapp to MetaMask as follows:
 
 ```swift
 let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
@@ -207,6 +207,7 @@ let result = await metamaskSDK.request(transactionRequest)
 #### Example: Send chained rpc (batch) requests
 ```swift
 
+Please note that for request batching, the collection of `EthereumRequest<T>` needs to be of the same `<T>` type, i.e all requests use the same `params` type, e.g `[Transaction]`, or `[String]` etc. You can mix the rpc requests e.g a mix of `personal_sign`, eth_signTypedData_v4 etc as long as they share the same params type. 
 // Create parameters
 let account = metamaskSDK.account
 
@@ -232,4 +233,44 @@ let signRequest3 = EthereumRequest(
 let requestBatch: [EthereumRequest] = [signRequest1, signRequest2, signRequest3]
 
 let result = await metamaskSDK.batchRequest(requestBatch)
+```
+
+### 5. Connect With Request
+#### Example: Connect with request
+
+We have provided a convenience method that enables you to connect and make any request in one rpc request without having to call `connect()` first.
+
+```swift
+let transaction = Transaction(
+    to: to,
+    from: metamaskSDK.account, // this is initially empty before connection, will be populated with selected address once connected
+    value: amount
+)
+
+let parameters: [Transaction] = [transaction]
+
+let transactionRequest = EthereumRequest(
+    method: .ethSendTransaction,
+    params: parameters
+)
+
+let transactionResult = metamaskSDK.connectWith(transactionRequest)
+```
+
+#### Example: Connect with sign
+
+We have further provided a specific convenience method that enables you to connect and make a personal sign rpc request.
+In this case you do not need to construct a request, you only provide the message to personal sign.
+
+```kotlin
+val message = "This is the message to sign"
+
+let connectSignResult = await metamaskSDK.connectAndSign(message: message)
+
+switch connectSignResult {
+    case let .success(value):
+        // use result
+    case let .failure(error):
+        // handle error
+}
 ```
