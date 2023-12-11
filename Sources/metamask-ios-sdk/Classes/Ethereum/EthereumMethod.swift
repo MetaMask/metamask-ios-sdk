@@ -28,6 +28,7 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethSignTypedDataV4 = "eth_signTypedData_v4"
     case addEthereumChain = "wallet_addEthereumChain"
     case metamaskBatch = "metamask_batch"
+    case metamaskConnectWith = "metamask_connectwith"
     case metaMaskChainChanged = "metamask_chainChanged"
     case ethSendRawTransaction = "eth_sendRawTransaction"
     case switchEthereumChain = "wallet_switchEthereumChain"
@@ -47,6 +48,8 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
             .watchAsset,
             .personalSign,
             .metamaskBatch,
+            .metaMaskConnectSign,
+            .metamaskConnectWith,
             .ethSignTypedData,
             .ethRequestAccounts,
             .ethSendTransaction,
@@ -66,6 +69,8 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
             .ethChainId,
             .personalSign,
             .metamaskBatch,
+            .metaMaskConnectSign,
+            .metamaskConnectWith,
             .ethSignTypedData,
             .ethRequestAccounts,
             .ethSendTransaction,
@@ -77,5 +82,13 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
         ]
 
         return resultMethods.contains(method)
+    }
+    
+    static func isConnectMethod(_ method: EthereumMethod) -> Bool {
+        let connectMethods: [EthereumMethod] = [
+            .metaMaskConnectSign,
+            .metamaskConnectWith
+        ]
+        return connectMethods.contains(method)
     }
 }

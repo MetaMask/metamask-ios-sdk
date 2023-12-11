@@ -16,6 +16,11 @@ struct TransactionView: View {
     @State private var errorMessage = ""
     @State private var showError = false
     @State private var to = "0x0000000000000000000000000000000000000000"
+    @State var isConnectWith: Bool = false
+    @State private var sendTransactionTitle = "Send Transaction"
+    @State private var connectWithSendTransactionTitle = "Connect & Send Transaction"
+    
+    @State private var showProgressView = false
 
     var body: some View {
         Form {
@@ -56,22 +61,30 @@ struct TransactionView: View {
             }
 
             Section {
-                Button {
-                    Task {
-                        await sendTransaction()
+                ZStack {
+                    Button {
+                        Task {
+                            await sendTransaction()
+                        }
+                    } label: {
+                        Text(isConnectWith ? connectWithSendTransactionTitle : sendTransactionTitle)
+                            .modifier(TextButton())
+                            .frame(maxWidth: .infinity, maxHeight: 32)
                     }
-                } label: {
-                    Text("Send transaction")
-                        .modifier(TextButton())
-                        .frame(maxWidth: .infinity, maxHeight: 32)
+                    .alert(isPresented: $showError) {
+                        Alert(
+                            title: Text("Error"),
+                            message: Text(errorMessage)
+                        )
+                    }
+                    .modifier(ButtonStyle())
+                    
+                    if showProgressView {
+                        ProgressView()
+                            .scaleEffect(1.5, anchor: .center)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                    }
                 }
-                .alert(isPresented: $showError) {
-                    Alert(
-                        title: Text("Error"),
-                        message: Text(errorMessage)
-                    )
-                }
-                .modifier(ButtonStyle())
             }
         }
         .background(Color.blue.grayscale(0.5))
@@ -91,7 +104,13 @@ struct TransactionView: View {
             params: parameters // eth_sendTransaction rpc call expects an array parameters object
         )
         
-        let transactionResult = await metamaskSDK.request(transactionRequest)
+        showProgressView = true
+        
+        let transactionResult = isConnectWith
+        ? await metamaskSDK.connectWith(transactionRequest)
+        : await metamaskSDK.request(transactionRequest)
+        
+        showProgressView = false
         
         switch transactionResult {
         case let .success(value):
