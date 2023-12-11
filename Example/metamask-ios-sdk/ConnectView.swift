@@ -15,7 +15,11 @@ extension Notification.Name {
 struct ConnectView: View {
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(appMetadata)
 
-    private static let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
+    private static let appMetadata = AppMetadata(
+        name: "Dub Dapp",
+        url: "https://dubdapp.com",
+        iconUrl: "https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png"
+    )
 
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
