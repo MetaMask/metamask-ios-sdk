@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "metamask-ios-sdk",
     platforms: [
-        .iOS(.v14)
+        .iOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -32,5 +32,5 @@ let package = Package(
                 name: "Ecies",
                 path: "Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework"),
     ],
-    swiftLanguageVersions: [.v5]
+    swiftLanguageVersions: [.v5_5]
 )

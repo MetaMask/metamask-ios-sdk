@@ -19,6 +19,7 @@ class SessionManagerTests: XCTestCase {
 
     override func tearDown() {
         super.tearDown()
+        sessionManager.clear()
     }
 
     func testInitiallyNoSessionExists() {
