@@ -20,9 +20,6 @@ struct ReadOnlyCallsView: View {
     @State var web3ClientVersionResult: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
-    
-    private let signButtonTitle = "Sign"
-    private let connectAndSignButtonTitle = "Connect & Sign"
 
     var body: some View {
         NavigationView {
