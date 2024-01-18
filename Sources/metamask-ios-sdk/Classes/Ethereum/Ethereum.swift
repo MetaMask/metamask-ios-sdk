@@ -18,6 +18,8 @@ class Ethereum {
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
     
+    var sdkOptions: SDKOptions?
+    
     weak var delegate: EthereumEventsDelegate?
 
     private var connected: Bool = false
@@ -161,25 +163,27 @@ class Ethereum {
         disconnect()
     }
     
-    // MARK: Deeplinking
-    
-    func requiresAuthorisation(method: EthereumMethod) -> Bool {
-        switch method {
-        case .ethRequestAccounts:
-            return account.isEmpty ? true : false
-        default:
-            return EthereumMethod.requiresDeeplinking(method)
-        }
-    }
-    
     // MARK: Request Sending
     
     func sendRequest(_ request: any RPCRequest) {
-        commClient.sendMessage(request, encrypt: true)
-        let authorise = requiresAuthorisation(method: request.methodType)
-        
-        if authorise {
-            commClient.requestAuthorisation()
+        if
+            EthereumMethod.isReadOnly(request.methodType),
+            let sdkOptions = sdkOptions,
+            !sdkOptions.infuraAPIKey.isEmpty {
+            let infuraProvider = InfuraProvider(infuraAPIKey: sdkOptions.infuraAPIKey)
+            Task {
+                if let result = await infuraProvider.sendRequest(request, chainId: chainId) {
+                    sendResult(result, id: request.id)
+                }
+            }
+        } else {
+            commClient.sendMessage(request, encrypt: true)
+            let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
+            let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
+            
+            if authorise && !skipAuthorisation {
+                commClient.requestAuthorisation()
+            }
         }
     }
     

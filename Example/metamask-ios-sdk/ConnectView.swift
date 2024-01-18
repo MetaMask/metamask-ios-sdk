@@ -13,7 +13,11 @@ extension Notification.Name {
 
 @MainActor
 struct ConnectView: View {
-    @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(appMetadata)
+    // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
+    @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
+        appMetadata,
+        sdkOptions: nil // SDKOptions(infuraAPIKey: "1234")
+    )
 
     private static let appMetadata = AppMetadata(
         name: "Dub Dapp",
