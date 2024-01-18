@@ -17,6 +17,7 @@
 		D107588D293F289500D6C66B /* SignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588C293F289500D6C66B /* SignView.swift */; };
 		D107588F293F385700D6C66B /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588E293F385700D6C66B /* TransactionView.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
+		D131DF902B5957440055EF13 /* ReadOnlyCallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */; };
 		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
 		D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1494FEA2970149B002D36D6 /* SwitchChainView.swift */; };
@@ -61,6 +62,7 @@
 		D107588C293F289500D6C66B /* SignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignView.swift; sourceTree = "<group>"; };
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
+		D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyCallsView.swift; sourceTree = "<group>"; };
 		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
 		D1494FEA2970149B002D36D6 /* SwitchChainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchChainView.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */,
 				D14FA2F529E578B200F3A059 /* ViewExtension.swift */,
 				D14FA2F729E57B6900F3A059 /* ToastView.swift */,
+				D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -406,6 +409,7 @@
 				D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */,
 				D14FA2F629E578B200F3A059 /* ViewExtension.swift in Sources */,
 				D14FA2F829E57B6900F3A059 /* ToastView.swift in Sources */,
+				D131DF902B5957440055EF13 /* ReadOnlyCallsView.swift in Sources */,
 				D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */,
 				D14FA2F429E576EB00F3A059 /* ToastOverlay.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,

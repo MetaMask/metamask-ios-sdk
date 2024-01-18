@@ -90,6 +90,10 @@ struct ConnectView: View {
                             NavigationLink("Switch chain") {
                                 SwitchChainView().environmentObject(metaMaskSDK)
                             }
+                            
+                            NavigationLink("Read-only RPCs") {
+                                ReadOnlyCallsView().environmentObject(metaMaskSDK)
+                            }
                         }
                     }
                 }
