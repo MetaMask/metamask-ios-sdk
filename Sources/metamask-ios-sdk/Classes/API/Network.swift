@@ -5,7 +5,9 @@
 import SwiftUI
 
 public protocol Networking: ObservableObject {
-    func post(_ parameters: [String: Any], endpoint: Endpoint) async throws
+    @discardableResult
+    func post(_ parameters: [String: Any], endpoint: Endpoint) async throws -> Data
+    func post(_ parameters: [String: Any], endpoint: String) async throws -> Data
     func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T
 }
 
@@ -21,8 +23,13 @@ public class Network: Networking {
         return response
     }
 
-    public func post(_ parameters: [String: Any], endpoint: Endpoint) async throws {
-        guard let url = URL(string: endpoint.url) else {
+    @discardableResult
+    public func post(_ parameters: [String: Any], endpoint: Endpoint) async throws -> Data {
+        try await post(parameters, endpoint: endpoint.url)
+    }
+    
+    public func post(_ parameters: [String: Any], endpoint: String) async throws -> Data {
+        guard let url = URL(string: endpoint) else {
             throw NetworkError.invalidUrl
         }
 
@@ -32,7 +39,8 @@ public class Network: Networking {
         request.httpBody = payload
         request.httpMethod = "POST"
 
-        _ = try await URLSession.shared.data(for: request)
+        let response = try await URLSession.shared.data(for: request)
+        return response.0
     }
 
     private func request(for url: URL) -> URLRequest {

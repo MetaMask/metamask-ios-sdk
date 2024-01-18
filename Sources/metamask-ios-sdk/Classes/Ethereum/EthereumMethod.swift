@@ -42,8 +42,8 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethGetBlockTransactionCountByNumber = "eth_getBlockTransactionCountByNumber"
     case unknownMethod = "unknown"
 
-    static func requiresDeeplinking(_ method: EthereumMethod) -> Bool {
-        let deeplinkMethods: [EthereumMethod] = [
+    static func requiresAuthorisation(_ method: EthereumMethod) -> Bool {
+        let methods: [EthereumMethod] = [
             .ethSign,
             .watchAsset,
             .personalSign,
@@ -59,7 +59,11 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
             .switchEthereumChain
         ]
 
-        return deeplinkMethods.contains(method)
+        return methods.contains(method)
+    }
+    
+    static func isReadOnly(_ method: EthereumMethod) -> Bool {
+        !requiresAuthorisation(method)
     }
 
     static func isResultMethod(_ method: EthereumMethod) -> Bool {

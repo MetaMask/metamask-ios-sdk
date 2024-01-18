@@ -344,6 +344,7 @@ private extension Client {
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
+        Logging.log("Deeplink url: \(deeplinkUrl)")
 
         DispatchQueue.main.async {
             UIApplication.shared.open(url)
