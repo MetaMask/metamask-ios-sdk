@@ -176,7 +176,6 @@ class Ethereum {
                     sendResult(result, id: request.id)
                 }
             }
-            
         } else {
             commClient.sendMessage(request, encrypt: true)
             let authorise = EthereumMethod.requiresAuthorisation(request.methodType)

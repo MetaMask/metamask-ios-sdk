@@ -106,12 +106,9 @@ struct SignView: View {
             method: .ethSignTypedDataV4,
             params: params
         )
-        
-        let getBalanceRequest = EthereumRequest(method: .ethGetBalance, params: [from, "latest"])
-        let accountsRequest = EthereumRequest(method: .ethRequestAccounts)
 
         showProgressView = true
-        let requestResult = await metamaskSDK.request(accountsRequest)
+        let requestResult = await metamaskSDK.request(signRequest)
         showProgressView = false
         
         switch requestResult {
