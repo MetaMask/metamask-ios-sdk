@@ -54,7 +54,7 @@ Alternatively, you can add the URL directly in your project's package file:
 dependencies: [
     .package(
         url: "https://github.com/MetaMask/metamask-ios-sdk",
-        from: "0.4.0"
+        from: "0.5.0"
     )
 ]
 ```
