@@ -172,7 +172,10 @@ class Ethereum {
             !sdkOptions.infuraAPIKey.isEmpty {
             let infuraProvider = InfuraProvider(infuraAPIKey: sdkOptions.infuraAPIKey)
             Task {
-                if let result = await infuraProvider.sendRequest(request, chainId: chainId) {
+                if let result = await infuraProvider.sendRequest(
+                    request,
+                    chainId: chainId,
+                    appMetadata: commClient.appMetadata ?? AppMetadata(name: "", url: "")) {
                     sendResult(result, id: request.id)
                 }
             }

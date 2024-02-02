@@ -5,6 +5,7 @@
 import SwiftUI
 
 public protocol Networking: ObservableObject {
+    func addHeaders(_ headers: [String: String])
     @discardableResult
     func post(_ parameters: [String: Any], endpoint: Endpoint) async throws -> Data
     func post(_ parameters: [String: Any], endpoint: String) async throws -> Data
@@ -12,6 +13,10 @@ public protocol Networking: ObservableObject {
 }
 
 public class Network: Networking {
+    private var additionalHeaders: [String: String] = [
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    ]
     public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
@@ -42,11 +47,17 @@ public class Network: Networking {
         let response = try await URLSession.shared.data(for: request)
         return response.0
     }
+    
+    public func addHeaders(_ headers: [String: String]) {
+        additionalHeaders.merge(headers) { (_, new) in new }
+    }
 
     private func request(for url: URL) -> URLRequest {
         var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        for (key, value) in additionalHeaders {
+            request.addValue(value, forHTTPHeaderField: key)
+        }
+        
         return request
     }
 }
