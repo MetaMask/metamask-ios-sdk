@@ -74,7 +74,7 @@ public class InfuraProvider {
         return rpcUrls[chainId]
     }
     
-    func sendRequest(_ request: any RPCRequest, chainId: String) async -> Any? {
+    func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
         Logging.log("InfuraProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
         
         let params: [String: Any] = [
@@ -88,6 +88,12 @@ public class InfuraProvider {
             Logging.error("InfuraProvider:: Infura endpoint for chainId \(chainId) is not available")
             return nil
         }
+        
+        let devicePlatformInfo = DeviceInfo.platformDescription
+        network.addHeaders([
+            "Metamask-Sdk-Info": "Sdk/iOS SdkVersion/\(SDKInfo.version) Platform/\(devicePlatformInfo) dApp/\(appMetadata.url) dAppTitle/\(appMetadata.name)"
+        ]
+        )
         
         do {
             let response = try await network.post(params, endpoint: endpoint)
