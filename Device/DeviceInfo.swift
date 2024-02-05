@@ -3,6 +3,7 @@
 //  metamask-ios-sdk
 //
 
+import UIKit
 import Foundation
 
 struct DeviceInfo {
