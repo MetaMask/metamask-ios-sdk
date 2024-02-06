@@ -9,7 +9,7 @@ public class InfuraProvider {
     private let infuraAPIKey: String
     private let network: any Networking
     
-    init(infuraAPIKey: String, network: any Networking = Network()) {
+    public init(infuraAPIKey: String, network: any Networking = Network()) {
         self.infuraAPIKey = infuraAPIKey
         self.network = network
     }
@@ -74,7 +74,7 @@ public class InfuraProvider {
         return rpcUrls[chainId]
     }
     
-    func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
+    public func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
         Logging.log("InfuraProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
         
         let params: [String: Any] = [

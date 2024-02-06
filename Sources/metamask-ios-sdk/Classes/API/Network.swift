@@ -13,10 +13,13 @@ public protocol Networking: ObservableObject {
 }
 
 public class Network: Networking {
+    public init() {}
+    
     private var additionalHeaders: [String: String] = [
         "Accept": "application/json",
         "Content-Type": "application/json"
     ]
+    
     public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
