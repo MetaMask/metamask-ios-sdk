@@ -48,6 +48,7 @@ public class Channel: CommunicationChannel {
             socketURL: url,
             config: [
                 .log(false),
+                .forceWebsockets(true),
                 options
             ]
         )
