@@ -32,5 +32,5 @@ let package = Package(
                 name: "Ecies",
                 path: "Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework"),
     ],
-    swiftLanguageVersions: [.version("5.5")]
+    swiftLanguageVersions: [.version("5")]
 )
