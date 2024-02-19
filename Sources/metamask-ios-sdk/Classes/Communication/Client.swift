@@ -232,7 +232,7 @@ private extension Client {
             guard let self = self else { return }
             Logging.log("SDK disconnected")
 
-            track(event: .disconnected)
+            self.track(event: .disconnected)
 
             // for debug purposes only
             NotificationCenter.default.post(
@@ -241,7 +241,7 @@ private extension Client {
                 userInfo: ["value": "Clients Disconnected"]
             )
 
-            isReady = false
+            self.isReady = false
         }
     }
 }
