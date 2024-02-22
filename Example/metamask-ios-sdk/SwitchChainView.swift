@@ -119,16 +119,8 @@ struct SwitchChainView: View {
     }
 
     func switchEthereumChain() async {
-        let switchChainParams: [String: String] = [
-            "chainId": networkSelection.chainId
-        ]
-
-        let switchChainRequest = EthereumRequest(
-            method: .switchEthereumChain,
-            params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
-        )
-        
-        let switchChainResult = await metamaskSDK.request(switchChainRequest)
+        let switchChainResult = await metamaskSDK.switchEthereumChain(chainId: networkSelection
+            .chainId)
         
         switch switchChainResult {
         case .success(_):
@@ -165,18 +157,7 @@ struct SwitchChainView: View {
     }
 
     func addEthereumChain() async {
-        let addChainParams = AddChainRequest(
-            chainId: networkSelection.chainId,
-            chainName: networkSelection.name,
-            rpcUrls: networkSelection.rpcUrls
-        )
-
-        let addChainRequest = EthereumRequest(
-            method: .addEthereumChain,
-            params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
-        )
-        
-        let addChainResult = await metamaskSDK.request(addChainRequest)
+        let addChainResult = await metamaskSDK.addEthereumChain(chainId: networkSelection.chainId, chainName: networkSelection.name, rpcUrls: networkSelection.rpcUrls)
         
         switch addChainResult {
         case .success:

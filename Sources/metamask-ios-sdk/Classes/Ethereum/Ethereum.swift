@@ -135,6 +135,107 @@ class Ethereum {
         return await request(connectWithRequest)
     }
     
+    // MARK: Convenience Methods
+    
+    func getChainId() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethChainId, params: [String]())
+    }
+    
+    func getEthAccounts() async -> Result<[String], RequestError> {
+        let result = await ethereumRequest(method: .ethAccounts, params: [String]())
+        switch result {
+        case .success(let account): return .success([account])
+        case .failure(let error): return .failure(error)
+        }
+    }
+    
+    func getEthGasPrice() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGasPrice)
+    }
+    
+    func getEthBalance(address: String, block: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBalance, params: [address, block])
+    }
+    
+    func getEthBlockNumber() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethBlockNumber)
+    }
+    
+    func getEthEstimateGas() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethEstimateGas)
+    }
+    
+    func getWeb3ClientVersion() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .web3ClientVersion, params: [String]())
+    }
+    
+    func personalSign(message: String, address: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .personalSign, params: [address, message])
+    }
+    
+    func signTypedDataV4(typedData: String, address: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSignTypedDataV4, params: [address, typedData])
+    }
+    
+    func sendTransaction(from: String, to: String, amount: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSendTransaction, params: [
+            [
+                "from": from,
+                "to": to,
+                "amount": amount
+            ]
+        ])
+    }
+    
+    func sendRawTransaction(signedTransaction: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSendRawTransaction, params: [signedTransaction])
+    }
+    
+    func getBlockTransactionCountByNumber(blockNumber: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBlockTransactionCountByNumber, params: [blockNumber])
+    }
+    
+    func getBlockTransactionCountByHash(blockHash: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBlockTransactionCountByHash, params: [blockHash])
+    }
+    
+    func getTransactionCount(address: String, tagOrblockNumber: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetTransactionCount, params: [address, tagOrblockNumber])
+    }
+    
+    func addEthereumChain(chainId: String, chainName: String, rpcUrls: [String]) async -> Result<String, RequestError> {
+        struct AddChainParameters: CodableData {
+            let chainId: String
+            let chainName: String
+            let rpcUrls: [String]
+
+            public func socketRepresentation() -> NetworkData {
+                [
+                    "chainId": chainId,
+                    "chainName": chainName,
+                    "rpcUrls": rpcUrls
+                ]
+            }
+        }
+        
+        return await ethereumRequest(method: .addEthereumChain, params: [
+            [
+                AddChainParameters(chainId: chainId, chainName: chainName, rpcUrls: rpcUrls)
+            ]
+        ])
+    }
+    
+    func switchEthereumChain(chainId: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .switchEthereumChain, params: [
+            ["chainId": chainId]
+        ])
+    }
+    
+    private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<String, RequestError> {
+        let ethRequest = EthereumRequest(method: method, params: params)
+        return await request(ethRequest)
+    }
+    
     /// Disconnect dapp
     func disconnect() {
         updateChainId("")

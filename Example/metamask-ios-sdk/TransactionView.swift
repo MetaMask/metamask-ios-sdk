@@ -108,7 +108,7 @@ struct TransactionView: View {
         
         let transactionResult = isConnectWith
         ? await metamaskSDK.connectWith(transactionRequest)
-        : await metamaskSDK.request(transactionRequest)
+        : await metamaskSDK.sendTransaction(from: metamaskSDK.account, to: to, amount: amount)
         
         showProgressView = false
         
