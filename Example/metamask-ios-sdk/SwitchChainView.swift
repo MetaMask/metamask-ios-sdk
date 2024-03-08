@@ -157,7 +157,17 @@ struct SwitchChainView: View {
     }
 
     func addEthereumChain() async {
-        let addChainResult = await metamaskSDK.addEthereumChain(chainId: networkSelection.chainId, chainName: networkSelection.name, rpcUrls: networkSelection.rpcUrls)
+        let addChainResult = await metamaskSDK.addEthereumChain(
+            chainId: networkSelection.chainId,
+            chainName: networkSelection.name,
+            rpcUrls: networkSelection.rpcUrls,
+            iconUrls: nil,
+            blockExplorerUrls: nil,
+            nativeCurrency: NativeCurrency(
+                name: networkSelection.name,
+                symbol: networkSelection.chainId,
+                decimals: 18)
+        )
         
         switch addChainResult {
         case .success:
@@ -178,20 +188,6 @@ struct SwitchChainView: View {
                 message: error.localizedDescription
             )
         }
-    }
-}
-
-struct AddChainRequest: CodableData {
-    let chainId: String
-    let chainName: String
-    let rpcUrls: [String]
-
-    public func socketRepresentation() -> NetworkData {
-        [
-            "chainId": chainId,
-            "chainName": chainName,
-            "rpcUrls": rpcUrls
-        ]
     }
 }
 

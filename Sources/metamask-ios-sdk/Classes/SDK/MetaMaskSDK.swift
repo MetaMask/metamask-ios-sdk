@@ -161,8 +161,20 @@ public extension MetaMaskSDK {
         await ethereum.getTransactionCount(address: address, tagOrblockNumber: tagOrblockNumber)
     }
     
-    func addEthereumChain(chainId: String, chainName: String, rpcUrls: [String]) async -> Result<String, RequestError>  {
-        await ethereum.addEthereumChain(chainId: chainId, chainName: chainName, rpcUrls: rpcUrls)
+    func addEthereumChain(chainId: String,
+                          chainName: String,
+                          rpcUrls: [String],
+                          iconUrls: [String]?,
+                          blockExplorerUrls: [String]?,
+                          nativeCurrency: NativeCurrency) async -> Result<String, RequestError>  {
+        await ethereum.addEthereumChain(
+            chainId: chainId,
+            chainName: chainName,
+            rpcUrls: rpcUrls,
+            iconUrls: iconUrls,
+            blockExplorerUrls: blockExplorerUrls,
+            nativeCurrency: nativeCurrency
+        )
     }
     
     func switchEthereumChain(chainId: String) async -> Result<String, RequestError> {

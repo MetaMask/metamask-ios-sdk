@@ -203,24 +203,24 @@ class Ethereum {
         await ethereumRequest(method: .ethGetTransactionCount, params: [address, tagOrblockNumber])
     }
     
-    func addEthereumChain(chainId: String, chainName: String, rpcUrls: [String]) async -> Result<String, RequestError> {
-        struct AddChainParameters: CodableData {
-            let chainId: String
-            let chainName: String
-            let rpcUrls: [String]
+    func addEthereumChain(chainId: String, 
+                          chainName: String,
+                          rpcUrls: [String],
+                          iconUrls: [String]?,
+                          blockExplorerUrls: [String]?,
+                          nativeCurrency: NativeCurrency) async -> Result<String, RequestError> {
 
-            public func socketRepresentation() -> NetworkData {
-                [
-                    "chainId": chainId,
-                    "chainName": chainName,
-                    "rpcUrls": rpcUrls
-                ]
-            }
-        }
         
         return await ethereumRequest(method: .addEthereumChain, params: [
             [
-                AddChainParameters(chainId: chainId, chainName: chainName, rpcUrls: rpcUrls)
+                AddChainParameters(
+                    chainId: chainId,
+                    chainName: chainName,
+                    rpcUrls: rpcUrls,
+                    iconUrls: iconUrls,
+                    blockExplorerUrls: blockExplorerUrls,
+                    nativeCurrency: nativeCurrency
+                )
             ]
         ])
     }
