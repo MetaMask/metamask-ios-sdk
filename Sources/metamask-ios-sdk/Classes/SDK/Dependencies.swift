@@ -17,8 +17,9 @@ final class Dependencies {
         self.trackEvent(event, parameters: parameters)
     })
     
-    lazy var ethereum: Ethereum = Ethereum(commClient: client, trackEvent: { event in
-        self.trackEvent(event)
+    lazy var ethereum: Ethereum = Ethereum(commClient: client, trackEvent: { event, parameters in
+        
+        self.trackEvent(event, parameters: parameters ?? [:])
     })
     
     func trackEvent(_ event: Event, parameters: [String: Any] = [:]) {

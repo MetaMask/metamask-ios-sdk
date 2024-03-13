@@ -8,6 +8,7 @@ import Foundation
 public typealias RequestJob = () -> Void
 
 protocol CommunicationClient: AnyObject {
+    var channelId: String { get set }
     var appMetadata: AppMetadata? { get set }
     var useDeeplinks: Bool { get set }
     var isConnected: Bool { get }

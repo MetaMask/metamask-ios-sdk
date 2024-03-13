@@ -3,6 +3,7 @@
 //
 
 public enum Event: String {
+    case sdkRpcRequest = "sdk_rpc_request"
     case connectionRequest = "sdk_connect_request_started"
     case reconnectionRequest = "sdk_reconnect_request_started"
     case connected = "sdk_connection_established"
