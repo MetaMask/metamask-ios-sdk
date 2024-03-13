@@ -32,7 +32,6 @@ public class Analytics: Tracking {
 
         var params = parameters
         params["event"] = event.name
-        Logging.log("Analytics:: \(params)")
 
         do {
             try await network.post(params, endpoint: .analytics)
