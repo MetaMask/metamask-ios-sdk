@@ -12,4 +12,6 @@ public protocol RPCRequest: CodableData {
     associatedtype ParameterType: CodableData
     var params: ParameterType { get }
     var methodType: EthereumMethod { get }
+    
+    func toDictionary() -> [String: Any]?
 }

@@ -36,4 +36,21 @@ public struct EthereumRequest<T: CodableData>: RPCRequest {
             "parameters": try? params.socketRepresentation()
         ]
     }
+    
+    public func toDictionary() -> [String: Any]? {
+        let encoder = JSONEncoder()
+        do {
+            let jsonData = try encoder.encode(self)
+            guard let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else {
+                print("Error converting JSON data to dictionary")
+                Logging.error("Message:: Error converting JSON data to dictionary")
+                return nil
+            }
+            return jsonObject
+        } catch {
+            print("Error encoding JSON: \(error)")
+            Logging.error("Message:: Error encoding JSON: \(error)")
+            return nil
+        }
+    }
 }

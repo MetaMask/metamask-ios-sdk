@@ -7,11 +7,13 @@ import UIKit
 import Combine
 import Foundation
 
-public class Client: CommunicationClient {
+public class SocketClient: CommunicationClient {
+    var communicationLayer: CommunicationLayer = .socket
+    
     var appMetadata: AppMetadata?
     private let session: SessionManager
     private var keyExchange = KeyExchange()
-    private let channel = Channel()
+    private let channel = SocketChannel()
 
     private var channelId: String = ""
 
@@ -113,7 +115,7 @@ public class Client: CommunicationClient {
 
 // MARK: Request jobs
 
-extension Client {
+extension SocketClient {
     func addRequest(_ job: @escaping RequestJob) {
         requestJobs.append(job)
     }
@@ -128,7 +130,7 @@ extension Client {
 
 // MARK: Event handling
 
-private extension Client {
+private extension SocketClient {
     func handleConnection() {
         let channelId = channelId
 
@@ -248,7 +250,7 @@ private extension Client {
 
 // MARK: Message handling
 
-private extension Client {
+private extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         let keyExchangeMessage: Message<KeyExchangeMessage>
         
@@ -338,7 +340,7 @@ private extension Client {
 
 // MARK: Deeplinking
 
-private extension Client {
+private extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -353,7 +355,7 @@ private extension Client {
 
 // MARK: Message sending
 
-extension Client {
+extension SocketClient {
     func sendOriginatorInfo() {
         let originatorInfo = OriginatorInfo(
             title: appMetadata?.name,
@@ -418,7 +420,9 @@ extension Client {
                         id: channelId,
                         message: encryptedMessage
                     )
-                    channel.emit(ClientEvent.message, message)
+                    let dictionary = message.toDictionary() ?? [:]
+                    Logging.log("Message dictionary: \(dictionary)")
+                    channel.emit(ClientEvent.message, dictionary)
                     
                 } catch {
                     Logging.error("\(error.localizedDescription)")
@@ -437,7 +441,7 @@ extension Client {
 
 // MARK: Analytics
 
-extension Client {
+extension SocketClient {
     func track(event: Event) {
         let id = channelId
         var parameters: [String: Any] = ["id": id]
@@ -464,6 +468,6 @@ extension Client {
     }
 }
 
-public extension Client {
+public extension SocketClient {
     internal static let live: CommunicationClient = Dependencies.shared.client
 }

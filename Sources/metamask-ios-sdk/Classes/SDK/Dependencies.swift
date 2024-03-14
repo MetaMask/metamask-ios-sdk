@@ -13,9 +13,13 @@ final class Dependencies {
     lazy var store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)
     lazy var sessionManager: SessionManager = SessionManager(store: store, sessionDuration: 24 * 3600 * 7)
     
-    lazy var client: CommunicationClient = Client(session: sessionManager, trackEvent: { event, parameters in
-        self.trackEvent(event, parameters: parameters)
-    })
+    lazy var client: CommunicationClient = Client(
+        session: sessionManager,
+        communicationLayer: .socket,
+        trackEvent: { event, parameters in
+            self.trackEvent(event, parameters: parameters)
+        }
+    )
     
     lazy var ethereum: Ethereum = Ethereum(commClient: client, trackEvent: { event in
         self.trackEvent(event)
