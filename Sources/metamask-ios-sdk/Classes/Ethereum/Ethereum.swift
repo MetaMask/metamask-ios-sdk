@@ -31,7 +31,7 @@ class Ethereum {
     private var account: String = ""
     
     let commClient: CommunicationClient
-    private var trackEvent: ((Event) -> Void)?
+    private var trackEvent: ((Event, [String: Any]?) -> Void)?
     
     private var appMetaDataValidationError: EthereumPublisher? {
         guard
@@ -49,7 +49,7 @@ class Ethereum {
         return nil
     }
     
-    init(commClient: CommunicationClient, trackEvent: @escaping ((Event) -> Void)) {
+    init(commClient: CommunicationClient, trackEvent: @escaping ((Event, [String: Any]?) -> Void)) {
         self.trackEvent = trackEvent
         self.commClient = commClient
         self.commClient.receiveEvent = receiveEvent
@@ -152,7 +152,7 @@ class Ethereum {
     
     func terminateConnection() {
         if connected {
-            trackEvent?(.connectionRejected)
+            trackEvent?(.connectionRejected, nil)
         }
         
         let error = RequestError(from: ["message": "The connection request has been rejected"])
@@ -183,6 +183,20 @@ class Ethereum {
             commClient.sendMessage(request, encrypt: true)
             let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
             let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
+            
+            if authorise {
+                let additionalParams: [String: Any] = [
+                    "method": request.method,
+                    "sdkVersion": SDKInfo.version,
+                    "url": commClient.appMetadata?.url ?? "",
+                    "title": commClient.appMetadata?.name ?? "",
+                    "channelId": commClient.channelId,
+                    "platform": SDKInfo.platform,
+                    "timestamp": TimestampGenerator.timestamp(),
+                    "from": "mobile"
+                ]
+                trackEvent?(.sdkRpcRequest, additionalParams)
+            }
             
             if authorise && !skipAuthorisation {
                 commClient.requestAuthorisation()
@@ -306,7 +320,7 @@ class Ethereum {
                 method == .ethRequestAccounts,
                 requestError.codeType == .userRejectedRequest
             {
-                trackEvent?(.connectionRejected)
+                trackEvent?(.connectionRejected, nil)
             }
             sendError(requestError, id: id)
             return
@@ -340,7 +354,7 @@ class Ethereum {
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
-                trackEvent?(.connectionAuthorised)
+                trackEvent?(.connectionAuthorised, nil)
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {

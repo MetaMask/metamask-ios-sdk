@@ -13,7 +13,7 @@ public class Client: CommunicationClient {
     private var keyExchange = KeyExchange()
     private let channel = Channel()
 
-    private var channelId: String = ""
+    var channelId: String = ""
 
     var isConnected: Bool {
         channel.isConnected
@@ -443,12 +443,6 @@ extension Client {
         var parameters: [String: Any] = ["id": id]
 
         switch event {
-        case .connected,
-                .disconnected,
-                .reconnectionRequest,
-                .connectionAuthorised,
-                .connectionRejected:
-            break
         case .connectionRequest:
             let additionalParams: [String: Any] = [
                 "commLayer": "socket",
@@ -458,6 +452,8 @@ extension Client {
                 "platform": SDKInfo.platform
             ]
             parameters.merge(additionalParams) { current, _ in current }
+        default:
+            break
         }
         
         trackEvent?(event, parameters)

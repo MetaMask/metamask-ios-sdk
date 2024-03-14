@@ -28,6 +28,11 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
     case ethSignTypedDataV4 = "eth_signTypedData_v4"
     case addEthereumChain = "wallet_addEthereumChain"
     case metamaskBatch = "metamask_batch"
+    case metamaskOpen = "metamask_open"
+    case personalEcRecover = "personal_ecRecover"
+    case walletRevokePermissions = "wallet_revokePermissions"
+    case walletRequestPermissions  = "wallet_requestPermissions"
+    case walletGetPermissions = "wallet_getPermissions"
     case metamaskConnectWith = "metamask_connectwith"
     case metaMaskChainChanged = "metamask_chainChanged"
     case ethSendRawTransaction = "eth_sendRawTransaction"
@@ -46,6 +51,11 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
         let methods: [EthereumMethod] = [
             .ethSign,
             .watchAsset,
+            .metamaskOpen,
+            .personalEcRecover,
+            .walletRequestPermissions,
+            .walletRevokePermissions,
+            .walletGetPermissions,
             .personalSign,
             .metamaskBatch,
             .metaMaskConnectSign,
@@ -73,6 +83,9 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
             .ethChainId,
             .personalSign,
             .metamaskBatch,
+            .walletRevokePermissions,
+            .walletGetPermissions,
+            .walletRequestPermissions,
             .metaMaskConnectSign,
             .metamaskConnectWith,
             .ethSignTypedData,
