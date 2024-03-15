@@ -17,7 +17,7 @@ public struct NativeCurrency: CodableData {
     
     public func socketRepresentation() -> NetworkData {
         [
-            "name": name,
+            "name": name ?? "",
             "symbol": symbol,
             "decimals": decimals
         ]

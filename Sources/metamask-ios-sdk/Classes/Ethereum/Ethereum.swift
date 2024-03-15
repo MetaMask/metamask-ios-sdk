@@ -142,11 +142,7 @@ class Ethereum {
     }
     
     func getEthAccounts() async -> Result<[String], RequestError> {
-        let result = await ethereumRequest(method: .ethAccounts, params: [String]())
-        switch result {
-        case .success(let account): return .success([account])
-        case .failure(let error): return .failure(error)
-        }
+        await ethereumRequest(method: .ethAccounts, params: [String]())
     }
     
     func getEthGasPrice() async -> Result<String, RequestError> {
@@ -212,7 +208,6 @@ class Ethereum {
 
         
         return await ethereumRequest(method: .addEthereumChain, params: [
-            [
                 AddChainParameters(
                     chainId: chainId,
                     chainName: chainName,
@@ -221,7 +216,6 @@ class Ethereum {
                     blockExplorerUrls: blockExplorerUrls,
                     nativeCurrency: nativeCurrency
                 )
-            ]
         ])
     }
     
@@ -232,6 +226,11 @@ class Ethereum {
     }
     
     private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<String, RequestError> {
+        let ethRequest = EthereumRequest(method: method, params: params)
+        return await request(ethRequest)
+    }
+    
+    private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<[String], RequestError> {
         let ethRequest = EthereumRequest(method: method, params: params)
         return await request(ethRequest)
     }
@@ -351,7 +350,23 @@ class Ethereum {
                         continuation.resume(returning: .failure(error))
                     }
                 }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
+                    continuation.resume(returning: .success(result as? String ?? ""))
+                }).store(in: &cancellables)
+        }
+    }
+    
+    func request(_ req: any RPCRequest) async -> Result<[String], RequestError> {
+        return await withCheckedContinuation { continuation in
+            request(req)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success([]))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success(result as? [String] ?? []))
                 }).store(in: &cancellables)
         }
     }
@@ -443,7 +458,7 @@ class Ethereum {
             if let account = result.first {
                 trackEvent?(.connectionAuthorised)
                 updateAccount(account)
-                sendResult(account, id: id)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Request accounts failure")
             }

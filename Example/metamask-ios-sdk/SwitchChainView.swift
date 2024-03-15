@@ -13,7 +13,7 @@ struct SwitchChainView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State private var alert: AlertInfo?
-    @State var networkSelection: Network = .goerli
+    @State var networkSelection: Network = .polygon
 
     struct AlertInfo: Identifiable {
         enum Status {
@@ -32,8 +32,7 @@ struct SwitchChainView: View {
     }
     
     enum Network: String, CaseIterable, Identifiable {
-        case goerli = "0x5"
-        case kovan = "0x2a"
+        case avalanche = "0xa86a"
         case ethereum = "0x1"
         case polygon = "0x89"
         
@@ -47,14 +46,22 @@ struct SwitchChainView: View {
             switch self {
                 case .polygon: return "Polygon"
                 case .ethereum: return "Ethereum"
-                case .kovan: return "Kovan Testnet"
-                case .goerli: return "Goerli Testnet"
+                case .avalanche: return "Avalanche"
+            }
+        }
+        
+        var symbol: String {
+            switch self {
+                case .polygon: return "MATIC"
+                case .ethereum: return "ETH"
+                case .avalanche: return "AVAX"
             }
         }
         
         var rpcUrls: [String] {
             switch self {
             case .polygon: return ["https://polygon-rpc.com"]
+            case .avalanche: return ["https://api.avax.network/ext/bc/C/rpc"]
             default: return []
             }
         }
@@ -112,8 +119,8 @@ struct SwitchChainView: View {
         }
         .onAppear {
             networkSelection = metamaskSDK.chainId == networkSelection.rawValue
-                ? .ethereum
-            : .goerli
+            ? .ethereum
+            : .polygon
         }
         .background(Color.blue.grayscale(0.5))
     }
@@ -161,11 +168,11 @@ struct SwitchChainView: View {
             chainId: networkSelection.chainId,
             chainName: networkSelection.name,
             rpcUrls: networkSelection.rpcUrls,
-            iconUrls: nil,
+            iconUrls: [],
             blockExplorerUrls: nil,
             nativeCurrency: NativeCurrency(
                 name: networkSelection.name,
-                symbol: networkSelection.chainId,
+                symbol: networkSelection.symbol,
                 decimals: 18)
         )
         
