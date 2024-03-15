@@ -100,15 +100,10 @@ struct SignView: View {
     }
 
     func signMessage() async {
-        let from = metamaskSDK.account
-        let params: [String] = [from, signMessage]
-        let signRequest = EthereumRequest(
-            method: .ethSignTypedDataV4,
-            params: params
-        )
+        let account = metamaskSDK.account
 
         showProgressView = true
-        let requestResult = await metamaskSDK.request(signRequest)
+        let requestResult = await metamaskSDK.signTypedDataV4(typedData: signMessage, address: account)
         showProgressView = false
         
         switch requestResult {

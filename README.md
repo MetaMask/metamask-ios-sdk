@@ -54,7 +54,7 @@ Alternatively, you can add the URL directly in your project's package file:
 dependencies: [
     .package(
         url: "https://github.com/MetaMask/metamask-ios-sdk",
-        from: "0.5.1"
+        from: "0.5.2"
     )
 ]
 ```
@@ -76,7 +76,7 @@ let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 
 @ObservedObject var metamaskSDK = MetaMaskSDK.shared(appMetadata)
 
-metamaskSDK.connect()
+let connectResult = await metamaskSDK.connect()
 ```
 
 By default, MetaMask logs three SDK events: `connectionRequest`, `connected`, and `disconnected`.
@@ -88,14 +88,15 @@ To disable this, set `metamaskSDK.enableDebug = false`.
 You can now call any [JSON-RPC API method](https://docs.metamask.io/wallet/reference/eth_subscribe/)
 using `metamaskSDK.request()`.
 
+We have provided convenience methods for most common rpc calls so that you do not have to manually construct rpc requests. However, if you wish to provide a more fine-grained request not catered for by the convenience methods you can construct a request and then call `metamaskSDK.request(EthereumRequest)`
+
 #### Example: Get chain ID
 
 The following example gets the user's chain ID by calling
 [`eth_chainId`](https://docs.metamask.io/wallet/reference/eth_chainid/).
 
 ```swift
-let chainIdRequest = EthereumRequest(method: .ethChainId)
-let chainId = await metamaskSDK.request(chainIdRequest)
+let result = await metamaskSDK.getChainId()
 ```
 
 #### Example: Get account balance
@@ -106,26 +107,27 @@ The following example gets the user's account balance by calling
 ```swift
 
 // Create parameters
-let account = metamaskSDK.account
-
-let parameters: [String] = [
-    account, // account to check for balance
-    "latest" // "latest", "earliest" or "pending" (optional)
-  ]
-
-// Create request
-let getBalanceRequest = EthereumRequest(
-    method: .ethGetBalance,
-    params: parameters)
+let selectedAddress = metamaskSDK.account
 
 // Make request
-let accountBalance = await metamaskSDK.request(getBalanceRequest)
+let accountBalance = await metamaskSDK.getEthBalance(address: selectedAddress, block: "latest")
 ```
 
 #### Example: Send transaction
 
 The following example sends a transaction by calling
 [`eth_sendTransaction`](https://docs.metamask.io/wallet/reference/eth_sendtransaction/).
+
+**Use convenience method**
+```swift
+let selectedAddress = metamaskSDK.account
+
+let result = await metamaskSDK.sendTransaction(
+    from: selectedAddress, 
+    to: "0x...", // recipient address
+    value: "0x....." // amount
+    )
+```
 
 **Use a dictionary**
 

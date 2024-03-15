@@ -13,7 +13,7 @@ struct SwitchChainView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State private var alert: AlertInfo?
-    @State var networkSelection: Network = .goerli
+    @State var networkSelection: Network = .polygon
 
     struct AlertInfo: Identifiable {
         enum Status {
@@ -32,8 +32,7 @@ struct SwitchChainView: View {
     }
     
     enum Network: String, CaseIterable, Identifiable {
-        case goerli = "0x5"
-        case kovan = "0x2a"
+        case avalanche = "0xa86a"
         case ethereum = "0x1"
         case polygon = "0x89"
         
@@ -47,14 +46,22 @@ struct SwitchChainView: View {
             switch self {
                 case .polygon: return "Polygon"
                 case .ethereum: return "Ethereum"
-                case .kovan: return "Kovan Testnet"
-                case .goerli: return "Goerli Testnet"
+                case .avalanche: return "Avalanche"
+            }
+        }
+        
+        var symbol: String {
+            switch self {
+                case .polygon: return "MATIC"
+                case .ethereum: return "ETH"
+                case .avalanche: return "AVAX"
             }
         }
         
         var rpcUrls: [String] {
             switch self {
             case .polygon: return ["https://polygon-rpc.com"]
+            case .avalanche: return ["https://api.avax.network/ext/bc/C/rpc"]
             default: return []
             }
         }
@@ -112,23 +119,15 @@ struct SwitchChainView: View {
         }
         .onAppear {
             networkSelection = metamaskSDK.chainId == networkSelection.rawValue
-                ? .ethereum
-            : .goerli
+            ? .ethereum
+            : .polygon
         }
         .background(Color.blue.grayscale(0.5))
     }
 
     func switchEthereumChain() async {
-        let switchChainParams: [String: String] = [
-            "chainId": networkSelection.chainId
-        ]
-
-        let switchChainRequest = EthereumRequest(
-            method: .switchEthereumChain,
-            params: [switchChainParams] // wallet_switchEthereumChain rpc call expects an array parameters object
-        )
-        
-        let switchChainResult = await metamaskSDK.request(switchChainRequest)
+        let switchChainResult = await metamaskSDK.switchEthereumChain(chainId: networkSelection
+            .chainId)
         
         switch switchChainResult {
         case .success(_):
@@ -165,18 +164,17 @@ struct SwitchChainView: View {
     }
 
     func addEthereumChain() async {
-        let addChainParams = AddChainRequest(
+        let addChainResult = await metamaskSDK.addEthereumChain(
             chainId: networkSelection.chainId,
             chainName: networkSelection.name,
-            rpcUrls: networkSelection.rpcUrls
+            rpcUrls: networkSelection.rpcUrls,
+            iconUrls: [],
+            blockExplorerUrls: nil,
+            nativeCurrency: NativeCurrency(
+                name: networkSelection.name,
+                symbol: networkSelection.symbol,
+                decimals: 18)
         )
-
-        let addChainRequest = EthereumRequest(
-            method: .addEthereumChain,
-            params: [addChainParams] // wallet_addEthereumChain rpc call expects an array parameters object
-        )
-        
-        let addChainResult = await metamaskSDK.request(addChainRequest)
         
         switch addChainResult {
         case .success:
@@ -197,20 +195,6 @@ struct SwitchChainView: View {
                 message: error.localizedDescription
             )
         }
-    }
-}
-
-struct AddChainRequest: CodableData {
-    let chainId: String
-    let chainName: String
-    let rpcUrls: [String]
-
-    public func socketRepresentation() -> NetworkData {
-        [
-            "chainId": chainId,
-            "chainName": chainName,
-            "rpcUrls": rpcUrls
-        ]
     }
 }
 
