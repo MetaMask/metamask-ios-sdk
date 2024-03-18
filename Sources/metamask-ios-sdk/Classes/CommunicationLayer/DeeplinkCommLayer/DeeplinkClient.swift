@@ -11,7 +11,7 @@ public class DeeplinkClient {
     public static var useDeeplinks: Bool = true
     
     private static var _deeplinkUrl: String {
-        useDeeplinks ? "metamask:/" : "https://metamask.app.link"
+        useDeeplinks ? "targeter:/" : "https://metamask.app.link"
     }
 
 //    var deeplinkUrl: String {

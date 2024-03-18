@@ -194,9 +194,10 @@ struct ConnectView: View {
     }
     
     func connectSDK() async {
-        showProgressView = true
-        let result = await metaMaskSDK.connect()
         showProgressView = false
+        //showProgressView = true
+        let result = await metaMaskSDK.connect()
+        //showProgressView = false
         
         switch result {
         case let .failure(error):

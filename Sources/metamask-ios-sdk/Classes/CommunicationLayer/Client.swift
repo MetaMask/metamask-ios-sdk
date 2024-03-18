@@ -349,14 +349,15 @@ private extension Client {
 
 private extension Client {
     func deeplinkToMetaMask() {
-        guard
-            let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-            let url = URL(string: urlString)
-        else { return }
-
-        DispatchQueue.main.async {
-            UIApplication.shared.open(url)
-        }
+        DeeplinkClient.sendMessage(deeplink: .connect("pubkey"), channelId: channelId)
+//        guard
+//            let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+//            let url = URL(string: urlString)
+//        else { return }
+//
+//        DispatchQueue.main.async {
+//            UIApplication.shared.open(url)
+//        }
     }
 }
 
