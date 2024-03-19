@@ -54,7 +54,7 @@ public class MetaMaskSDK: ObservableObject {
         }
     }
 
-    private init(appMetadata: AppMetadata, communicationLayer: CommunicationLayer, enableDebug: Bool, sdkOptions: SDKOptions?) {
+    private init(appMetadata: AppMetadata, communicationLayer: CommLayer, enableDebug: Bool, sdkOptions: SDKOptions?) {
         self.ethereum.delegate = self
         self.ethereum.commClient.communicationLayer = communicationLayer
         self.ethereum.sdkOptions = sdkOptions
@@ -64,7 +64,7 @@ public class MetaMaskSDK: ObservableObject {
     }
     
     public static func shared(_ appMetadata: AppMetadata, 
-                              communicationLayer: CommunicationLayer = .socket,
+                              communicationLayer: CommLayer = .socket,
                               enableDebug: Bool = true,
                               sdkOptions: SDKOptions?) -> MetaMaskSDK {
         guard let sdk = SDKWrapper.shared.sdk else {

@@ -49,7 +49,7 @@ public class DeeplinkManager {
             keyExchange.setTheirPublicKey(theirPublicKey)
             
             if skipHandshake {
-                let msg: String = (try? keyExchange.encryptMessage("Wallet 7.15.0")) ?? "Something went wrong"
+                let msg: String = (try? keyExchange.encryptMessage("Metamask iOS SDK \(SDKInfo.version)")) ?? "Something went wrong"
                 response = .message(msg, publicKey: keyExchange.pubkey)
             } else {
                 response = .keyExchange(type: KeyExchangeType.syn.rawValue, publicKey: keyExchange.pubkey)
@@ -59,6 +59,8 @@ public class DeeplinkManager {
             keyExchange.setTheirPublicKey(theirPublicKey)
             let decryptedMsg: String = (try? keyExchange.decryptMessage(message)) ?? "Could not decrypt message"
             Logging.log("DeeplinkManager:: decrypted message: \(decryptedMsg)")
+            let msg: String = (try? keyExchange.encryptMessage("Metamask iOS SDK \(SDKInfo.version)")) ?? "Something went wrong"
+            response = .message(msg, publicKey: keyExchange.pubkey)
             //return .message("Got your message!")
         case .invalid:
             print("DeeplinkManager:: Invalid deeplink: \(link)")

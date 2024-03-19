@@ -1,11 +1,11 @@
 //
-//  CommunicationLayer.swift
+//  CommLayer.swift
 //  metamask-ios-sdk
 //
 
 import Foundation
 
-public enum CommunicationLayer {
+public enum CommLayer {
     case socket
     case deeplink
 }

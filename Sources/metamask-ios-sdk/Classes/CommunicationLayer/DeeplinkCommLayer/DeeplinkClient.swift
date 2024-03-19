@@ -35,7 +35,7 @@ public class DeeplinkClient {
         channelId = sessionInfo.0.sessionId
     }
     
-    private func sendMessageToMetaMask(_ message: String) {
+    private func sendMessage(_ message: String) {
         let deeplink = "\(_deeplinkUrl)/\(message)"
         guard
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -54,13 +54,13 @@ public class DeeplinkClient {
             if let pubkey = pubKey {
                 message.append("&pubkey=\(pubkey)")
             }
-            sendMessageToMetaMask(message)
+            sendMessage(message)
         case .connect(_, let pubKey):
             let message = "\(Deeplink.connect)?appScheme=\(appScheme)&pubkey=\(pubKey)"
-            sendMessageToMetaMask(message)
+            sendMessage(message)
         case .message(let message, let pubKey):
             let message = "\(Deeplink.message)?message=\(message)&pubkey=\(pubKey)&channelId=\(channelId)"
-            sendMessageToMetaMask(message)
+            sendMessage(message)
         default: break
         }
     }

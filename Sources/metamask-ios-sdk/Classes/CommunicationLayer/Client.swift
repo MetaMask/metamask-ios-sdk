@@ -8,7 +8,7 @@ import Combine
 import Foundation
 
 public class Client: CommunicationClient {
-    public var communicationLayer: CommunicationLayer
+    public var communicationLayer: CommLayer
     public var appMetadata: AppMetadata?
     private let session: SessionManager
     private var keyExchange = KeyExchange()
@@ -62,7 +62,7 @@ public class Client: CommunicationClient {
             + keyExchange.pubkey
     }
 
-    init(session: SessionManager, communicationLayer: CommunicationLayer, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
+    init(session: SessionManager, communicationLayer: CommLayer, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
         self.communicationLayer = communicationLayer
         self.trackEvent = trackEvent

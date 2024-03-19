@@ -8,7 +8,7 @@ import Combine
 import Foundation
 
 public class SocketClient: CommunicationClient {
-    public var communicationLayer: CommunicationLayer = .socket
+    public var communicationLayer: CommLayer = .socket
     
     public var appMetadata: AppMetadata?
     private let session: SessionManager
