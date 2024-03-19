@@ -8,20 +8,20 @@ import Combine
 import Foundation
 
 public class SocketClient: CommunicationClient {
-    var communicationLayer: CommunicationLayer = .socket
+    public var communicationLayer: CommunicationLayer = .socket
     
-    var appMetadata: AppMetadata?
+    public var appMetadata: AppMetadata?
     private let session: SessionManager
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
     private var channelId: String = ""
 
-    var isConnected: Bool {
+    public var isConnected: Bool {
         channel.isConnected
     }
     
-    var networkUrl: String {
+    public var networkUrl: String {
         get {
             channel.networkUrl
         } set {
@@ -29,7 +29,7 @@ public class SocketClient: CommunicationClient {
         }
     }
     
-    var sessionDuration: TimeInterval {
+    public var sessionDuration: TimeInterval {
         get {
             session.sessionDuration
         } set {
@@ -39,17 +39,17 @@ public class SocketClient: CommunicationClient {
     
     private var isReady: Bool = false
     private var isReconnection = false
-    var tearDownConnection: (() -> Void)?
-    var onClientsTerminated: (() -> Void)?
+    public var tearDownConnection: (() -> Void)?
+    public var onClientsTerminated: (() -> Void)?
 
-    var receiveEvent: (([String: Any]) -> Void)?
-    var receiveResponse: ((String, [String: Any]) -> Void)?
+    public var receiveEvent: (([String: Any]) -> Void)?
+    public var receiveResponse: ((String, [String: Any]) -> Void)?
     
     var trackEvent: ((Event, [String: Any]) -> Void)?
     
     var requestJobs: [RequestJob] = []
     
-    var useDeeplinks: Bool = true
+    public var useDeeplinks: Bool = true
     
     private var _deeplinkUrl: String {
         useDeeplinks ? "metamask:/" : "https://metamask.app.link"
@@ -77,7 +77,7 @@ public class SocketClient: CommunicationClient {
         handleDisconnection()
     }
 
-    func connect() {
+    public func connect() {
         if channel.isConnected { return }
         
         setupClient()
@@ -89,13 +89,13 @@ public class SocketClient: CommunicationClient {
         channel.connect()
     }
 
-    func disconnect() {
+    public func disconnect() {
         isReady = false
         channel.disconnect()
         channel.tearDown()
     }
     
-    func clearSession() {
+    public func clearSession() {
         channelId = ""
         session.clear()
         disconnect()
@@ -108,7 +108,7 @@ public class SocketClient: CommunicationClient {
         sendMessage(keyExchangeStartMessage, encrypt: false)
     }
     
-    func requestAuthorisation() {
+    public func requestAuthorisation() {
         deeplinkToMetaMask()
     }
 }
@@ -116,7 +116,7 @@ public class SocketClient: CommunicationClient {
 // MARK: Request jobs
 
 extension SocketClient {
-    func addRequest(_ job: @escaping RequestJob) {
+    public func addRequest(_ job: @escaping RequestJob) {
         requestJobs.append(job)
     }
     
@@ -374,7 +374,7 @@ extension SocketClient {
         sendMessage(requestInfo, encrypt: true)
     }
 
-    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
+    public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
             addRequest { [weak self] in
                 guard let self = self else { return }
@@ -442,7 +442,7 @@ extension SocketClient {
 // MARK: Analytics
 
 extension SocketClient {
-    func track(event: Event) {
+    public func track(event: Event) {
         let id = channelId
         var parameters: [String: Any] = ["id": id]
 

@@ -13,7 +13,7 @@ protocol EthereumEventsDelegate: AnyObject {
     func accountChanged(_ account: String)
 }
 
-class Ethereum {
+public class Ethereum {
     private let CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []

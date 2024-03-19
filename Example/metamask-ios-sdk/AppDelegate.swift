@@ -17,9 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         print("AppDelegate:: recieved url \(url)")
-        if let deeplink = DeeplinkManager.handleDeeplink(url) {
-            DeeplinkClient.sendMessage(deeplink: deeplink, channelId: "someChannelId")
-        }
+        Dependencies.shared.deeplinkManager.handleUrl(url)
         return true
     }
 

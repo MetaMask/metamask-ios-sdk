@@ -8,19 +8,19 @@ import Combine
 import Foundation
 
 public class Client: CommunicationClient {
-    var communicationLayer: CommunicationLayer
-    var appMetadata: AppMetadata?
+    public var communicationLayer: CommunicationLayer
+    public var appMetadata: AppMetadata?
     private let session: SessionManager
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
     private var channelId: String = ""
 
-    var isConnected: Bool {
+    public var isConnected: Bool {
         channel.isConnected
     }
     
-    var networkUrl: String {
+    public var networkUrl: String {
         get {
             channel.networkUrl
         } set {
@@ -28,7 +28,7 @@ public class Client: CommunicationClient {
         }
     }
     
-    var sessionDuration: TimeInterval {
+    public var sessionDuration: TimeInterval {
         get {
             session.sessionDuration
         } set {
@@ -38,17 +38,17 @@ public class Client: CommunicationClient {
     
     private var isReady: Bool = false
     private var isReconnection = false
-    var tearDownConnection: (() -> Void)?
-    var onClientsTerminated: (() -> Void)?
+    public var tearDownConnection: (() -> Void)?
+    public var onClientsTerminated: (() -> Void)?
 
-    var receiveEvent: (([String: Any]) -> Void)?
-    var receiveResponse: ((String, [String: Any]) -> Void)?
+    public var receiveEvent: (([String: Any]) -> Void)?
+    public var receiveResponse: ((String, [String: Any]) -> Void)?
     
     var trackEvent: ((Event, [String: Any]) -> Void)?
     
     var requestJobs: [RequestJob] = []
     
-    var useDeeplinks: Bool = true
+    public var useDeeplinks: Bool = true
     
     private var _deeplinkUrl: String {
         useDeeplinks ? "metamask:/" : "https://metamask.app.link"
@@ -79,7 +79,7 @@ public class Client: CommunicationClient {
         }
     }
 
-    func connect() {
+    public func connect() {
         if channel.isConnected { return }
         
         setupClient()
@@ -91,13 +91,13 @@ public class Client: CommunicationClient {
         channel.connect()
     }
 
-    func disconnect() {
+    public func disconnect() {
         isReady = false
         channel.disconnect()
         channel.tearDown()
     }
     
-    func clearSession() {
+    public func clearSession() {
         channelId = ""
         session.clear()
         disconnect()
@@ -110,7 +110,7 @@ public class Client: CommunicationClient {
         sendMessage(keyExchangeStartMessage, encrypt: false)
     }
     
-    func requestAuthorisation() {
+    public func requestAuthorisation() {
         deeplinkToMetaMask()
     }
 }
@@ -118,7 +118,7 @@ public class Client: CommunicationClient {
 // MARK: Request jobs
 
 extension Client {
-    func addRequest(_ job: @escaping RequestJob) {
+    public func addRequest(_ job: @escaping RequestJob) {
         requestJobs.append(job)
     }
     
@@ -349,7 +349,7 @@ private extension Client {
 
 private extension Client {
     func deeplinkToMetaMask() {
-        DeeplinkClient.sendMessage(deeplink: .connect("pubkey"), channelId: channelId)
+        Dependencies.shared.deeplinkManager.connect()
 //        guard
 //            let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
 //            let url = URL(string: urlString)
@@ -382,7 +382,7 @@ extension Client {
         sendMessage(requestInfo, encrypt: true)
     }
 
-    func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
+    public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
             addRequest { [weak self] in
                 guard let self = self else { return }
@@ -399,7 +399,7 @@ extension Client {
                         )
                         self.channel.emit(ClientEvent.message, message)
                     case .deeplink:
-                        DeeplinkClient.sendMessage(deeplink: .message(encryptedMessage), channelId: channelId)
+                        sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
                     }
                     /*
                     let message: Message = .init(
@@ -434,7 +434,7 @@ extension Client {
                             )
                             self.channel.emit(ClientEvent.message, message)
                         case .deeplink:
-                            DeeplinkClient.sendMessage(deeplink: .message(encryptedMessage), channelId: channelId)
+                            sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
                         }
                         
                         /*
@@ -465,7 +465,7 @@ extension Client {
                         )
                         self.channel.emit(ClientEvent.message, message)
                     case .deeplink:
-                        DeeplinkClient.sendMessage(deeplink: .message(encryptedMessage), channelId: channelId)
+                        sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
                     }
                     
                     //channel.emit(ClientEvent.message, message)
@@ -484,19 +484,23 @@ extension Client {
                 self.channel.emit(ClientEvent.message, message)
             case .deeplink:
                 if let message = message as? KeyExchangeMessage {
-                    DeeplinkClient.sendMessage(deeplink: .keyExchange(message.type.rawValue, keyExchange.pubkey), channelId: channelId)
+                    sendMessage(deeplink: .keyExchange(type: message.type.rawValue, publicKey: keyExchange.pubkey))
                 }
             }
             
             //channel.emit(ClientEvent.message, message)
         }
     }
+    
+    public func sendMessage(deeplink: Deeplink) {
+        Dependencies.shared.deeplinkManager.sendMessage(deeplink: deeplink)
+    }
 }
 
 // MARK: Analytics
 
 extension Client {
-    func track(event: Event) {
+    public func track(event: Event) {
         let id = channelId
         var parameters: [String: Any] = ["id": id]
 

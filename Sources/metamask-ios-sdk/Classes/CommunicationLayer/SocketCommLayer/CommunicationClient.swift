@@ -7,7 +7,7 @@ import Foundation
 
 public typealias RequestJob = () -> Void
 
-protocol CommunicationClient: AnyObject {
+public protocol CommunicationClient: AnyObject {
     var communicationLayer: CommunicationLayer { get set }
     var appMetadata: AppMetadata? { get set }
     var useDeeplinks: Bool { get set }

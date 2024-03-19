@@ -7,9 +7,9 @@ import UIKit
 import Foundation
 
 public enum Deeplink {
-    case keyExchange(String, String?)
-    case message(String)
-    case connect(String)
+    case keyExchange(type: String, publicKey: String?)
+    case message(String, publicKey: String)
+    case connect(appScheme: String? = nil, publicKey: String)
     case invalid
     
     static let keyExchange = "key-exchange"
