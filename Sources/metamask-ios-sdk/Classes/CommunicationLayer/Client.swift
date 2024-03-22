@@ -169,12 +169,7 @@ private extension Client {
 
             Logging.log("SDK connected to server")
 
-            switch communicationLayer {
-            case .socket:
-                self.channel.emit(ClientEvent.joinChannel, channelId)
-            default: break
-            }
-            //self.channel.emit(ClientEvent.joinChannel, channelId)
+            self.channel.emit(ClientEvent.joinChannel, channelId)
 
             if !self.isReady {
                 self.deeplinkToMetaMask()
@@ -315,7 +310,10 @@ private extension Client {
             options: []
         )
             as? [String: Any] ?? [:]
-
+        handleResponseMessage(json)
+    }
+    
+    func handleResponseMessage(_ json: [String: Any]) {
         if json["type"] as? String == "terminate" {
             disconnect()
             onClientsTerminated?()
@@ -349,7 +347,7 @@ private extension Client {
 
 private extension Client {
     func deeplinkToMetaMask() {
-        Dependencies.shared.deeplinkManager.connect()
+        Dependencies.shared.client.connect()
 //        guard
 //            let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
 //            let url = URL(string: urlString)
@@ -381,6 +379,21 @@ extension Client {
 
         sendMessage(requestInfo, encrypt: true)
     }
+    
+    public func send(_ message: String, encrypt: Bool) {
+        do {
+            let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
+            
+            let message: Message = .init(
+                id: self.channelId,
+                message: encryptedMessage
+            )
+            self.channel.emit(ClientEvent.message, message)
+            
+        } catch {
+            Logging.error("\(error.localizedDescription)")
+        }
+    }
 
     public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
@@ -390,25 +403,13 @@ extension Client {
                 
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                   
-                    switch communicationLayer {
-                    case .socket:
-                        let message: Message = .init(
-                            id: self.channelId,
-                            message: encryptedMessage
-                        )
-                        self.channel.emit(ClientEvent.message, message)
-                    case .deeplink:
-                        sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
-                    }
-                    /*
+
                     let message: Message = .init(
                         id: self.channelId,
                         message: encryptedMessage
                     )
                     self.channel.emit(ClientEvent.message, message)
-                    */
-                    
+
                 } catch {
                     Logging.error("Could not encrypt message: \(error.localizedDescription)")
                 }
@@ -426,24 +427,11 @@ extension Client {
                     do {
                         let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
                         
-                        switch communicationLayer {
-                        case .socket:
-                            let message: Message = .init(
-                                id: self.channelId,
-                                message: encryptedMessage
-                            )
-                            self.channel.emit(ClientEvent.message, message)
-                        case .deeplink:
-                            sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
-                        }
-                        
-                        /*
                         let message: Message = .init(
                             id: self.channelId,
                             message: encryptedMessage
                         )
                         self.channel.emit(ClientEvent.message, message)
-                        */
                         
                     } catch {
                         Logging.error("\(error.localizedDescription)")
@@ -456,44 +444,24 @@ extension Client {
                         id: channelId,
                         message: encryptedMessage
                     )
-                    
-                    switch communicationLayer {
-                    case .socket:
-                        let message: Message = .init(
-                            id: self.channelId,
-                            message: encryptedMessage
-                        )
-                        self.channel.emit(ClientEvent.message, message)
-                    case .deeplink:
-                        sendMessage(deeplink: .message(encryptedMessage, publicKey: keyExchange.pubkey))
-                    }
-                    
-                    //channel.emit(ClientEvent.message, message)
+
+                    channel.emit(ClientEvent.message, message)
                     
                 } catch {
                     Logging.error("\(error.localizedDescription)")
                 }
             }
         } else {
-            switch communicationLayer {
-            case .socket:
-                let message = Message(
-                    id: channelId,
-                    message: message
-                )
-                self.channel.emit(ClientEvent.message, message)
-            case .deeplink:
-                if let message = message as? KeyExchangeMessage {
-                    sendMessage(deeplink: .keyExchange(type: message.type.rawValue, publicKey: keyExchange.pubkey))
-                }
-            }
-            
-            //channel.emit(ClientEvent.message, message)
+            let message = Message(
+                id: channelId,
+                message: message
+            )
+            self.channel.emit(ClientEvent.message, message)
         }
     }
     
     public func sendMessage(deeplink: Deeplink) {
-        Dependencies.shared.deeplinkManager.sendMessage(deeplink: deeplink)
+        Dependencies.shared.deeplinkClient.sendMessage(deeplink: deeplink)
     }
 }
 

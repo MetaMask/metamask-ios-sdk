@@ -5,8 +5,6 @@
 
 import Foundation
 
-public typealias RequestJob = () -> Void
-
 public protocol CommunicationClient: AnyObject {
     var communicationLayer: CommLayer { get set }
     var appMetadata: AppMetadata? { get set }
@@ -27,4 +25,5 @@ public protocol CommunicationClient: AnyObject {
     func requestAuthorisation()
     func addRequest(_ job: @escaping RequestJob)
     func sendMessage<T: CodableData>(_ message: T, encrypt: Bool)
+    func send(_ message: String, encrypt: Bool)
 }

@@ -8,11 +8,15 @@ import Combine
 import Foundation
 
 public class SocketClient: CommunicationClient {
+    public func send(_ message: String, encrypt: Bool) {
+        
+    }
+    
     public var communicationLayer: CommLayer = .socket
     
     public var appMetadata: AppMetadata?
     private let session: SessionManager
-    private var keyExchange = KeyExchange()
+    private var keyExchange: KeyExchange
     private let channel = SocketChannel()
 
     private var channelId: String = ""
@@ -63,8 +67,11 @@ public class SocketClient: CommunicationClient {
             + keyExchange.pubkey
     }
 
-    init(session: SessionManager, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
+    init(session: SessionManager, 
+         keyExchange: KeyExchange = .live,
+         trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
+        self.keyExchange = keyExchange
         self.trackEvent = trackEvent
     }
     

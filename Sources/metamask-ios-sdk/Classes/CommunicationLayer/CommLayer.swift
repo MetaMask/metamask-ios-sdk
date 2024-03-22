@@ -5,7 +5,7 @@
 
 import Foundation
 
-public enum CommLayer {
+public enum CommLayer: String {
     case socket
-    case deeplink
+    case deeplinking
 }

@@ -195,17 +195,18 @@ struct ConnectView: View {
     
     func connectSDK() async {
         showProgressView = false
+        Dependencies.shared.deeplinkClient.connect()
         //showProgressView = true
-        let result = await metaMaskSDK.connect()
-        //showProgressView = false
-        
-        switch result {
-        case let .failure(error):
-            errorMessage = error.localizedDescription
-            showError = true
-        default:
-            break
-        }
+//        let result = await metaMaskSDK.connect()
+//        //showProgressView = false
+//        
+//        switch result {
+//        case let .failure(error):
+//            errorMessage = error.localizedDescription
+//            showError = true
+//        default:
+//            break
+//        }
     }
 }
 

@@ -7,133 +7,87 @@ import UIKit
 import Foundation
 
 public class DeeplinkManager {
+    var onReceivePublicKey: ((String) -> Void)?
+    var onReceiveMessage: ((String) -> Void)?
+    var decryptMessage: ((String) throws -> String?)? 
     
-    let keyExchange: KeyExchange
-    let deeplinkClient: DeeplinkClient
-    private let skipHandshake: Bool
-    
-    init(deeplinkClient: DeeplinkClient,
-         keyExchange: KeyExchange = KeyExchange(),
-         skipHandshake: Bool = true
-    ) {
-        self.keyExchange = keyExchange
-        self.skipHandshake = skipHandshake
-        self.deeplinkClient = deeplinkClient
-    }
-    
-    public func handleUrl(_ url: URL) {
+    public func handleUrl(_ url: URL)  {
         handleUrl(url.absoluteString)
     }
     
-    public func handleUrl(_ url: String) {
+    public func handleUrl(_ url: String)  {
         let deeplink = getDeeplink(url)
-        var response: Deeplink?
         
         switch deeplink {
-        case .keyExchange(let type, let theirPublicKey):
-            print("DeeplinkManager:: key exchange: \(type), pubkey: \(theirPublicKey)")
-            if let senderPubKey = theirPublicKey {
-                keyExchange.setTheirPublicKey(senderPubKey)
-            }
-            let keyExchangetype = KeyExchangeType(rawValue: type)!
-            let keyExchangeMessage = KeyExchangeMessage(type: keyExchangetype, pubkey: theirPublicKey)
-            
-            if let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage) {
-                response = .keyExchange(type: nextKeyExchangeMessage.type.rawValue, publicKey: keyExchange.pubkey)
+        case .connect(let schema, let pubkey, let channelId):
+            Logging.error("DeeplinkManager:: connect from \(schema) pubkey: \(pubkey), channelId: \(channelId)")
+            onReceivePublicKey?(pubkey)
+        case .mmsdk(let message, let pubkey):
+            Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")
+            onReceivePublicKey?(pubkey)
+            if let decryptedMsg: String = try? decryptMessage?(message) {
+                Logging.log("DeeplinkManager:: decrypted message: \(decryptedMsg)")
+                onReceiveMessage?(decryptedMsg)
             } else {
-                let msg: String = (try? keyExchange.encryptMessage("Wallet 7.15.0")) ?? "Something went wrong"
-                response = .message(msg, publicKey: keyExchange.pubkey)
+                Logging.error("DeeplinkManager:: Could not decrypt message: \(message)")
             }
-        case .connect(_, let theirPublicKey):
-            print("DeeplinkManager:: connect otherPubKey: \(theirPublicKey)")
-            keyExchange.setTheirPublicKey(theirPublicKey)
             
-            if skipHandshake {
-                let msg: String = (try? keyExchange.encryptMessage("Metamask iOS SDK \(SDKInfo.version)")) ?? "Something went wrong"
-                response = .message(msg, publicKey: keyExchange.pubkey)
-            } else {
-                response = .keyExchange(type: KeyExchangeType.syn.rawValue, publicKey: keyExchange.pubkey)
-            }
-        case .message(let message, let theirPublicKey):
-            print("DeeplinkManager:: message: \(message)")
-            keyExchange.setTheirPublicKey(theirPublicKey)
-            let decryptedMsg: String = (try? keyExchange.decryptMessage(message)) ?? "Could not decrypt message"
-            Logging.log("DeeplinkManager:: decrypted message: \(decryptedMsg)")
-            let msg: String = (try? keyExchange.encryptMessage("Metamask iOS SDK \(SDKInfo.version)")) ?? "Something went wrong"
-            response = .message(msg, publicKey: keyExchange.pubkey)
-            //return .message("Got your message!")
-        case .invalid:
-            print("DeeplinkManager:: Invalid deeplink: \(link)")
-        }
-        
-        if let message = response {
-            deeplinkClient.sendMessage(deeplink: message)
+        case .none:
+            Logging.error("DeeplinkManager:: invalid url \(url)")
         }
     }
     
-    func getDeeplink(_ link: String) -> Deeplink {
+    func getDeeplink(_ link: String) -> Deeplink? {
         
         guard let url = URL(string: link) else {
             Logging.error("DeeplinkManager:: Deeplink has invalid url")
-            return .invalid
+            return nil
         }
         
         guard let _ = url.scheme else {
-            print("DeeplinkManager:: Deeplink is missing scheme")
-            return .invalid
+            Logging.error("DeeplinkManager:: Deeplink is missing scheme")
+            return nil
         }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             Logging.error("DeeplinkManager:: Deeplink missing components")
-            return .invalid
+            return nil
         }
         
         guard let action = components.host else {
             Logging.error("DeeplinkManager:: Deeplink missing action")
-            return .invalid
+            return nil
         }
         
         if action == Deeplink.connect {
-            guard let appScheme: String = components.queryItems?.first(where: { $0.name == "appScheme" })?.value else {
-                print("DeeplinkManager:: Connect missing appScheme")
-                return .invalid
+            guard let schema: String = components.queryItems?.first(where: { $0.name == "schema" })?.value else {
+                Logging.error("DeeplinkManager:: Connect missing schema")
+                return nil
             }
             
-            guard let theirPublicKey: String = components.queryItems?.first(where: { $0.name == "pubkey" })?.value else {
-                print("DeeplinkManager:: Connect step missing other party's public key")
-                return .invalid
-            }
-            return .connect(appScheme: appScheme, publicKey: theirPublicKey)
-            
-        } else if action == Deeplink.keyExchange {
-            guard let type = components.queryItems?.first(where: { $0.name == "type" })?.value else {
-                Logging.error("DeeplinkManager:: Deeplink missing key exchange type")
-                return .invalid
+            guard let pubkey: String = components.queryItems?.first(where: { $0.name == "pubkey" })?.value else {
+                Logging.error("DeeplinkManager:: Connect step missing other party's public key")
+                return nil
             }
             
-            let theirPublicKey: String? = components.queryItems?.first(where: { $0.name == "pubkey" })?.value
-            return .keyExchange(type: type, publicKey: theirPublicKey)
+            guard let channelId: String = components.queryItems?.first(where: { $0.name == "channelId" })?.value else {
+                Logging.error("DeeplinkManager:: Connect step missing channelId")
+                return nil
+            }
+            return .connect(schema: schema, pubkey: pubkey, channelId: channelId)
             
-        } else if action == Deeplink.message {
+        } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {
                 Logging.error("DeeplinkManager:: Deeplink missing message")
-                return .invalid
+                return nil
             }
             guard let pubkey = components.queryItems?.first(where: { $0.name == "pubkey" })?.value else {
-                print("DeeplinkManager:: Deeplink missing pubkey")
-                return .invalid
+                Logging.error("DeeplinkManager:: Deeplink missing pubkey")
+                return nil
             }
-            return .message(message, publicKey: pubkey)
+            return .mmsdk(message: message, pubkey: pubkey)
         }
 
-        return .invalid
-    }
-    
-    public func connect() {
-        sendMessage(deeplink: .connect(publicKey: keyExchange.pubkey))
-    }
-    
-    public func sendMessage(deeplink: Deeplink) {
-        deeplinkClient.sendMessage(deeplink: deeplink)
+        return nil
     }
 }

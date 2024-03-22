@@ -117,7 +117,9 @@ public class KeyExchange {
     }
 
     public func setTheirPublicKey(_ publicKey: String?) {
-        theirPublicKey = publicKey
+        if let theirPubKey = publicKey {
+            theirPublicKey = theirPubKey
+        }
     }
 
     public static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
@@ -151,6 +153,17 @@ public class KeyExchange {
             publicKey: theirPublicKey
         )
     }
+    
+    public func encrypt(_ message: String) throws -> String {
+        guard let theirPublicKey = theirPublicKey else {
+            throw KeyExchangeError.keysNotExchanged
+        }
+
+        return try encyption.encrypt(
+            message,
+            publicKey: theirPublicKey
+        )
+    }
 
     public func decryptMessage(_ message: String) throws -> String {
         guard theirPublicKey != nil else {
@@ -163,4 +176,8 @@ public class KeyExchange {
         )
         return decryted
     }
+}
+
+extension KeyExchange {
+    static let live = Dependencies.shared.keyExchange
 }

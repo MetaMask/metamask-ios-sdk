@@ -27,11 +27,9 @@ public final class Dependencies {
     
     public lazy var keyExchange: KeyExchange = KeyExchange()
     
-    public lazy var deeplinkClient: DeeplinkClient = DeeplinkClient(session: sessionManager)
-    public lazy var deeplinkManager: DeeplinkManager = DeeplinkManager(
-        deeplinkClient: deeplinkClient,
-        keyExchange: keyExchange)
+    public lazy var deeplinkManager: DeeplinkManager = DeeplinkManager(keyExchange: keyExchange)
     
+    public lazy var deeplinkClient: DeeplinkClient = DeeplinkClient(session: sessionManager, deeplinkManager: deeplinkManager)
     
     public func trackEvent(_ event: Event, parameters: [String: Any] = [:]) {
         Task {
