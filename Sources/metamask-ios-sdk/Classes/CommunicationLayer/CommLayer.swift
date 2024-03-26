@@ -1,11 +1,11 @@
 //
-//  ClientType.swift
+//  CommLayer.swift
 //  metamask-ios-sdk
 //
 
 import Foundation
 
-public enum ClientType: String {
+public enum CommLayer {
     case socket
-    case deeplinking
+    case deeplinking(dappScheme: String)
 }

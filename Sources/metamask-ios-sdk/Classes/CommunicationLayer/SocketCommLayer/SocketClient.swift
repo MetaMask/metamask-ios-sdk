@@ -7,16 +7,10 @@ import UIKit
 import Combine
 import Foundation
 
-public class SocketClient: CommunicationClient {
-    public func send(_ message: String, encrypt: Bool) {
-        
-    }
-    
-    public var communicationLayer: CommLayer = .socket
-    
+public class SocketClient: CommClient {
     public var appMetadata: AppMetadata?
     private let session: SessionManager
-    private var keyExchange: KeyExchange
+    private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
     private var channelId: String = ""
@@ -46,10 +40,8 @@ public class SocketClient: CommunicationClient {
     public var tearDownConnection: (() -> Void)?
     public var onClientsTerminated: (() -> Void)?
 
-    public var receiveEvent: (([String: Any]) -> Void)?
-    public var receiveResponse: ((String, [String: Any]) -> Void)?
-    
-    var trackEvent: ((Event, [String: Any]) -> Void)?
+    public var handleResponse: (([String: Any]) -> Void)?
+    public var trackEvent: ((Event, [String: Any]) -> Void)?
     
     var requestJobs: [RequestJob] = []
     
@@ -67,11 +59,8 @@ public class SocketClient: CommunicationClient {
             + keyExchange.pubkey
     }
 
-    init(session: SessionManager, 
-         keyExchange: KeyExchange = .live,
-         trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
+    init(session: SessionManager, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
-        self.keyExchange = keyExchange
         self.trackEvent = trackEvent
     }
     
@@ -259,10 +248,10 @@ private extension SocketClient {
 
 private extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
-        let keyExchangeMessage: Message<KeyExchangeMessage>
+        let keyExchangeMessage: SocketMessage<KeyExchangeMessage>
         
         do {
-            keyExchangeMessage = try Message<KeyExchangeMessage>.message(from: message)
+            keyExchangeMessage = try SocketMessage<KeyExchangeMessage>.message(from: message)
         } catch {
             initiateKeyExchange()
             return
@@ -287,7 +276,7 @@ private extension SocketClient {
         }
         
         do {
-            let message = try Message<String>.message(from: msg)
+            let message = try SocketMessage<String>.message(from: msg)
             try handleEncryptedMessage(message)
         } catch {
             switch error {
@@ -307,7 +296,7 @@ private extension SocketClient {
         }
     }
 
-    func handleEncryptedMessage(_ message: Message<String>) throws {
+    func handleEncryptedMessage(_ message: SocketMessage<String>) throws {
         let decryptedText = try keyExchange.decryptMessage(message.message)
 
         let json: [String: Any] = try JSONSerialization.jsonObject(
@@ -315,7 +304,10 @@ private extension SocketClient {
             options: []
         )
             as? [String: Any] ?? [:]
-
+        handleResponseMessage(json)
+    }
+    
+    func handleResponseMessage(_ json: [String: Any]) {
         if json["type"] as? String == "terminate" {
             disconnect()
             onClientsTerminated?()
@@ -331,16 +323,7 @@ private extension SocketClient {
             Logging.log("Received wallet info")
             isReady = true
         } else if let data = json["data"] as? [String: Any] {
-            if let id = data["id"] {
-                if let identifier: Int64 = id as? Int64 {
-                    let id: String = String(identifier)
-                    receiveResponse?(id, data)
-                } else if let identifier: String = id as? String {
-                    receiveResponse?(identifier, data)
-                }
-            } else {
-                receiveEvent?(data)
-            }
+            handleResponse?(data)
         }
     }
 }
@@ -380,6 +363,22 @@ extension SocketClient {
 
         sendMessage(requestInfo, encrypt: true)
     }
+    
+    public func send(_ message: String, encrypt: Bool) {
+        do {
+            let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
+            
+            let message: SocketMessage = .init(
+                id: self.channelId,
+                message: encryptedMessage
+            )
+
+            self.channel.emit(ClientEvent.message, message)
+            
+        } catch {
+            Logging.error("\(error.localizedDescription)")
+        }
+    }
 
     public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
         if encrypt && !keyExchange.keysExchanged {
@@ -389,11 +388,14 @@ extension SocketClient {
                 
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                    let message: Message = .init(
+
+                    let message: SocketMessage = .init(
                         id: self.channelId,
                         message: encryptedMessage
                     )
+                    
                     self.channel.emit(ClientEvent.message, message)
+
                 } catch {
                     Logging.error("Could not encrypt message: \(error.localizedDescription)")
                 }
@@ -410,10 +412,12 @@ extension SocketClient {
                     
                     do {
                         let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                        let message: Message = .init(
+                        
+                        let message: SocketMessage = .init(
                             id: self.channelId,
                             message: encryptedMessage
                         )
+                        
                         self.channel.emit(ClientEvent.message, message)
                         
                     } catch {
@@ -423,25 +427,24 @@ extension SocketClient {
             } else {
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                    let message: Message = .init(
+                    let message: SocketMessage = .init(
                         id: channelId,
                         message: encryptedMessage
                     )
-                    let dictionary = message.toDictionary() ?? [:]
-                    Logging.log("Message dictionary: \(dictionary)")
-                    channel.emit(ClientEvent.message, dictionary)
+
+                    channel.emit(ClientEvent.message, message)
                     
                 } catch {
                     Logging.error("\(error.localizedDescription)")
                 }
             }
         } else {
-            let message = Message(
+            let message = SocketMessage(
                 id: channelId,
                 message: message
             )
-
-            channel.emit(ClientEvent.message, message)
+            
+            self.channel.emit(ClientEvent.message, message)
         }
     }
 }
@@ -473,8 +476,4 @@ extension SocketClient {
         
         trackEvent?(event, parameters)
     }
-}
-
-public extension SocketClient {
-    internal static let live: CommunicationClient = Dependencies.shared.client
 }

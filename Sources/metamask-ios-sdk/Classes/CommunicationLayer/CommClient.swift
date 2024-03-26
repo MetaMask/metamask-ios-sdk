@@ -7,23 +7,23 @@ import Foundation
 
 public typealias RequestJob = () -> Void
 
-protocol CommClient {
-    var commLayer: CommLayer { get }
-    var appMetadata: AppMetadata? { get set }
-    var trackEvent: ((Event) -> Void)? { get }
+public protocol CommClient {
     
-    var handleEvent: (([String: Any]) -> Void)? { get }
-    var handleResponse: ((String, [String: Any]) -> Void)? { get }
+    var appMetadata: AppMetadata? { get set }
+    var sessionDuration: TimeInterval { get set }
+    
+    var trackEvent: ((Event, [String: Any]) -> Void)? { get set }
+    var handleResponse: (([String: Any]) -> Void)? { get set }
     
     func connect()
     func disconnect()
-    func terminateConnection()
+    func clearSession()
     func addRequest(_ job: @escaping RequestJob)
-    func sendMessage(_ message: String, encrypted: Bool)
+    func sendMessage(_ message: String, encrypt: Bool)
 }
 
-extension CommClient {
-    func sendOriginatorInfo() {
+public extension CommClient {
+    func originatorInfo() -> RequestInfo {
         let originatorInfo = OriginatorInfo(
             title: appMetadata?.name,
             url: appMetadata?.url,
@@ -32,12 +32,10 @@ extension CommClient {
             apiVersion: SDKInfo.version
         )
 
-        let requestInfo = RequestInfo(
+        return RequestInfo(
             type: "originator_info",
             originator: originatorInfo,
             originatorInfo: originatorInfo
         )
-
-        sendMessage(requestInfo, encrypt: true)
     }
 }

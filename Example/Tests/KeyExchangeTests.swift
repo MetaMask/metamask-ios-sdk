@@ -59,9 +59,9 @@ class KeyExchangeTests: XCTestCase {
         keyExchangeBob.setTheirPublicKey(keyExchangeAlice.pubkey)
 
         // Test encryption and decryption of a message
-        let originalMessage = Message(id: "1234", message: "Mayday, mayday Planet 1804!")
+        let originalMessage = SocketMessage(id: "1234", message: "Mayday, mayday Planet 1804!")
         do {
-            let encryptedMessage = try keyExchangeAlice.encryptMessage(originalMessage)
+            let encryptedMessage = try keyExchangeAlice.encryptMessage(originalMessage.toJsonString() ?? "")
             let decryptedMessage = try keyExchangeBob.decryptMessage(encryptedMessage)
             let json: [String: Any] = try JSONSerialization.jsonObject(
                 with: Data(decryptedMessage.utf8),
@@ -69,7 +69,7 @@ class KeyExchangeTests: XCTestCase {
             )
                 as? [String: Any] ?? [:]
             do {
-                let message = try Message<String>.message(from: json)
+                let message = try SocketMessage<String>.message(from: json)
                 XCTAssertEqual(message.id, originalMessage.id)
                 XCTAssertEqual(message.message, originalMessage.message)
             } catch {

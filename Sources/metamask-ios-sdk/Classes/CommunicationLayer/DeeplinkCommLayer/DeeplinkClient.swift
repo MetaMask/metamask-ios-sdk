@@ -8,36 +8,49 @@ import Foundation
 
 
 public class DeeplinkClient: CommClient {
+    
     public var useDeeplinks: Bool = true
     
     private let schema = "metamaskdapp"
     private let session: SessionManager
     private var channelId: String = ""
-    private let targetAppSchema: String
+    private let dappScheme: String
     
-    var appMetadata: AppMetadata?
-    var trackEvent: ((Event) -> Void)?
-    var handleEvent: (([String: Any]) -> Void)?
-    var handleResponse: ((String, [String: Any]) -> Void)?
+    public var appMetadata: AppMetadata?
+    public var trackEvent: ((Event, [String : Any]) -> Void)?
+    public var handleResponse: (([String: Any]) -> Void)?
     
     private let keyExchange: KeyExchange
     private let deeplinkManager: DeeplinkManager
+    
+    public var sessionDuration: TimeInterval {
+        get {
+            session.sessionDuration
+        } set {
+            session.sessionDuration = newValue
+        }
+    }
     
     var requestJobs: [RequestJob] = []
     
     init(session: SessionManager,
          keyExchange: KeyExchange,
          deeplinkManager: DeeplinkManager,
-         targetAppSchema: String = "targeter"
+         dappScheme: String
     ) {
         self.session = session
         self.keyExchange = keyExchange
         self.deeplinkManager = deeplinkManager
-        self.targetAppSchema = targetAppSchema
+        self.dappScheme = dappScheme
+        setupClient()
+        setupCallbacks()
+    }
+    
+    private func setupCallbacks() {
+        self.deeplinkManager.onConnect = sendOriginatorInfo
         self.deeplinkManager.onReceiveMessage = handleMessage
         self.deeplinkManager.onReceivePublicKey = keyExchange.setTheirPublicKey
         self.deeplinkManager.decryptMessage = keyExchange.decryptMessage
-        setupClient()
     }
     
     private func setupClient() {
@@ -45,8 +58,12 @@ public class DeeplinkClient: CommClient {
         channelId = sessionInfo.0.sessionId
     }
     
+    public func clearSession() {
+        keyExchange.reset()
+    }
+    
     private func sendMessage(_ message: String) {
-        let deeplink = "\(targetAppSchema)://\(message)"
+        let deeplink = "\(dappScheme)://\(message)"
         guard
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
@@ -61,6 +78,18 @@ public class DeeplinkClient: CommClient {
         deeplinkManager.handleUrl(url)
     }
     
+    private func sendOriginatorInfo() {
+        track(event: .connected)
+        
+        guard
+            let info = originatorInfo().toJsonString(),
+            let encrypted = try? keyExchange.encryptMessage(info)
+        else { return }
+
+        let deeplink: Deeplink = .mmsdk(message: encrypted, pubkey: keyExchange.pubkey)
+        sendMessage(deeplink)
+    }
+    
     func sendMessage(_ deeplink: Deeplink) {
         switch deeplink {
         case .connect(let schema, let pubkey, let channelId):
@@ -73,54 +102,106 @@ public class DeeplinkClient: CommClient {
     }
     
     public func connect() {
+        track(event: .connectionRequest)
         sendMessage(.connect(
             schema: schema,
             pubkey: keyExchange.pubkey,
             channelId: channelId))
     }
+    
+    public func track(event: Event) {
+        let id = channelId
+        var parameters: [String: Any] = ["id": id]
+
+        switch event {
+        case .connected,
+                .disconnected,
+                .reconnectionRequest,
+                .connectionAuthorised,
+                .connectionRejected:
+            break
+        case .connectionRequest:
+            let additionalParams: [String: Any] = [
+                "commLayer": "deeplinking",
+                "sdkVersion": SDKInfo.version,
+                "url": appMetadata?.url ?? "",
+                "title": appMetadata?.name ?? "",
+                "platform": SDKInfo.platform
+            ]
+            parameters.merge(additionalParams) { current, _ in current }
+        }
+        
+        trackEvent?(event, parameters)
+    }
 }
 
 extension DeeplinkClient {
-    func terminateConnection() {}
+    public func disconnect() {
+        track(event: .disconnected)
+    }
     
-    var commLayer: CommLayer { .deeplinking }
+    public func terminateConnection() {
+        track(event: .disconnected)
+    }
     
-    func disconnect() {}
-    
-    func addRequest(_ job: @escaping RequestJob) {
+    public func addRequest(_ job: @escaping RequestJob) {
+        Logging.log("DeeplinkClient:: Adding request job")
         requestJobs.append(job)
     }
     
-    func sendMessage(_ message: String, encrypted: Bool) {
-        let deeplink: Deeplink = .mmsdk(message: message, pubkey: keyExchange.pubkey)
-        sendMessage(deeplink)
+    func runQueuedJobs() {
+        while !requestJobs.isEmpty {
+            let job = requestJobs.popLast()
+            job?()
+        }
     }
     
-    func handleMessage(_ message: String) {
+    public func sendMessage(_ message: String, encrypt: Bool) {
+        if encrypt {
+            do {
+                let encryptedMessage = try keyExchange.encryptMessage(message)
+                let deeplink: Deeplink = .mmsdk(message: encryptedMessage, pubkey: keyExchange.pubkey)
+                sendMessage(deeplink)
+            } catch {
+                Logging.error("DeeplinkClient:: Could not encrypt message \(message), error: \(error)")
+            }
+        } else {
+            let deeplink: Deeplink = .mmsdk(message: message, pubkey: keyExchange.pubkey)
+            sendMessage(deeplink)
+        }
+    }
+    
+    public func handleMessage(_ message: String) {
         do {
+
+            guard let data = message.data(using: .utf8) else {
+                Logging.error("DeeplinkClient:: Cannot convert message to data: \(message)")
+                return
+            }
+            
             let json: [String: Any] = try JSONSerialization.jsonObject(
-                with: Data(message.utf8),
+                with: data,
                 options: []
             )
                 as? [String: Any] ?? [:]
+            
+            if json["type"] as? String == "terminate" {
+                disconnect()
+                Logging.log("Connection terminated")
+            } else if json["type"] as? String == "ready" {
+                Logging.log("DeeplinkClient:: Connection is ready")
+                runQueuedJobs()
+                return
+            }
             
             guard let data = json["data"] as? [String: Any] else {
                 Logging.log("DeeplinkClient:: Ignoring response \(json)")
                 return
             }
-            
-            if let id = data["id"] {
-                if let identifier: Int64 = id as? Int64 {
-                    let id: String = String(identifier)
-                    handleResponse?(id, data)
-                } else if let identifier: String = id as? String {
-                    handleResponse?(identifier, data)
-                }
-            } else {
-                handleEvent?(data)
-            }
+            Logging.log("DeeplinkClient:: handling response")
+            handleResponse?(data)
         } catch {
-            Logging.error("DeeplinkClient:: Could not deserialise message to json \(message)")
+            Logging.error("DeeplinkClient:: Could not convert message to json. Message: \(message)\nError: \(error)")
         }
     }
 }

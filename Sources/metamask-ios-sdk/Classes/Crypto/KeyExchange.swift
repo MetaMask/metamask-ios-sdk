@@ -5,7 +5,7 @@
 import SocketIO
 import Foundation
 
-public enum KeyExchangeType: String, Codable {
+public enum KeyExchangeType: String, Mappable {
     case start = "key_handshake_start"
     case ack = "key_handshake_ACK"
     case syn = "key_handshake_SYN"
@@ -30,7 +30,7 @@ public enum KeyExchangeError: Error {
     case encodingError
 }
 
-public struct KeyExchangeMessage: CodableData {
+public struct KeyExchangeMessage: CodableData, Mappable {
     public let type: KeyExchangeType
     public let pubkey: String?
     
@@ -173,7 +173,7 @@ public class KeyExchange {
         let decryted = try encyption.decrypt(
             message,
             privateKey: privateKey
-        )
+        ).trimEscapingChars()
         return decryted
     }
 }

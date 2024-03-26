@@ -1,5 +1,5 @@
 //
-//  Message.swift
+//  SocketMessage.swift
 //  metamask-ios-sdk
 //
 
@@ -9,7 +9,7 @@ enum DecodingError: Error {
     case invalidMessage
 }
 
-public struct Message<T: CodableData>: CodableData {
+public struct SocketMessage<T: CodableData>: CodableData, Mappable {
     public let id: String
     public let message: T
     
@@ -23,19 +23,6 @@ public struct Message<T: CodableData>: CodableData {
             "id": id,
             "message": try? message.socketRepresentation(),
         ]
-    }
-    
-    public func toJSONString() -> String? {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        
-        do {
-            let jsonData = try encoder.encode(self)
-            return String(data: jsonData, encoding: .utf8)
-        } catch {
-            Logging.error("Message:: Error encoding JSON: \(error)")
-            return nil
-        }
     }
     
     func toDictionary() -> [String: Any]? {
@@ -55,10 +42,10 @@ public struct Message<T: CodableData>: CodableData {
         }
     }
 
-    public static func message(from message: [String: Any]) throws -> Message<T> {
+    public static func message(from message: [String: Any]) throws -> SocketMessage<T> {
         do {
             let json = try JSONSerialization.data(withJSONObject: message)
-            let message = try JSONDecoder().decode(Message<T>.self, from: json)
+            let message = try JSONDecoder().decode(SocketMessage<T>.self, from: json)
             return message
         } catch {
             Logging.error("Message \(message) could not be decoded: \(error.localizedDescription)")

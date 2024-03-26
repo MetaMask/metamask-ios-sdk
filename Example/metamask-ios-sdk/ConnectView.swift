@@ -16,6 +16,7 @@ struct ConnectView: View {
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
         appMetadata,
+        commLayer: .socket,
         sdkOptions: nil // SDKOptions(infuraAPIKey: "1234")
     )
 
@@ -195,18 +196,18 @@ struct ConnectView: View {
     
     func connectSDK() async {
         showProgressView = false
-        Dependencies.shared.deeplinkClient.connect()
+        //Dependencies.shared.deeplinkClient.connect()
         //showProgressView = true
-//        let result = await metaMaskSDK.connect()
-//        //showProgressView = false
-//        
-//        switch result {
-//        case let .failure(error):
-//            errorMessage = error.localizedDescription
-//            showError = true
-//        default:
-//            break
-//        }
+        let result = await metaMaskSDK.connect()
+        //showProgressView = false
+        
+        switch result {
+        case let .failure(error):
+            errorMessage = error.localizedDescription
+            showError = true
+        default:
+            break
+        }
     }
 }
 

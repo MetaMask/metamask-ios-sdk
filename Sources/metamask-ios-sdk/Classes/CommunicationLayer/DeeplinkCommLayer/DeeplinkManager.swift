@@ -10,6 +10,9 @@ public class DeeplinkManager {
     var onReceivePublicKey: ((String) -> Void)?
     var onReceiveMessage: ((String) -> Void)?
     var decryptMessage: ((String) throws -> String?)? 
+    var onConnect: (() -> Void)?
+    
+    private var connected = false
     
     public func handleUrl(_ url: URL)  {
         handleUrl(url.absoluteString)
@@ -25,6 +28,12 @@ public class DeeplinkManager {
         case .mmsdk(let message, let pubkey):
             Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")
             onReceivePublicKey?(pubkey)
+            
+            if !connected {
+                connected = true
+                onConnect?()
+            }
+            
             if let decryptedMsg: String = try? decryptMessage?(message) {
                 Logging.log("DeeplinkManager:: decrypted message: \(decryptedMsg)")
                 onReceiveMessage?(decryptedMsg)
