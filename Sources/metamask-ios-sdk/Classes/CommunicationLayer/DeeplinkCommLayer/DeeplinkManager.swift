@@ -22,8 +22,8 @@ public class DeeplinkManager {
         let deeplink = getDeeplink(url)
         
         switch deeplink {
-        case .connect(let schema, let pubkey, let channelId):
-            Logging.error("DeeplinkManager:: connect from \(schema) pubkey: \(pubkey), channelId: \(channelId)")
+        case .connect(let scheme, let pubkey, let channelId):
+            Logging.error("DeeplinkManager:: connect from \(scheme) pubkey: \(pubkey), channelId: \(channelId)")
             onReceivePublicKey?(pubkey)
         case .mmsdk(let message, let pubkey):
             Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")
@@ -69,8 +69,8 @@ public class DeeplinkManager {
         }
         
         if action == Deeplink.connect {
-            guard let schema: String = components.queryItems?.first(where: { $0.name == "schema" })?.value else {
-                Logging.error("DeeplinkManager:: Connect missing schema")
+            guard let scheme: String = components.queryItems?.first(where: { $0.name == "scheme" })?.value else {
+                Logging.error("DeeplinkManager:: Connect missing scheme")
                 return nil
             }
             
@@ -83,7 +83,7 @@ public class DeeplinkManager {
                 Logging.error("DeeplinkManager:: Connect step missing channelId")
                 return nil
             }
-            return .connect(schema: schema, pubkey: pubkey, channelId: channelId)
+            return .connect(scheme: scheme, pubkey: pubkey, channelId: channelId)
             
         } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {

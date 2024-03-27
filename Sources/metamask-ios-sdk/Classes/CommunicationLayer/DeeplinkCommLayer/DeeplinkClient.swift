@@ -11,7 +11,7 @@ public class DeeplinkClient: CommClient {
     
     public var useDeeplinks: Bool = true
     
-    private let schema = "metamaskdapp"
+    private let scheme = "metamaskdapp"
     private let session: SessionManager
     private var channelId: String = ""
     private let dappScheme: String
@@ -92,8 +92,8 @@ public class DeeplinkClient: CommClient {
     
     func sendMessage(_ deeplink: Deeplink) {
         switch deeplink {
-        case .connect(let schema, let pubkey, let channelId):
-            let message = "connect?schema=\(schema)&pubkey=\(pubkey)&channelId=\(channelId)&comm=deeplinking"
+        case .connect(let scheme, let pubkey, let channelId):
+            let message = "connect?scheme=\(scheme)&pubkey=\(pubkey)&channelId=\(channelId)&comm=deeplinking"
             sendMessage(message)
         case .mmsdk(let message, let pubkey):
             let message = "mmsdk?message=\(message)&pubkey=\(String(describing: pubkey))"
@@ -104,7 +104,7 @@ public class DeeplinkClient: CommClient {
     public func connect() {
         track(event: .connectionRequest)
         sendMessage(.connect(
-            schema: schema,
+            scheme: scheme,
             pubkey: keyExchange.pubkey,
             channelId: channelId))
     }
