@@ -9,8 +9,7 @@ import Foundation
 public class DeeplinkManager {
     var onReceivePublicKey: ((String) -> Void)?
     var onReceiveMessage: ((String) -> Void)?
-    var decryptMessage: ((String) throws -> String?)? 
-    var onConnect: (() -> Void)?
+    var decryptMessage: ((String) throws -> String?)?
     
     private var connected = false
     
@@ -31,7 +30,6 @@ public class DeeplinkManager {
             
             if !connected {
                 connected = true
-                onConnect?()
             }
             
             if let decryptedMsg: String = try? decryptMessage?(message) {

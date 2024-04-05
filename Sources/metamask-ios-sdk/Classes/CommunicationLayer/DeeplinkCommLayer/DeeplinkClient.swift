@@ -46,7 +46,6 @@ public class DeeplinkClient: CommClient {
     }
     
     private func setupCallbacks() {
-        self.deeplinkManager.onConnect = sendOriginatorInfo
         self.deeplinkManager.onReceiveMessage = handleMessage
         self.deeplinkManager.onReceivePublicKey = keyExchange.setTheirPublicKey
         self.deeplinkManager.decryptMessage = keyExchange.decryptMessage
@@ -75,18 +74,6 @@ public class DeeplinkClient: CommClient {
     
     public func handleUrl(_ url: URL) {
         deeplinkManager.handleUrl(url)
-    }
-    
-    private func sendOriginatorInfo() {
-        track(event: .connected)
-        
-        guard
-            let info = originatorInfo().toJsonString(),
-            let encrypted = try? keyExchange.encryptMessage(info)
-        else { return }
-
-        let deeplink: Deeplink = .mmsdk(message: encrypted, pubkey: keyExchange.pubkey)
-        sendMessage(deeplink)
     }
     
     func sendMessage(_ deeplink: Deeplink) {
