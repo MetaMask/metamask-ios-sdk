@@ -23,7 +23,7 @@ public class DeeplinkManager {
         
         switch deeplink {
         case .connect(let scheme, let pubkey, let channelId):
-            Logging.error("DeeplinkManager:: connect from \(scheme) pubkey: \(pubkey), channelId: \(channelId)")
+            Logging.log("DeeplinkManager:: connect from \(scheme) pubkey: \(pubkey), channelId: \(channelId)")
             onReceivePublicKey?(pubkey)
         case .mmsdk(let message, let pubkey):
             Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")

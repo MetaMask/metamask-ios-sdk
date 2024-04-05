@@ -11,7 +11,6 @@ public class DeeplinkClient: CommClient {
     
     public var useDeeplinks: Bool = true
     
-    private let scheme = "metamaskdapp"
     private let session: SessionManager
     private var channelId: String = ""
     private let dappScheme: String
@@ -63,7 +62,7 @@ public class DeeplinkClient: CommClient {
     }
     
     private func sendMessage(_ message: String) {
-        let deeplink = "\(dappScheme)://\(message)"
+        let deeplink = "metamask://\(message)"
         guard
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
@@ -93,7 +92,8 @@ public class DeeplinkClient: CommClient {
     func sendMessage(_ deeplink: Deeplink) {
         switch deeplink {
         case .connect(let scheme, let pubkey, let channelId):
-            let message = "connect?scheme=\(scheme)&pubkey=\(pubkey)&channelId=\(channelId)&comm=deeplinking"
+            let originatorInfo = originatorInfo().toJsonString() ?? ""
+            let message = "connect?scheme=\(scheme)&pubkey=\(pubkey)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
             sendMessage(message)
         case .mmsdk(let message, let pubkey):
             let message = "mmsdk?message=\(message)&pubkey=\(String(describing: pubkey))"
@@ -104,7 +104,7 @@ public class DeeplinkClient: CommClient {
     public func connect() {
         track(event: .connectionRequest)
         sendMessage(.connect(
-            scheme: scheme,
+            scheme: dappScheme,
             pubkey: keyExchange.pubkey,
             channelId: channelId))
     }
