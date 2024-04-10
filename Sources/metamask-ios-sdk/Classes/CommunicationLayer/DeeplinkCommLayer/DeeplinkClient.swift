@@ -87,6 +87,7 @@ public class DeeplinkClient: CommClient {
         case .connectWith(let scheme, _, let channelId, let request):
             let originatorInfo = originatorInfo().toJsonString() ?? ""
             let message = "connect?scheme=\(scheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)&request=\(request)"
+            sendMessage(message)
         case .mmsdk(let message, _, let channelId):
             let message = "mmsdk?message=\(message)&channelId=\(channelId ?? "")"
             Logging.log("DeeplinkClient:: Sending message \(message)")
