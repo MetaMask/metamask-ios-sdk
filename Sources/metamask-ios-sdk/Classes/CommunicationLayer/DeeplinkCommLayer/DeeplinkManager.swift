@@ -20,8 +20,6 @@ public class DeeplinkManager {
         let deeplink = getDeeplink(url)
         
         switch deeplink {
-        case .connect(let scheme, _, let channelId):
-            Logging.log("DeeplinkManager:: connect from \(scheme), channelId: \(channelId)")
         case .mmsdk(let message, _, _):
             Logging.log("DeeplinkManager:: message: \(message)")
             
@@ -30,11 +28,12 @@ public class DeeplinkManager {
             }
             
             let base64Decoded = message.base64Decode() ?? ""
+            Logging.log("DeeplinkManager:: base64Decoded: \(base64Decoded)")
             
             onReceiveMessage?(base64Decoded)
             
-        case .none:
-            Logging.error("DeeplinkManager:: invalid url \(url)")
+        default:
+            Logging.error("DeeplinkManager:: ignoring url \(url)")
         }
     }
     

@@ -15,7 +15,7 @@ public protocol CommClient {
     var trackEvent: ((Event, [String: Any]) -> Void)? { get set }
     var handleResponse: (([String: Any]) -> Void)? { get set }
     
-    func connect()
+    func connect(with request: String?)
     func disconnect()
     func clearSession()
     func addRequest(_ job: @escaping RequestJob)

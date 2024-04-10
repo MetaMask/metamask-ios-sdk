@@ -84,6 +84,9 @@ public class DeeplinkClient: CommClient {
             let originatorInfo = originatorInfo().toJsonString() ?? ""
             let message = "connect?scheme=\(scheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
             sendMessage(message)
+        case .connectWith(let scheme, _, let channelId, let request):
+            let originatorInfo = originatorInfo().toJsonString() ?? ""
+            let message = "connect?scheme=\(scheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)&request=\(request)"
         case .mmsdk(let message, _, let channelId):
             let message = "mmsdk?message=\(message)&channelId=\(channelId ?? "")"
             Logging.log("DeeplinkClient:: Sending message \(message)")
@@ -91,12 +94,22 @@ public class DeeplinkClient: CommClient {
         }
     }
     
-    public func connect() {
+    public func connect(with request: String? = nil) {
         track(event: .connectionRequest)
-        sendMessage(.connect(
-            scheme: dappScheme,
-            pubkey: nil,
-            channelId: channelId))
+        
+        if let request = request {
+            sendMessage(.connectWith(
+                scheme: dappScheme,
+                pubkey: nil,
+                channelId: channelId,
+                request: request
+            ))
+        } else {
+            sendMessage(.connect(
+                scheme: dappScheme,
+                pubkey: nil,
+                channelId: channelId))
+        }
     }
     
     public func track(event: Event) {

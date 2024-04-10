@@ -73,7 +73,7 @@ public class SocketClient: CommClient {
         handleDisconnection()
     }
 
-    public func connect() {
+    public func connect(with request: String?) {
         if channel.isConnected { return }
         
         setupClient()

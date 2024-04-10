@@ -89,7 +89,7 @@ public class Ethereum {
             return dappValidationError
         }
         
-        commClient.connect()
+        commClient.connect(with: nil)
         connected = true
         
         return requestAccounts()
@@ -117,14 +117,30 @@ public class Ethereum {
             return dappValidationError
         }
         
-        commClient.connect()
+        if commClient is SocketClient {
+            commClient.connect(with: nil)
+            
+            let connectSignRequest = EthereumRequest(
+                method: .metaMaskConnectSign,
+                params: [message]
+            )
+            return request(connectSignRequest)
+        }
         
         let connectSignRequest = EthereumRequest(
             method: .metaMaskConnectSign,
             params: [message]
         )
         
-        return request(connectSignRequest)
+        let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
+        submittedRequests[connectSignRequest.id] = submittedRequest
+        let publisher = submittedRequests[connectSignRequest.id]?.publisher
+        
+        let requestJson = connectSignRequest.toJsonString() ?? ""
+        
+        commClient.connect(with: requestJson)
+        
+        return publisher
     }
     
     func connectAndSign(message: String) async -> Result<String, RequestError> {
@@ -149,7 +165,28 @@ public class Ethereum {
             method: EthereumMethod.metamaskConnectWith.rawValue,
             params: params
         )
-        return await request(connectWithRequest)
+        
+        let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
+        submittedRequests[connectWithRequest.id] = submittedRequest
+        let publisher = submittedRequests[connectWithRequest.id]?.publisher
+        
+        let requestJson = connectWithRequest.toJsonString() ?? ""
+        
+        commClient.connect(with: requestJson)
+        
+        return await withCheckedContinuation { continuation in
+            publisher?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
+        }
     }
     
     /// Disconnect dapp
@@ -282,7 +319,7 @@ public class Ethereum {
     func request(_ request: any RPCRequest) -> EthereumPublisher? {
         if !connected && !EthereumMethod.isConnectMethod(request.methodType) {
             if request.methodType == .ethRequestAccounts {
-                commClient.connect()
+                commClient.connect(with: nil)
                 connected = true
                 return requestAccounts()
             }
@@ -296,7 +333,7 @@ public class Ethereum {
             if connected {
                 sendRequest(request)
             } else {
-                commClient.connect()
+                commClient.connect(with: nil)
                 connected = true
                 commClient.addRequest { [weak self] in
                     Logging.log("Ethereum:: Adding request \(request)")
