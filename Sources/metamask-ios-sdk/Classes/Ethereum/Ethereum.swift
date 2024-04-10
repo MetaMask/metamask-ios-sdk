@@ -124,6 +124,7 @@ public class Ethereum {
                 method: .metaMaskConnectSign,
                 params: [message]
             )
+            connected = true
             return request(connectSignRequest)
         }
         
@@ -139,6 +140,7 @@ public class Ethereum {
         let requestJson = connectSignRequest.toJsonString() ?? ""
         
         commClient.connect(with: requestJson)
+        connected = true
         
         return publisher
     }
