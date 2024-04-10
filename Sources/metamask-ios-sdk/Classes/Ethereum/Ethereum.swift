@@ -85,10 +85,6 @@ public class Ethereum {
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect() -> EthereumPublisher? {
-        if let dappValidationError = appMetaDataValidationError {
-            return dappValidationError
-        }
-        
         commClient.connect(with: nil)
         connected = true
         
@@ -121,10 +117,6 @@ public class Ethereum {
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
-        if let dappValidationError = appMetaDataValidationError {
-            return dappValidationError
-        }
-        
         if commClient is SocketClient {
             commClient.connect(with: nil)
             
@@ -547,7 +539,17 @@ public class Ethereum {
             let method = event["method"] as? String,
             let ethMethod = EthereumMethod(rawValue: method)
         else {
-            Logging.error("Unhandled event: \(event)")
+            if let chainId = event["chainId"] as? String {
+                Logging.log("Got metamask_connect* chainId: \(chainId)")
+                updateChainId(chainId)
+            }
+            
+            if
+                let accounts = event["accounts"] as? [String],
+                let selectedAddress = accounts.first {
+                Logging.log("Got metamask_connect* selectedAddress: \(selectedAddress)")
+                updateAccount(selectedAddress)
+            }
             return
         }
         

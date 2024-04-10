@@ -89,6 +89,7 @@ public class SocketClient: CommClient {
         isReady = false
         channel.disconnect()
         channel.tearDown()
+        session.clear()
     }
     
     public func clearSession() {

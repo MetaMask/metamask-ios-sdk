@@ -142,6 +142,7 @@ public class DeeplinkClient: CommClient {
 extension DeeplinkClient {
     public func disconnect() {
         track(event: .disconnected)
+        session.clear()
     }
     
     public func terminateConnection() {
