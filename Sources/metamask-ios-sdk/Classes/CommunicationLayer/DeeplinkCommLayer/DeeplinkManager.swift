@@ -7,7 +7,6 @@ import UIKit
 import Foundation
 
 public class DeeplinkManager {
-    var onReceivePublicKey: ((String) -> Void)?
     var onReceiveMessage: ((String) -> Void)?
     var decryptMessage: ((String) throws -> String?)?
     
@@ -21,23 +20,18 @@ public class DeeplinkManager {
         let deeplink = getDeeplink(url)
         
         switch deeplink {
-        case .connect(let scheme, let pubkey, let channelId):
-            Logging.log("DeeplinkManager:: connect from \(scheme) pubkey: \(pubkey), channelId: \(channelId)")
-            onReceivePublicKey?(pubkey)
-        case .mmsdk(let message, let pubkey, _):
-            Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")
-            onReceivePublicKey?(pubkey)
+        case .connect(let scheme, _, let channelId):
+            Logging.log("DeeplinkManager:: connect from \(scheme), channelId: \(channelId)")
+        case .mmsdk(let message, _, _):
+            Logging.log("DeeplinkManager:: message: \(message)")
             
             if !connected {
                 connected = true
             }
             
-            if let decryptedMsg: String = try? decryptMessage?(message) {
-                Logging.log("DeeplinkManager:: decrypted message: \(decryptedMsg)")
-                onReceiveMessage?(decryptedMsg)
-            } else {
-                Logging.error("DeeplinkManager:: Could not decrypt message: \(message)")
-            }
+            let base64Decoded = message.base64Decode() ?? ""
+            
+            onReceiveMessage?(base64Decoded)
             
         case .none:
             Logging.error("DeeplinkManager:: invalid url \(url)")
@@ -72,27 +66,19 @@ public class DeeplinkManager {
                 return nil
             }
             
-            guard let pubkey: String = components.queryItems?.first(where: { $0.name == "pubkey" })?.value else {
-                Logging.error("DeeplinkManager:: Connect step missing other party's public key")
-                return nil
-            }
-            
             guard let channelId: String = components.queryItems?.first(where: { $0.name == "channelId" })?.value else {
                 Logging.error("DeeplinkManager:: Connect step missing channelId")
                 return nil
             }
-            return .connect(scheme: scheme, pubkey: pubkey, channelId: channelId)
+            return .connect(scheme: scheme, pubkey: nil, channelId: channelId)
             
         } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {
                 Logging.error("DeeplinkManager:: Deeplink missing message")
                 return nil
             }
-            guard let pubkey = components.queryItems?.first(where: { $0.name == "pubkey" })?.value else {
-                Logging.error("DeeplinkManager:: Deeplink missing pubkey")
-                return nil
-            }
-            return .mmsdk(message: message, pubkey: pubkey, channelId: nil)
+
+            return .mmsdk(message: message, pubkey: nil, channelId: nil)
         }
 
         return nil
