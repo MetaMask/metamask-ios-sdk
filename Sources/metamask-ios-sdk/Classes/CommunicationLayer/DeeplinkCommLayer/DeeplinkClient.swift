@@ -174,7 +174,6 @@ extension DeeplinkClient {
     
     public func handleMessage(_ message: String) {
         do {
-
             guard let data = message.data(using: .utf8) else {
                 Logging.error("DeeplinkClient:: Cannot convert message to data: \(message)")
                 return
