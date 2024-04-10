@@ -6,7 +6,7 @@
 import Foundation
 
 public protocol CommunicationClient: AnyObject {
-    var communicationLayer: CommLayer { get set }
+    var communicationLayer: Transport { get set }
     var appMetadata: AppMetadata? { get set }
     var useDeeplinks: Bool { get set }
     var isConnected: Bool { get }

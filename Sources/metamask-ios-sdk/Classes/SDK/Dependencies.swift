@@ -13,10 +13,10 @@ public final class Dependencies {
     public lazy var store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier)
     public lazy var sessionManager: SessionManager = SessionManager(store: store, sessionDuration: 24 * 3600 * 7)
     
-    public func ethereum(commLayer: CommLayer) -> Ethereum {
+    public func ethereum(transport: Transport) -> Ethereum {
         let client: CommClient
         
-        switch commLayer {
+        switch transport {
         case .deeplinking(let dappScheme):
             client = deeplinkClient(dappScheme: dappScheme)
         case .socket:

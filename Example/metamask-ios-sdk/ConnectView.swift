@@ -16,7 +16,7 @@ struct ConnectView: View {
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
         appMetadata,
-        commLayer: .deeplinking(dappScheme: "metamaskdapp"),
+        transport: .deeplinking(dappScheme: "metamaskdapp"),
         sdkOptions: nil // SDKOptions(infuraAPIKey: "1234")
     )
 

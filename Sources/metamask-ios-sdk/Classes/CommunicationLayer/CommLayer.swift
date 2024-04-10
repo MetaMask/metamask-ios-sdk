@@ -5,7 +5,7 @@
 
 import Foundation
 
-public enum CommLayer {
+public enum Transport {
     case socket
     case deeplinking(dappScheme: String)
 }

@@ -92,7 +92,15 @@ public class Ethereum {
         commClient.connect(with: nil)
         connected = true
         
-        return requestAccounts()
+        if commClient is SocketClient {
+            return requestAccounts()
+        }
+        
+        let submittedRequest = SubmittedRequest(method: "")
+        submittedRequests[Ethereum.CONNECTION_ID] = submittedRequest
+        let publisher = submittedRequests[Ethereum.CONNECTION_ID]?.publisher
+
+        return publisher
     }
     
     @discardableResult
@@ -268,19 +276,19 @@ public class Ethereum {
         submittedRequests[requestAccountsRequest.id] = submittedRequest
         let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
         
-        let chainIdRequest = createChainIdRequest()
-        let params = [requestAccountsRequest, chainIdRequest]
-
-        let batchRequest = EthereumRequest(
-            id: Ethereum.BATCH_CONNECTION_ID,
-            method: EthereumMethod.metamaskBatch.rawValue,
-            params: params)
-        
-        let submittedBatchRequest = SubmittedRequest(method: batchRequest.method)
-        submittedRequests[batchRequest.id] = submittedBatchRequest
+//        let chainIdRequest = createChainIdRequest()
+//        let params = [requestAccountsRequest, chainIdRequest]
+//
+//        let batchRequest = EthereumRequest(
+//            id: Ethereum.BATCH_CONNECTION_ID,
+//            method: EthereumMethod.metamaskBatch.rawValue,
+//            params: params)
+//        
+//        let submittedBatchRequest = SubmittedRequest(method: batchRequest.method)
+//        submittedRequests[batchRequest.id] = submittedBatchRequest
         
         commClient.addRequest { [weak self] in
-            self?.sendRequest(batchRequest)
+            self?.sendRequest(requestAccountsRequest)
         }
         
         return publisher
@@ -524,6 +532,17 @@ public class Ethereum {
     }
     
     func receiveEvent(_ event: [String: Any]) {
+        if let error = event["error"] as? [String: Any] {
+            Logging.error("Ethereum:: receive error: \(error)")
+            let requestError = RequestError(from: error)
+            
+            if requestError.codeType == .userRejectedRequest
+            {
+                track?(.connectionRejected, [:])
+            }
+            sendError(requestError, id: Ethereum.CONNECTION_ID)
+        }
+        
         guard
             let method = event["method"] as? String,
             let ethMethod = EthereumMethod(rawValue: method)

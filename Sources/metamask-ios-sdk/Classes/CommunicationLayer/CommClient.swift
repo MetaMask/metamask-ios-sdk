@@ -8,7 +8,6 @@ import Foundation
 public typealias RequestJob = () -> Void
 
 public protocol CommClient {
-    
     var appMetadata: AppMetadata? { get set }
     var sessionDuration: TimeInterval { get set }
     
