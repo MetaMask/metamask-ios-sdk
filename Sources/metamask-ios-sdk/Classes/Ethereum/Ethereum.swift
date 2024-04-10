@@ -501,7 +501,21 @@ public class Ethereum {
             }
         default:
             Logging.log("Mpendulo:: Going for default case")
+            
+            if let chainId = data["chainId"] as? String {
+                Logging.log("Mpendulo:: Got metamask_connect* chainId: \(chainId)")
+                updateChainId(chainId)
+            }
+            
+            if
+                let accounts = data["accounts"] as? [String],
+                let selectedAddress = accounts.first {
+                Logging.log("Mpendulo:: Got metamask_connect* selectedAddress: \(selectedAddress)")
+                updateAccount(selectedAddress)
+            }
+            
             if let result = data["result"] {
+                Logging.log("Mpendulo:: Got metamask_connect* result: \(result)")
                 sendResult(result, id: id)
             } else {
                 Logging.error("Unknown response: \(data)")
