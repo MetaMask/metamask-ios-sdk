@@ -52,6 +52,7 @@ public class DeeplinkClient: CommClient {
     }
     
     private func setupClient() {
+        session.clear()
         let sessionInfo = session.fetchSessionConfig()
         channelId = sessionInfo.0.sessionId
     }
@@ -66,6 +67,8 @@ public class DeeplinkClient: CommClient {
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
+        
+        Logging.log("DeeplinkClient:: Sending deeplink \(urlString)")
 
         DispatchQueue.main.async {
             UIApplication.shared.open(url)
@@ -82,8 +85,9 @@ public class DeeplinkClient: CommClient {
             let originatorInfo = originatorInfo().toJsonString() ?? ""
             let message = "connect?scheme=\(scheme)&pubkey=\(pubkey)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
             sendMessage(message)
-        case .mmsdk(let message, let pubkey):
-            let message = "mmsdk?message=\(message)&pubkey=\(String(describing: pubkey))"
+        case .mmsdk(let message, let pubkey, let channelId):
+            let message = "mmsdk?message=\(message)&pubkey=\(String(describing: pubkey))&channelId=\(channelId ?? "")"
+            Logging.log("DeeplinkClient:: Sending message \(message)")
             sendMessage(message)
         }
     }
@@ -147,13 +151,21 @@ extension DeeplinkClient {
         if encrypt {
             do {
                 let encryptedMessage = try keyExchange.encryptMessage(message)
-                let deeplink: Deeplink = .mmsdk(message: encryptedMessage, pubkey: keyExchange.pubkey)
+                let deeplink: Deeplink = .mmsdk(
+                    message: encryptedMessage,
+                    pubkey: keyExchange.pubkey,
+                    channelId: channelId
+                )
                 sendMessage(deeplink)
             } catch {
                 Logging.error("DeeplinkClient:: Could not encrypt message \(message), error: \(error)")
             }
         } else {
-            let deeplink: Deeplink = .mmsdk(message: message, pubkey: keyExchange.pubkey)
+            let deeplink: Deeplink = .mmsdk(
+                message: message,
+                pubkey: keyExchange.pubkey,
+                channelId: channelId
+            )
             sendMessage(deeplink)
         }
     }

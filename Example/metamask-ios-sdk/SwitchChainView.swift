@@ -13,7 +13,7 @@ struct SwitchChainView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
     @State private var alert: AlertInfo?
-    @State var networkSelection: Network = .goerli
+    @State var networkSelection: Network = .polygon
 
     struct AlertInfo: Identifiable {
         enum Status {
@@ -32,7 +32,6 @@ struct SwitchChainView: View {
     }
     
     enum Network: String, CaseIterable, Identifiable {
-        case goerli = "0x5"
         case kovan = "0x2a"
         case ethereum = "0x1"
         case polygon = "0x89"
@@ -48,7 +47,6 @@ struct SwitchChainView: View {
                 case .polygon: return "Polygon"
                 case .ethereum: return "Ethereum"
                 case .kovan: return "Kovan Testnet"
-                case .goerli: return "Goerli Testnet"
             }
         }
         
@@ -113,7 +111,7 @@ struct SwitchChainView: View {
         .onAppear {
             networkSelection = metamaskSDK.chainId == networkSelection.rawValue
                 ? .ethereum
-            : .goerli
+            : .polygon
         }
         .background(Color.blue.grayscale(0.5))
     }

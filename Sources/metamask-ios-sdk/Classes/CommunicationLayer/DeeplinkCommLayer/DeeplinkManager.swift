@@ -24,7 +24,7 @@ public class DeeplinkManager {
         case .connect(let scheme, let pubkey, let channelId):
             Logging.log("DeeplinkManager:: connect from \(scheme) pubkey: \(pubkey), channelId: \(channelId)")
             onReceivePublicKey?(pubkey)
-        case .mmsdk(let message, let pubkey):
+        case .mmsdk(let message, let pubkey, _):
             Logging.log("DeeplinkManager:: message: \(message), pubkey: \(pubkey)")
             onReceivePublicKey?(pubkey)
             
@@ -92,7 +92,7 @@ public class DeeplinkManager {
                 Logging.error("DeeplinkManager:: Deeplink missing pubkey")
                 return nil
             }
-            return .mmsdk(message: message, pubkey: pubkey)
+            return .mmsdk(message: message, pubkey: pubkey, channelId: nil)
         }
 
         return nil

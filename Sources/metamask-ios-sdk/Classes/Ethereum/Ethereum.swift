@@ -14,7 +14,8 @@ protocol EthereumEventsDelegate: AnyObject {
 }
 
 public class Ethereum {
-    private let CONNECTION_ID = TimestampGenerator.timestamp()
+    private static let CONNECTION_ID = TimestampGenerator.timestamp()
+    private static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
     
@@ -196,10 +197,9 @@ public class Ethereum {
                 }
             }
         } else {
-
-            Logging.log("Mpendulo:: Sending request: \(request)")
         
             if commClient is SocketClient {
+                Logging.log("Ethereum::Mpendulo:: Sending request: \(request)")
                 (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
                 
                 let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
@@ -213,6 +213,7 @@ public class Ethereum {
                     Logging.error("Ethereum:: could not convert request to JSON: \(request)")
                     return
                 }
+                Logging.log("Ethereum::Mpendulo:: Sending request JSON: \(requestJson)")
                 
                 commClient.sendMessage(requestJson, encrypt: true)
             }
@@ -222,17 +223,54 @@ public class Ethereum {
     @discardableResult
     private func requestAccounts() -> EthereumPublisher? {
         let requestAccountsRequest = EthereumRequest(
-            id: CONNECTION_ID,
+            id: Ethereum.CONNECTION_ID,
             method: .ethRequestAccounts
         )
         
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
-        submittedRequests[CONNECTION_ID] = submittedRequest
-        let publisher = submittedRequests[CONNECTION_ID]?.publisher
+        submittedRequests[requestAccountsRequest.id] = submittedRequest
+        let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
+        
+        let chainIdRequest = createChainIdRequest()
+        let params = [requestAccountsRequest, chainIdRequest]
+
+        let batchRequest = EthereumRequest(
+            id: Ethereum.BATCH_CONNECTION_ID,
+            method: EthereumMethod.metamaskBatch.rawValue,
+            params: params)
+        
+        let submittedBatchRequest = SubmittedRequest(method: batchRequest.method)
+        submittedRequests[batchRequest.id] = submittedBatchRequest
         
         commClient.addRequest { [weak self] in
-            self?.sendRequest(requestAccountsRequest)
+            self?.sendRequest(batchRequest)
         }
+        
+        return publisher
+    }
+    
+    private func createChainIdRequest() -> EthereumRequest<String> {
+        let chainIdRequest = EthereumRequest(
+            method: .ethChainId
+        )
+        
+        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
+        submittedRequests[chainIdRequest.id] = submittedRequest
+        
+        return chainIdRequest
+    }
+    
+    @discardableResult
+    private func requestChainId() -> EthereumPublisher? {
+        let chainIdRequest = EthereumRequest(
+            method: .ethChainId
+        )
+        
+        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
+        submittedRequests[chainIdRequest.id] = submittedRequest
+        let publisher = submittedRequests[chainIdRequest.id]?.publisher
+        
+        sendRequest(chainIdRequest)
         
         return publisher
     }
@@ -307,11 +345,13 @@ public class Ethereum {
     
     // MARK: Request Receiving
     private func updateChainId(_ id: String) {
+        Logging.log("Mpendulo:: updateChainId \(id)")
         chainId = id
         delegate?.chainIdChanged(id)
     }
     
     private func updateAccount(_ account: String) {
+        Logging.log("Mpendulo:: updateAccount \(account)")
         self.account = account
         delegate?.accountChanged(account)
     }
@@ -327,6 +367,7 @@ public class Ethereum {
     }
     
     func handleMessage(_ message: [String: Any]) {
+        Logging.log("Mpendulo:: handleMessage \(message)")
         if let id = message["id"] {
             if let identifier: Int64 = id as? Int64 {
                 let id: String = String(identifier)
@@ -335,12 +376,15 @@ public class Ethereum {
                 receiveResponse(message, id: identifier)
             }
         } else {
+            Logging.log("Mpendulo:: processing as event")
             receiveEvent(message)
         }
     }
     
     func receiveResponse(_ data: [String: Any], id: String) {
+        Logging.log("Mpendulo:: receiveResponse \(data)")
         guard let request = submittedRequests[id] else { return }
+        Logging.log("Mpendulo:: Received response for request \(request), data: \(data)")
         
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
@@ -387,7 +431,7 @@ public class Ethereum {
                 updateAccount(account)
                 sendResult(account, id: id)
             } else {
-                Logging.error("Request accounts failure")
+                Logging.error("Ethereum:: Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
@@ -402,7 +446,24 @@ public class Ethereum {
             } else {
                 Logging.error("Unexpected response \(data)")
             }
+        case .metamaskBatch:
+            Logging.log("Received data \(data)")
+            if
+                id == Ethereum.BATCH_CONNECTION_ID,
+                let result = data["result"] as? [Any],
+                result.count == 2,
+                let accounts = result.first as? [String],
+                let chainId = result[1] as? String {
+                
+                if let account = accounts.first {
+                    updateAccount(account)
+                }
+                updateChainId(chainId)
+            } else if let result = data["result"] {
+                sendResult(result, id: id)
+            }
         default:
+            Logging.log("Mpendulo:: Going for default case")
             if let result = data["result"] {
                 sendResult(result, id: id)
             } else {
