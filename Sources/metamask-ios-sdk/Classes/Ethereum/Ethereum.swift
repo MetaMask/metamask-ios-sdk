@@ -442,6 +442,11 @@ class Ethereum {
             return
         }
         
+        trackEvent?(.sdkRpcRequestDone, [
+            "from": "mobile",
+            "method": request.method
+        ])
+        
         guard
             let method = EthereumMethod(rawValue: request.method),
             EthereumMethod.isResultMethod(method) else {
