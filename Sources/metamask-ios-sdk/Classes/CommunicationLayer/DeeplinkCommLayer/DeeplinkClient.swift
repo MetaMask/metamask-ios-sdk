@@ -57,7 +57,8 @@ public class DeeplinkClient: CommClient {
     }
     
     public func clearSession() {
-        keyExchange.reset()
+        track(event: .disconnected)
+        setupClient()
     }
     
     private func sendMessage(_ message: String) {
@@ -142,7 +143,6 @@ public class DeeplinkClient: CommClient {
 extension DeeplinkClient {
     public func disconnect() {
         track(event: .disconnected)
-        session.clear()
     }
     
     public func terminateConnection() {

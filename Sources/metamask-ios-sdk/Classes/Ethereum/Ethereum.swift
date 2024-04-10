@@ -176,6 +176,8 @@ public class Ethereum {
         
         commClient.connect(with: requestJson)
         
+        connected = true
+        
         return await withCheckedContinuation { continuation in
             publisher?
                 .sink(receiveCompletion: { completion in
@@ -435,6 +437,19 @@ public class Ethereum {
                 track?(.connectionRejected, [:])
             }
             sendError(requestError, id: id)
+            
+            let accounts = data["accounts"] as? [String] ?? []
+            
+            if let account = accounts.first {
+                updateAccount(account)
+                sendResult(account, id: id)
+            }
+            
+            if let chainId = data["chainId"] as? String {
+                updateChainId(chainId)
+                sendResult(chainId, id: id)
+            }
+            
             return
         }
         
@@ -502,8 +517,6 @@ public class Ethereum {
                 sendResult(result, id: id)
             }
         default:
-            Logging.log("Mpendulo:: Going for default case")
-            
             if let chainId = data["chainId"] as? String {
                 Logging.log("Mpendulo:: Got metamask_connect* chainId: \(chainId)")
                 updateChainId(chainId)
@@ -519,8 +532,6 @@ public class Ethereum {
             if let result = data["result"] {
                 Logging.log("Mpendulo:: Got metamask_connect* result: \(result)")
                 sendResult(result, id: id)
-            } else {
-                Logging.error("Unknown response: \(data)")
             }
         }
     }
