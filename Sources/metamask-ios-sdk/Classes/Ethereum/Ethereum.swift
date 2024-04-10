@@ -240,7 +240,6 @@ public class Ethereum {
         } else {
         
             if commClient is SocketClient {
-                Logging.log("Ethereum::Mpendulo:: Sending request: \(request)")
                 (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
                 
                 let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
@@ -254,7 +253,6 @@ public class Ethereum {
                     Logging.error("Ethereum:: could not convert request to JSON: \(request)")
                     return
                 }
-                Logging.log("Ethereum::Mpendulo:: Sending request JSON: \(requestJson)")
                 
                 commClient.sendMessage(requestJson, encrypt: true)
             }
@@ -340,7 +338,6 @@ public class Ethereum {
                 commClient.connect(with: nil)
                 connected = true
                 commClient.addRequest { [weak self] in
-                    Logging.log("Ethereum:: Adding request \(request)")
                     self?.sendRequest(request)
                 }
             }
@@ -386,13 +383,11 @@ public class Ethereum {
     
     // MARK: Request Receiving
     private func updateChainId(_ id: String) {
-        Logging.log("Mpendulo:: updateChainId \(id)")
         chainId = id
         delegate?.chainIdChanged(id)
     }
     
     private func updateAccount(_ account: String) {
-        Logging.log("Mpendulo:: updateAccount \(account)")
         self.account = account
         delegate?.accountChanged(account)
     }
@@ -408,7 +403,6 @@ public class Ethereum {
     }
     
     func handleMessage(_ message: [String: Any]) {
-        Logging.log("Mpendulo:: handleMessage \(message)")
         if let id = message["id"] {
             if let identifier: Int64 = id as? Int64 {
                 let id: String = String(identifier)
@@ -417,15 +411,12 @@ public class Ethereum {
                 receiveResponse(message, id: identifier)
             }
         } else {
-            Logging.log("Mpendulo:: processing as event")
             receiveEvent(message)
         }
     }
     
     func receiveResponse(_ data: [String: Any], id: String) {
-        Logging.log("Mpendulo:: receiveResponse \(data)")
         guard let request = submittedRequests[id] else { return }
-        Logging.log("Mpendulo:: Received response for request \(request), data: \(data)")
         
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
@@ -438,6 +429,8 @@ public class Ethereum {
             }
             sendError(requestError, id: id)
             
+            // metamask_connectSign & metamask_connectwith can have both error & result
+            // if connection is approved but rpc request is denied
             let accounts = data["accounts"] as? [String] ?? []
             
             if let account = accounts.first {
@@ -501,7 +494,6 @@ public class Ethereum {
                 Logging.error("Unexpected response \(data)")
             }
         case .metamaskBatch:
-            Logging.log("Received data \(data)")
             if
                 id == Ethereum.BATCH_CONNECTION_ID,
                 let result = data["result"] as? [Any],
@@ -518,19 +510,16 @@ public class Ethereum {
             }
         default:
             if let chainId = data["chainId"] as? String {
-                Logging.log("Mpendulo:: Got metamask_connect* chainId: \(chainId)")
                 updateChainId(chainId)
             }
             
             if
                 let accounts = data["accounts"] as? [String],
                 let selectedAddress = accounts.first {
-                Logging.log("Mpendulo:: Got metamask_connect* selectedAddress: \(selectedAddress)")
                 updateAccount(selectedAddress)
             }
             
             if let result = data["result"] {
-                Logging.log("Mpendulo:: Got metamask_connect* result: \(result)")
                 sendResult(result, id: id)
             }
         }
@@ -553,14 +542,12 @@ public class Ethereum {
             let ethMethod = EthereumMethod(rawValue: method)
         else {
             if let chainId = event["chainId"] as? String {
-                Logging.log("Got metamask_connect* chainId: \(chainId)")
                 updateChainId(chainId)
             }
             
             if
                 let accounts = event["accounts"] as? [String],
                 let selectedAddress = accounts.first {
-                Logging.log("Got metamask_connect* selectedAddress: \(selectedAddress)")
                 updateAccount(selectedAddress)
             }
             return

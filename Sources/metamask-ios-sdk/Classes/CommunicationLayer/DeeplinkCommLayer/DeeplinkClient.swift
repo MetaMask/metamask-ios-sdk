@@ -199,7 +199,6 @@ extension DeeplinkClient {
                 Logging.log("DeeplinkClient:: Ignoring response \(json)")
                 return
             }
-            Logging.log("DeeplinkClient:: handling response")
             handleResponse?(data)
         } catch {
             Logging.error("DeeplinkClient:: Could not convert message to json. Message: \(message)\nError: \(error)")

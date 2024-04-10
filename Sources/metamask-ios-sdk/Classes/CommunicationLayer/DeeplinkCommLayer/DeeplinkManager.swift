@@ -21,14 +21,12 @@ public class DeeplinkManager {
         
         switch deeplink {
         case .mmsdk(let message, _, _):
-            Logging.log("DeeplinkManager:: message: \(message)")
             
             if !connected {
                 connected = true
             }
             
             let base64Decoded = message.base64Decode() ?? ""
-            Logging.log("DeeplinkManager:: base64Decoded: \(base64Decoded)")
             
             onReceiveMessage?(base64Decoded)
             
