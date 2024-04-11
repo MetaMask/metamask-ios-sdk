@@ -81,11 +81,11 @@ public class DeeplinkClient: CommClient {
     func sendMessage(_ deeplink: Deeplink) {
         switch deeplink {
         case .connect(_, let channelId):
-            let originatorInfo = originatorInfo().toJsonString() ?? ""
+            let originatorInfo = originatorInfo().toJsonString()?.base64Encode() ?? ""
             let message = "connect?scheme=\(dappScheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
             sendMessage(message)
         case .connectWith(_, let channelId, let request):
-            let originatorInfo = originatorInfo().toJsonString() ?? ""
+            let originatorInfo = originatorInfo().toJsonString()?.base64Encode() ?? ""
             let message = "connect?scheme=\(dappScheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)&request=\(request)"
             sendMessage(message)
         case .mmsdk(let message, _, let channelId):
