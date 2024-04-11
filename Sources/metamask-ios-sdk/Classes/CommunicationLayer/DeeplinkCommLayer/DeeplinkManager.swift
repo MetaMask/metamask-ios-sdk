@@ -28,7 +28,7 @@ public class DeeplinkManager {
             
             let base64Decoded = message.base64Decode() ?? ""
             
-            Logging.error("DeeplinkManager:: Received data: \(base64Decoded)")
+            Logging.log("DeeplinkManager:: Received data: \(base64Decoded)")
             
             onReceiveMessage?(base64Decoded)
             
@@ -59,17 +59,12 @@ public class DeeplinkManager {
             return nil
         }
         
-        if action == Deeplink.connect {
-            guard let scheme: String = components.queryItems?.first(where: { $0.name == "scheme" })?.value else {
-                Logging.error("DeeplinkManager:: Connect missing scheme")
-                return nil
-            }
-            
+        if action == Deeplink.connect {            
             guard let channelId: String = components.queryItems?.first(where: { $0.name == "channelId" })?.value else {
                 Logging.error("DeeplinkManager:: Connect step missing channelId")
                 return nil
             }
-            return .connect(scheme: scheme, pubkey: nil, channelId: channelId)
+            return .connect(pubkey: nil, channelId: channelId)
             
         } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {

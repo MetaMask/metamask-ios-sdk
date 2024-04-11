@@ -353,7 +353,7 @@ public class Ethereum {
                     return
                 }
                 
-                Logging.error("Ethereum:: Sending request: \(requestJson)")
+                Logging.log("Ethereum:: Sending request: \(requestJson)")
                 
                 commClient.sendMessage(requestJson, encrypt: true)
             }
@@ -548,12 +548,7 @@ public class Ethereum {
                 updateChainId(chainId)
                 sendResult(chainId, id: id)
             }
-            
-            track?(.sdkRpcRequestDone, [
-                "from": "mobile",
-                "method": request.method
-            ])
-            
+    
             return
         }
         
