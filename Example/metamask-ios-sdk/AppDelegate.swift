@@ -16,7 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        MetaMaskSDK.sharedInstance?.handleUrl(url)
+        if url.scheme == "metamask" {
+            MetaMaskSDK.sharedInstance?.handleUrl(url)
+        } else {
+            // handle other deeplinks
+        }
         return true
     }
 
