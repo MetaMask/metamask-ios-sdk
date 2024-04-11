@@ -506,6 +506,10 @@ public class Ethereum {
     func sendError(_ error: RequestError, id: String) {
         submittedRequests[id]?.error(error)
         submittedRequests.removeValue(forKey: id)
+        
+        if error.codeType == .unauthorisedRequest {
+            clearSession()
+        }
     }
     
     func handleMessage(_ message: [String: Any]) {
