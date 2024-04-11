@@ -5,7 +5,7 @@
 import SocketIO
 import Foundation
 
-public class Channel: CommunicationChannel {
+public class SocketChannel: CommunicationChannel {
     public typealias ChannelData = SocketData
     public typealias EventType = SocketClientEvent
     
@@ -58,7 +58,7 @@ public class Channel: CommunicationChannel {
 
 // MARK: Session
 
-extension Channel {
+extension SocketChannel {
     public func connect() {
         socket.connect()
     }
@@ -74,7 +74,7 @@ extension Channel {
 
 // MARK: Events
 
-extension Channel {
+extension SocketChannel {
     public func on(_ event: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
         socket.on(clientEvent: event, callback: { data, _ in
             DispatchQueue.main.async {

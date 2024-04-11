@@ -16,7 +16,7 @@ You can also see the [JavaScript SDK repository](https://github.com/MetaMask/met
   or emulator).
   You can install MetaMask Mobile from the [App Store](https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202)
   or clone and compile MetaMask Mobile from [source](https://github.com/MetaMask/metamask-mobile)
-  and build to your target device.
+  and build to your target device. Deeplink communication is only available from MetaMask Wallet version 7.21.0
 
 - iOS version 15 or later.
   The SDK supports `ios-arm64` (iOS devices) and `ios-arm64-simulator` (M1 chip simulators).
@@ -71,11 +71,62 @@ import metamask_ios_sdk
 
 We have provided a convenient way to make rpc requests without having to first make a connect request. Please refer to [Connect With Request](#5-connect-with-request) for examples. Otherwise you can connect your dapp to MetaMask as follows:
 
+Create dapp metadata
 ```swift
 let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
+```
 
-@ObservedObject var metamaskSDK = MetaMaskSDK.shared(appMetadata)
+#### Option 1: Deeplink Communication Layer
+The SDK supports communication with MetaMask wallet via deeplinking. To configure your dapp to work with deeplink communication you need to add a url scheme in your app target's Info setting under URL Types. Alternatively you can add it in app's your plist as shown below:
+```
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.dubdapp</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>dubdapp</string>
+            </array>
+        </dict>
+    </array>
+```
+Then in the AppDelegate's open url method handle 
+add 
+```swift
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    if URLComponents(url: url, resolvingAgainstBaseURL: true)?.host == "mmsdk" {
+        MetaMaskSDK.sharedInstance?.handleUrl(url)
+    } else {
+        // handle other deeplinks
+    }
+    return true
+}
+```
+And then initialise the SDK, specifying `.deeplinking` as the transport type, passing the scheme you used in the URL Types as the dappScheme.
+```swift
+@ObservedObject var metamaskSDK = MetaMaskSDK.shared(
+    appMetadata,
+    transport: .deeplinking(dappScheme: "dubdapp"),
+    sdkOptions: SDKOptions(infuraAPIKey: "your-api-key") // for read-only RPC calls
+)
+```
+#### NOTE
+Note that deeplink communication is only available from MetaMask Wallet version 7.21.0.
 
+#### Option 2: Socket Communication Layer
+Alternatively, the dapp can communicate with the MetaMask wallet via socket.
+```swift
+// To use deeplinking as transport layer
+@ObservedObject var metamaskSDK = MetaMaskSDK.shared(
+    appMetadata,
+    transport: .socket,
+    sdkOptions: SDKOptions(infuraAPIKey: "your-api-key") // for read-only RPC calls
+```
+Then connect the SDK
+```swift
 let connectResult = await metamaskSDK.connect()
 ```
 

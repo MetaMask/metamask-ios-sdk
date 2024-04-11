@@ -13,7 +13,7 @@ class SDKWrapper {
 
 public class MetaMaskSDK: ObservableObject {
     private var tracker: Tracking = Analytics.live
-    private let ethereum: Ethereum = .live
+    private let ethereum: Ethereum
     
     /// The active/selected MetaMask account chain
     @Published public var chainId: String = ""
@@ -23,7 +23,7 @@ public class MetaMaskSDK: ObservableObject {
     /// The active/selected MetaMask account address
     @Published public var account: String = ""
     
-    private var sharedInstance: MetaMaskSDK?
+    public static var sharedInstance: MetaMaskSDK? = SDKWrapper.shared.sdk
 
     /// In debug mode we track three events: connection request, connected, disconnected, otherwise no tracking
     public var enableDebug: Bool = true {
@@ -34,15 +34,15 @@ public class MetaMaskSDK: ObservableObject {
     
     public var networkUrl: String {
         get {
-            ethereum.commClient.networkUrl
+            (ethereum.commClient as? SocketClient)?.networkUrl ?? ""
         } set {
-            ethereum.commClient.networkUrl = newValue
+            (ethereum.commClient as? SocketClient)?.networkUrl = newValue
         }
     }
 
     public var useDeeplinks: Bool = false {
         didSet {
-            ethereum.commClient.useDeeplinks = useDeeplinks
+            (ethereum.commClient as? SocketClient)?.useDeeplinks = useDeeplinks
         }
     }
 
@@ -54,7 +54,8 @@ public class MetaMaskSDK: ObservableObject {
         }
     }
 
-    private init(appMetadata: AppMetadata, enableDebug: Bool, sdkOptions: SDKOptions?) {
+    private init(appMetadata: AppMetadata, transport: Transport, enableDebug: Bool, sdkOptions: SDKOptions?) {
+        self.ethereum = Dependencies.shared.ethereum(transport: transport)
         self.ethereum.delegate = self
         self.ethereum.sdkOptions = sdkOptions
         self.ethereum.updateMetadata(appMetadata)
@@ -62,9 +63,20 @@ public class MetaMaskSDK: ObservableObject {
         setupAppLifeCycleObservers()
     }
     
-    public static func shared(_ appMetadata: AppMetadata, enableDebug: Bool = true, sdkOptions: SDKOptions?) -> MetaMaskSDK {
+    public func handleUrl(_ url: URL) {
+        (ethereum.commClient as? DeeplinkClient)?.handleUrl(url)
+    }
+    
+    public static func shared(_ appMetadata: AppMetadata, 
+                              transport: Transport = .socket,
+                              enableDebug: Bool = true,
+                              sdkOptions: SDKOptions?) -> MetaMaskSDK {
         guard let sdk = SDKWrapper.shared.sdk else {
-            let metamaskSdk = MetaMaskSDK(appMetadata: appMetadata, enableDebug: enableDebug, sdkOptions: sdkOptions)
+            let metamaskSdk = MetaMaskSDK(
+                appMetadata: appMetadata,
+                transport: transport,
+                enableDebug: enableDebug,
+                sdkOptions: sdkOptions)
             SDKWrapper.shared.sdk = metamaskSdk
             return metamaskSdk
         }

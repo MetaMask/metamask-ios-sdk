@@ -6,7 +6,7 @@
 import Foundation
 import SocketIO
 
-public protocol RPCRequest: CodableData {
+public protocol RPCRequest: CodableData, Mappable {
     var id: String { get }
     var method: String { get }
     associatedtype ParameterType: CodableData

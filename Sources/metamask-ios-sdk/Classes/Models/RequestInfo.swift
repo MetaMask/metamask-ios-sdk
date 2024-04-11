@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct RequestInfo: CodableData {
+public struct RequestInfo: CodableData, Mappable {
     public let type: String
     public let originator: OriginatorInfo
     public let originatorInfo: OriginatorInfo

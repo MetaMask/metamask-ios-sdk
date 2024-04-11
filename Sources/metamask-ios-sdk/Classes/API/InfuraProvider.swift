@@ -19,8 +19,6 @@ public class InfuraProvider {
                 // ###### Ethereum ######
                 // Mainnet
                 "0x1": "https://mainnet.infura.io/v3/\(infuraAPIKey)",
-                // Goerli
-                "0x5": "https://goerli.infura.io/v3/\(infuraAPIKey)",
                 // Sepolia 11155111
                 "0x2a": "https://sepolia.infura.io/v3/\(infuraAPIKey)",
                 // ###### Polygon ######

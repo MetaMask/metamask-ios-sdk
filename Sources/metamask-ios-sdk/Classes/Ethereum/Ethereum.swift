@@ -13,8 +13,9 @@ protocol EthereumEventsDelegate: AnyObject {
     func accountChanged(_ account: String)
 }
 
-class Ethereum {
-    private let CONNECTION_ID = TimestampGenerator.timestamp()
+public class Ethereum {
+    static let CONNECTION_ID = TimestampGenerator.timestamp()
+    private static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
     
@@ -30,8 +31,8 @@ class Ethereum {
     /// The active/selected MetaMask account address
     private var account: String = ""
     
-    let commClient: CommunicationClient
-    private var trackEvent: ((Event, [String: Any]?) -> Void)?
+    var commClient: CommClient
+    private var track: ((Event, [String: Any]) -> Void)?
     
     private var appMetaDataValidationError: EthereumPublisher? {
         guard
@@ -49,13 +50,29 @@ class Ethereum {
         return nil
     }
     
-    init(commClient: CommunicationClient, trackEvent: @escaping ((Event, [String: Any]?) -> Void)) {
-        self.trackEvent = trackEvent
+    private init(commClient: CommClient, track: @escaping ((Event, [String: Any]) -> Void)) {
+        self.track = track
         self.commClient = commClient
-        self.commClient.receiveEvent = receiveEvent
-        self.commClient.tearDownConnection = disconnect
-        self.commClient.receiveResponse = receiveResponse
-        self.commClient.onClientsTerminated = terminateConnection
+        self.commClient.trackEvent = trackEvent
+        //self.commClient.terminateConnection()
+        self.commClient.handleResponse = handleMessage
+        //self.commClient.tearDownConnection = disconnect
+        //self.commClient.receiveResponse = receiveResponse
+        //self.commClient.onClientsTerminated = terminateConnection
+    }
+    
+    public static func shared(commClient: CommClient,
+                              trackEvent: @escaping ((Event, [String: Any]) -> Void)) -> Ethereum {
+        guard let ethereum = EthereumWrapper.shared.ethereum else {
+            let ethereum = Ethereum(commClient: commClient, track: trackEvent)
+            EthereumWrapper.shared.ethereum = ethereum
+            return ethereum
+        }
+        return ethereum
+    }
+    
+    private func trackEvent(event: Event, parameters: [String: Any]) {
+        track?(event, parameters)
     }
     
     func updateMetadata(_ metadata: AppMetadata) {
@@ -68,14 +85,18 @@ class Ethereum {
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect() -> EthereumPublisher? {
-        if let dappValidationError = appMetaDataValidationError {
-            return dappValidationError
-        }
-        
-        commClient.connect()
+        commClient.connect(with: nil)
         connected = true
         
-        return requestAccounts()
+        if commClient is SocketClient {
+            return requestAccounts()
+        }
+        
+        let submittedRequest = SubmittedRequest(method: "")
+        submittedRequests[Ethereum.CONNECTION_ID] = submittedRequest
+        let publisher = submittedRequests[Ethereum.CONNECTION_ID]?.publisher
+
+        return publisher
     }
     
     @discardableResult
@@ -96,18 +117,26 @@ class Ethereum {
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
-        if let dappValidationError = appMetaDataValidationError {
-            return dappValidationError
-        }
-        
-        commClient.connect()
-        
         let connectSignRequest = EthereumRequest(
             method: .metaMaskConnectSign,
             params: [message]
         )
+        connected = true
         
-        return request(connectSignRequest)
+        if commClient is SocketClient {
+            commClient.connect(with: nil)
+            return request(connectSignRequest)
+        }
+        
+        let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
+        submittedRequests[connectSignRequest.id] = submittedRequest
+        let publisher = submittedRequests[connectSignRequest.id]?.publisher
+
+        let requestJson = connectSignRequest.toJsonString() ?? ""
+        
+        commClient.connect(with: requestJson)
+        
+        return publisher
     }
     
     func connectAndSign(message: String) async -> Result<String, RequestError> {
@@ -126,13 +155,42 @@ class Ethereum {
         }
     }
     
-    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) -> EthereumPublisher? {
         let params: [EthereumRequest] = [req]
         let connectWithRequest = EthereumRequest(
             method: EthereumMethod.metamaskConnectWith.rawValue,
             params: params
         )
-        return await request(connectWithRequest)
+        connected = true
+        
+        if commClient is SocketClient {
+            commClient.connect(with: nil)
+            return request(connectWithRequest)
+        }
+        
+        let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
+        submittedRequests[connectWithRequest.id] = submittedRequest
+        let publisher = submittedRequests[connectWithRequest.id]?.publisher
+        let requestJson = connectWithRequest.toJsonString() ?? ""
+        
+        commClient.connect(with: requestJson)
+        return publisher
+    }
+    
+    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+        return await withCheckedContinuation { continuation in
+            connectWith(req)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success(""))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success("\(result)"))
+                }).store(in: &cancellables)
+        }
     }
     
     // MARK: Convenience Methods
@@ -252,7 +310,7 @@ class Ethereum {
     
     func terminateConnection() {
         if connected {
-            trackEvent?(.connectionRejected, nil)
+            track?(.connectionRejected, [:])
         }
         
         let error = RequestError(from: ["message": "The connection request has been rejected"])
@@ -280,26 +338,26 @@ class Ethereum {
                 }
             }
         } else {
-            commClient.sendMessage(request, encrypt: true)
-            let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
-            let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
-            
-            if authorise {
-                let additionalParams: [String: Any] = [
-                    "method": request.method,
-                    "sdkVersion": SDKInfo.version,
-                    "url": commClient.appMetadata?.url ?? "",
-                    "title": commClient.appMetadata?.name ?? "",
-                    "channelId": commClient.channelId,
-                    "platform": SDKInfo.platform,
-                    "timestamp": TimestampGenerator.timestamp(),
-                    "from": "mobile"
-                ]
-                trackEvent?(.sdkRpcRequest, additionalParams)
-            }
-            
-            if authorise && !skipAuthorisation {
-                commClient.requestAuthorisation()
+            track?(.sdkRpcRequest, [
+                "from": "mobile",
+                "method": request.method
+            ])
+            if commClient is SocketClient {
+                (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
+                
+                let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
+                let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
+                
+                if authorise && !skipAuthorisation {
+                    (commClient as? SocketClient)?.requestAuthorisation()
+                }
+            } else {
+                guard let requestJson = request.toJsonString() else {
+                    Logging.error("Ethereum:: could not convert request to JSON: \(request)")
+                    return
+                } 
+                
+                commClient.sendMessage(requestJson, encrypt: true)
             }
         }
     }
@@ -307,17 +365,43 @@ class Ethereum {
     @discardableResult
     private func requestAccounts() -> EthereumPublisher? {
         let requestAccountsRequest = EthereumRequest(
-            id: CONNECTION_ID,
+            id: Ethereum.CONNECTION_ID,
             method: .ethRequestAccounts
         )
         
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
-        submittedRequests[CONNECTION_ID] = submittedRequest
-        let publisher = submittedRequests[CONNECTION_ID]?.publisher
+        submittedRequests[requestAccountsRequest.id] = submittedRequest
+        let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
         
         commClient.addRequest { [weak self] in
             self?.sendRequest(requestAccountsRequest)
         }
+        
+        return publisher
+    }
+    
+    private func createChainIdRequest() -> EthereumRequest<String> {
+        let chainIdRequest = EthereumRequest(
+            method: .ethChainId
+        )
+        
+        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
+        submittedRequests[chainIdRequest.id] = submittedRequest
+        
+        return chainIdRequest
+    }
+    
+    @discardableResult
+    private func requestChainId() -> EthereumPublisher? {
+        let chainIdRequest = EthereumRequest(
+            method: .ethChainId
+        )
+        
+        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
+        submittedRequests[chainIdRequest.id] = submittedRequest
+        let publisher = submittedRequests[chainIdRequest.id]?.publisher
+        
+        sendRequest(chainIdRequest)
         
         return publisher
     }
@@ -329,7 +413,7 @@ class Ethereum {
     func request(_ request: any RPCRequest) -> EthereumPublisher? {
         if !connected && !EthereumMethod.isConnectMethod(request.methodType) {
             if request.methodType == .ethRequestAccounts {
-                commClient.connect()
+                commClient.connect(with: nil)
                 connected = true
                 return requestAccounts()
             }
@@ -343,7 +427,7 @@ class Ethereum {
             if connected {
                 sendRequest(request)
             } else {
-                commClient.connect()
+                commClient.connect(with: nil)
                 connected = true
                 commClient.addRequest { [weak self] in
                     self?.sendRequest(request)
@@ -424,9 +508,26 @@ class Ethereum {
     func sendError(_ error: RequestError, id: String) {
         submittedRequests[id]?.error(error)
         submittedRequests.removeValue(forKey: id)
+        
+        if error.codeType == .unauthorisedRequest {
+            clearSession()
+        }
     }
     
-    func receiveResponse(id: String, data: [String: Any]) {
+    func handleMessage(_ message: [String: Any]) {
+        if let id = message["id"] {
+            if let identifier: Int64 = id as? Int64 {
+                let id: String = String(identifier)
+                receiveResponse(message, id: id)
+            } else if let identifier: String = id as? String {
+                receiveResponse(message, id: identifier)
+            }
+        } else {
+            receiveEvent(message)
+        }
+    }
+    
+    func receiveResponse(_ data: [String: Any], id: String) {
         guard let request = submittedRequests[id] else { return }
         
         if let error = data["error"] as? [String: Any] {
@@ -436,13 +537,28 @@ class Ethereum {
                 method == .ethRequestAccounts,
                 requestError.codeType == .userRejectedRequest
             {
-                trackEvent?(.connectionRejected, nil)
+                track?(.connectionRejected, [:])
             }
             sendError(requestError, id: id)
+            
+            // metamask_connectSign & metamask_connectwith can have both error & result
+            // if connection is approved but rpc request is denied
+            let accounts = data["accounts"] as? [String] ?? []
+            
+            if let account = accounts.first {
+                updateAccount(account)
+                sendResult(account, id: id)
+            }
+            
+            if let chainId = data["chainId"] as? String {
+                updateChainId(chainId)
+                sendResult(chainId, id: id)
+            }
+    
             return
         }
         
-        trackEvent?(.sdkRpcRequestDone, [
+        track?(.sdkRpcRequestDone, [
             "from": "mobile",
             "method": request.method
         ])
@@ -475,11 +591,11 @@ class Ethereum {
         case .ethRequestAccounts:
             let result: [String] = data["result"] as? [String] ?? []
             if let account = result.first {
-                trackEvent?(.connectionAuthorised, nil)
+                track?(.connectionAuthorised, [:])
                 updateAccount(account)
                 sendResult(result, id: id)
             } else {
-                Logging.error("Request accounts failure")
+                Logging.error("Ethereum:: Request accounts failure")
             }
         case .ethChainId:
             if let result: String = data["result"] as? String {
@@ -494,21 +610,63 @@ class Ethereum {
             } else {
                 Logging.error("Unexpected response \(data)")
             }
+        case .metamaskBatch:
+            if
+                id == Ethereum.BATCH_CONNECTION_ID,
+                let result = data["result"] as? [Any],
+                result.count == 2,
+                let accounts = result.first as? [String],
+                let chainId = result[1] as? String {
+                
+                if let account = accounts.first {
+                    updateAccount(account)
+                }
+                updateChainId(chainId)
+            } else if let result = data["result"] {
+                sendResult(result, id: id)
+            }
         default:
+            if let chainId = data["chainId"] as? String {
+                updateChainId(chainId)
+            }
+            
+            if
+                let accounts = data["accounts"] as? [String],
+                let selectedAddress = accounts.first {
+                updateAccount(selectedAddress)
+            }
+            
             if let result = data["result"] {
                 sendResult(result, id: id)
-            } else {
-                Logging.error("Unknown response: \(data)")
             }
         }
     }
     
     func receiveEvent(_ event: [String: Any]) {
+        if let error = event["error"] as? [String: Any] {
+            Logging.error("Ethereum:: receive error: \(error)")
+            let requestError = RequestError(from: error)
+            
+            if requestError.codeType == .userRejectedRequest
+            {
+                track?(.connectionRejected, [:])
+            }
+            sendError(requestError, id: Ethereum.CONNECTION_ID)
+        }
+        
         guard
             let method = event["method"] as? String,
             let ethMethod = EthereumMethod(rawValue: method)
         else {
-            Logging.error("Unhandled event: \(event)")
+            if let chainId = event["chainId"] as? String {
+                updateChainId(chainId)
+            }
+            
+            if
+                let accounts = event["accounts"] as? [String],
+                let selectedAddress = accounts.first {
+                updateAccount(selectedAddress)
+            }
             return
         }
         
@@ -528,8 +686,4 @@ class Ethereum {
             Logging.error("Unhandled case: \(event)")
         }
     }
-}
-
-extension Ethereum {
-    static let live = Dependencies.shared.ethereum
 }
