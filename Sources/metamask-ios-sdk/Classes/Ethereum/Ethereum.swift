@@ -14,7 +14,7 @@ protocol EthereumEventsDelegate: AnyObject {
 }
 
 public class Ethereum {
-    private static let CONNECTION_ID = TimestampGenerator.timestamp()
+    static let CONNECTION_ID = TimestampGenerator.timestamp()
     private static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
@@ -193,6 +193,106 @@ public class Ethereum {
         }
     }
     
+    // MARK: Convenience Methods
+    
+    func getChainId() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethChainId, params: [String]())
+    }
+    
+    func getEthAccounts() async -> Result<[String], RequestError> {
+        await ethereumRequest(method: .ethAccounts, params: [String]())
+    }
+    
+    func getEthGasPrice() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGasPrice)
+    }
+    
+    func getEthBalance(address: String, block: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBalance, params: [address, block])
+    }
+    
+    func getEthBlockNumber() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethBlockNumber)
+    }
+    
+    func getEthEstimateGas() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethEstimateGas)
+    }
+    
+    func getWeb3ClientVersion() async -> Result<String, RequestError> {
+        await ethereumRequest(method: .web3ClientVersion, params: [String]())
+    }
+    
+    func personalSign(message: String, address: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .personalSign, params: [address, message])
+    }
+    
+    func signTypedDataV4(typedData: String, address: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSignTypedDataV4, params: [address, typedData])
+    }
+    
+    func sendTransaction(from: String, to: String, amount: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSendTransaction, params: [
+            [
+                "from": from,
+                "to": to,
+                "amount": amount
+            ]
+        ])
+    }
+    
+    func sendRawTransaction(signedTransaction: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethSendRawTransaction, params: [signedTransaction])
+    }
+    
+    func getBlockTransactionCountByNumber(blockNumber: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBlockTransactionCountByNumber, params: [blockNumber])
+    }
+    
+    func getBlockTransactionCountByHash(blockHash: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetBlockTransactionCountByHash, params: [blockHash])
+    }
+    
+    func getTransactionCount(address: String, tagOrblockNumber: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .ethGetTransactionCount, params: [address, tagOrblockNumber])
+    }
+    
+    func addEthereumChain(chainId: String, 
+                          chainName: String,
+                          rpcUrls: [String],
+                          iconUrls: [String]?,
+                          blockExplorerUrls: [String]?,
+                          nativeCurrency: NativeCurrency) async -> Result<String, RequestError> {
+
+        
+        return await ethereumRequest(method: .addEthereumChain, params: [
+                AddChainParameters(
+                    chainId: chainId,
+                    chainName: chainName,
+                    rpcUrls: rpcUrls,
+                    iconUrls: iconUrls,
+                    blockExplorerUrls: blockExplorerUrls,
+                    nativeCurrency: nativeCurrency
+                )
+        ])
+    }
+    
+    func switchEthereumChain(chainId: String) async -> Result<String, RequestError> {
+        await ethereumRequest(method: .switchEthereumChain, params: [
+            ["chainId": chainId]
+        ])
+    }
+    
+    private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<String, RequestError> {
+        let ethRequest = EthereumRequest(method: method, params: params)
+        return await request(ethRequest)
+    }
+    
+    private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<[String], RequestError> {
+        let ethRequest = EthereumRequest(method: method, params: params)
+        return await request(ethRequest)
+    }
+    
     /// Disconnect dapp
     func disconnect() {
         updateChainId("")
@@ -238,7 +338,6 @@ public class Ethereum {
                 }
             }
         } else {
-        
             if commClient is SocketClient {
                 (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
                 
@@ -253,6 +352,8 @@ public class Ethereum {
                     Logging.error("Ethereum:: could not convert request to JSON: \(request)")
                     return
                 }
+                
+                Logging.error("Ethereum:: Sending request: \(requestJson)")
                 
                 commClient.sendMessage(requestJson, encrypt: true)
             }
@@ -269,17 +370,6 @@ public class Ethereum {
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
         submittedRequests[requestAccountsRequest.id] = submittedRequest
         let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
-        
-//        let chainIdRequest = createChainIdRequest()
-//        let params = [requestAccountsRequest, chainIdRequest]
-//
-//        let batchRequest = EthereumRequest(
-//            id: Ethereum.BATCH_CONNECTION_ID,
-//            method: EthereumMethod.metamaskBatch.rawValue,
-//            params: params)
-//        
-//        let submittedBatchRequest = SubmittedRequest(method: batchRequest.method)
-//        submittedRequests[batchRequest.id] = submittedBatchRequest
         
         commClient.addRequest { [weak self] in
             self?.sendRequest(requestAccountsRequest)
@@ -356,7 +446,23 @@ public class Ethereum {
                         continuation.resume(returning: .failure(error))
                     }
                 }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
+                    continuation.resume(returning: .success(result as? String ?? ""))
+                }).store(in: &cancellables)
+        }
+    }
+    
+    func request(_ req: any RPCRequest) async -> Result<[String], RequestError> {
+        return await withCheckedContinuation { continuation in
+            request(req)?
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: .success([]))
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
+                }, receiveValue: { result in
+                    continuation.resume(returning: .success(result as? [String] ?? []))
                 }).store(in: &cancellables)
         }
     }
@@ -443,8 +549,18 @@ public class Ethereum {
                 sendResult(chainId, id: id)
             }
             
+            track?(.sdkRpcRequestDone, [
+                "from": "mobile",
+                "method": request.method
+            ])
+            
             return
         }
+        
+        track?(.sdkRpcRequestDone, [
+            "from": "mobile",
+            "method": request.method
+        ])
         
         guard
             let method = EthereumMethod(rawValue: request.method),
@@ -476,7 +592,7 @@ public class Ethereum {
             if let account = result.first {
                 track?(.connectionAuthorised, [:])
                 updateAccount(account)
-                sendResult(account, id: id)
+                sendResult(result, id: id)
             } else {
                 Logging.error("Ethereum:: Request accounts failure")
             }

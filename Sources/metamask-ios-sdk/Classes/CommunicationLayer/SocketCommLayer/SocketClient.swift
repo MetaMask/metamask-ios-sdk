@@ -13,7 +13,7 @@ public class SocketClient: CommClient {
     private var keyExchange = KeyExchange()
     private let channel = SocketChannel()
 
-    private var channelId: String = ""
+    var channelId: String = ""
 
     public var isConnected: Bool {
         channel.isConnected
@@ -458,12 +458,6 @@ extension SocketClient {
         var parameters: [String: Any] = ["id": id]
 
         switch event {
-        case .connected,
-                .disconnected,
-                .reconnectionRequest,
-                .connectionAuthorised,
-                .connectionRejected:
-            break
         case .connectionRequest:
             let additionalParams: [String: Any] = [
                 "commLayer": "socket",
@@ -473,6 +467,8 @@ extension SocketClient {
                 "platform": SDKInfo.platform
             ]
             parameters.merge(additionalParams) { current, _ in current }
+        default:
+            break
         }
         
         trackEvent?(event, parameters)

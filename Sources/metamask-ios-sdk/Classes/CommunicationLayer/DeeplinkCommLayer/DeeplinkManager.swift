@@ -28,6 +28,8 @@ public class DeeplinkManager {
             
             let base64Decoded = message.base64Decode() ?? ""
             
+            Logging.error("DeeplinkManager:: Received data: \(base64Decoded)")
+            
             onReceiveMessage?(base64Decoded)
             
         default:
