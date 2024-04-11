@@ -27,7 +27,7 @@
 			<string>org.demo.metamask-ios-sdk-Example</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>dubdapp</string>
+				<string>metamaskdapp</string>
 			</array>
 		</dict>
 	</array>
