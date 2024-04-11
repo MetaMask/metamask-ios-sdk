@@ -51,7 +51,6 @@ public class DeeplinkClient: CommClient {
     }
     
     private func setupClient() {
-        session.clear()
         let sessionInfo = session.fetchSessionConfig()
         channelId = sessionInfo.0.sessionId
     }
