@@ -338,6 +338,10 @@ public class Ethereum {
                 }
             }
         } else {
+            track?(.sdkRpcRequest, [
+                "from": "mobile",
+                "method": request.method
+            ])
             if commClient is SocketClient {
                 (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
                 
@@ -351,9 +355,7 @@ public class Ethereum {
                 guard let requestJson = request.toJsonString() else {
                     Logging.error("Ethereum:: could not convert request to JSON: \(request)")
                     return
-                }
-                
-                Logging.log("Ethereum:: Sending request: \(requestJson)")
+                } 
                 
                 commClient.sendMessage(requestJson, encrypt: true)
             }

@@ -9,8 +9,6 @@ import Foundation
 
 public class DeeplinkClient: CommClient {
     
-    public var useDeeplinks: Bool = true
-    
     private let session: SessionManager
     private var channelId: String = ""
     private let dappScheme: String
@@ -79,13 +77,12 @@ public class DeeplinkClient: CommClient {
     
     func sendMessage(_ deeplink: Deeplink) {
         switch deeplink {
-        case .connect(_, let channelId):
+        case .connect(_, let channelId, let request):
             let originatorInfo = originatorInfo().toJsonString()?.base64Encode() ?? ""
-            let message = "connect?scheme=\(dappScheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
-            sendMessage(message)
-        case .connectWith(_, let channelId, let request):
-            let originatorInfo = originatorInfo().toJsonString()?.base64Encode() ?? ""
-            let message = "connect?scheme=\(dappScheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)&request=\(request)"
+            var message = "connect?scheme=\(dappScheme)&channelId=\(channelId)&comm=deeplinking&originatorInfo=\(originatorInfo)"
+            if let request = request {
+                message.append("&request=\(request)")
+            }
             sendMessage(message)
         case .mmsdk(let message, _, let channelId):
             let message = "mmsdk?scheme=\(dappScheme)&message=\(message)&channelId=\(channelId ?? "")"
@@ -97,17 +94,11 @@ public class DeeplinkClient: CommClient {
     public func connect(with request: String? = nil) {
         track(event: .connectionRequest)
         
-        if let request = request {
-            sendMessage(.connectWith(
-                pubkey: nil,
-                channelId: channelId,
-                request: request
-            ))
-        } else {
-            sendMessage(.connect(
-                pubkey: nil,
-                channelId: channelId))
-        }
+        sendMessage(.connect(
+            pubkey: nil,
+            channelId: channelId,
+            request: request
+        ))
     }
     
     public func track(event: Event) {
@@ -148,7 +139,6 @@ extension DeeplinkClient {
     }
     
     public func addRequest(_ job: @escaping RequestJob) {
-        Logging.log("DeeplinkClient:: Adding request job")
         requestJobs.append(job)
     }
     

@@ -8,9 +8,6 @@ import Foundation
 
 public class DeeplinkManager {
     var onReceiveMessage: ((String) -> Void)?
-    var decryptMessage: ((String) throws -> String?)?
-    
-    private var connected = false
     
     public func handleUrl(_ url: URL)  {
         handleUrl(url.absoluteString)
@@ -21,14 +18,7 @@ public class DeeplinkManager {
         
         switch deeplink {
         case .mmsdk(let message, _, _):
-            
-            if !connected {
-                connected = true
-            }
-            
             let base64Decoded = message.base64Decode() ?? ""
-            
-            Logging.log("DeeplinkManager:: Received data: \(base64Decoded)")
             
             onReceiveMessage?(base64Decoded)
             
@@ -64,7 +54,7 @@ public class DeeplinkManager {
                 Logging.error("DeeplinkManager:: Connect step missing channelId")
                 return nil
             }
-            return .connect(pubkey: nil, channelId: channelId)
+            return .connect(pubkey: nil, channelId: channelId, request: nil)
             
         } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {
