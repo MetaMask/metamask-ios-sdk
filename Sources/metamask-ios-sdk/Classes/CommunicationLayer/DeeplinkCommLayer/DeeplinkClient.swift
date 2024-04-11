@@ -51,13 +51,13 @@ public class DeeplinkClient: CommClient {
     }
     
     private func setupClient() {
-        session.clear()
         let sessionInfo = session.fetchSessionConfig()
         channelId = sessionInfo.0.sessionId
     }
     
     public func clearSession() {
         track(event: .disconnected)
+        session.clear()
         setupClient()
     }
     
@@ -67,8 +67,6 @@ public class DeeplinkClient: CommClient {
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
-        
-        Logging.log("DeeplinkClient:: Sending deeplink \(urlString)")
 
         DispatchQueue.main.async {
             UIApplication.shared.open(url)
