@@ -8,6 +8,7 @@ import Foundation
 
 public class DeeplinkManager {
     var onReceiveMessage: ((String) -> Void)?
+    var decryptMessage: ((String) throws -> String?)?
     
     public func handleUrl(_ url: URL)  {
         handleUrl(url.absoluteString)

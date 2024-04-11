@@ -119,7 +119,6 @@ public class KeyExchange {
     public func setTheirPublicKey(_ publicKey: String?) {
         if let theirPubKey = publicKey {
             theirPublicKey = theirPubKey
-            Logging.log("Setting their theirPublicKey as \(theirPubKey)")
         }
     }
 

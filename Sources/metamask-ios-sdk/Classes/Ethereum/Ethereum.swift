@@ -117,30 +117,24 @@ public class Ethereum {
     }
     
     func connectAndSign(message: String) -> EthereumPublisher? {
-        if commClient is SocketClient {
-            commClient.connect(with: nil)
-            
-            let connectSignRequest = EthereumRequest(
-                method: .metaMaskConnectSign,
-                params: [message]
-            )
-            connected = true
-            return request(connectSignRequest)
-        }
-        
         let connectSignRequest = EthereumRequest(
             method: .metaMaskConnectSign,
             params: [message]
         )
+        connected = true
+        
+        if commClient is SocketClient {
+            commClient.connect(with: nil)
+            return request(connectSignRequest)
+        }
         
         let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
         submittedRequests[connectSignRequest.id] = submittedRequest
         let publisher = submittedRequests[connectSignRequest.id]?.publisher
-        
+
         let requestJson = connectSignRequest.toJsonString() ?? ""
         
         commClient.connect(with: requestJson)
-        connected = true
         
         return publisher
     }
@@ -161,25 +155,31 @@ public class Ethereum {
         }
     }
     
-    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
+    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) -> EthereumPublisher? {
         let params: [EthereumRequest] = [req]
         let connectWithRequest = EthereumRequest(
             method: EthereumMethod.metamaskConnectWith.rawValue,
             params: params
         )
+        connected = true
+        
+        if commClient is SocketClient {
+            commClient.connect(with: nil)
+            return request(connectWithRequest)
+        }
         
         let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
         submittedRequests[connectWithRequest.id] = submittedRequest
         let publisher = submittedRequests[connectWithRequest.id]?.publisher
-        
         let requestJson = connectWithRequest.toJsonString() ?? ""
         
         commClient.connect(with: requestJson)
-        
-        connected = true
-        
+        return publisher
+    }
+    
+    func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
-            publisher?
+            connectWith(req)?
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:

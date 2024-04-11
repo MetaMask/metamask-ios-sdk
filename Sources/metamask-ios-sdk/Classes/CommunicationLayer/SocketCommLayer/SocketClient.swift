@@ -409,7 +409,7 @@ extension SocketClient {
                 Logging.log("Connection not ready. Will send once wallet is open again")
                 addRequest { [weak self] in
                     guard let self = self else { return }
-                    Logging.log("Resuming sending requests after connection pause")
+                    Logging.log("Resuming sending requests")
                     
                     do {
                         let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
