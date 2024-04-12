@@ -77,7 +77,7 @@ let appMetadata = AppMetadata(name: "Dub Dapp", url: "https://dubdapp.com")
 ```
 
 #### Option 1: Deeplink Communication Layer
-The SDK supports communication with MetaMask wallet via deeplinking. To configure your dapp to work with deeplink communication you need to add a url scheme in your app target's Info setting under URL Types. Alternatively you can add it in app's your plist as shown below:
+The SDK supports communication with MetaMask wallet via deeplinking. To configure your dapp to work with deeplink communication you need to add a url scheme in your dapp target's Info setting under URL Types. Alternatively you can add it in your dapp's plist as shown below:
 ```
     <key>CFBundleURLTypes</key>
     <array>
@@ -93,8 +93,7 @@ The SDK supports communication with MetaMask wallet via deeplinking. To configur
         </dict>
     </array>
 ```
-Then in the AppDelegate's open url method handle 
-add 
+Then in the AppDelegate's open url method handle deeplinks from the MetaMask wallet
 ```swift
 func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     if URLComponents(url: url, resolvingAgainstBaseURL: true)?.host == "mmsdk" {
@@ -105,7 +104,7 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplication.Op
     return true
 }
 ```
-And then initialise the SDK, specifying `.deeplinking` as the transport type, passing the scheme you used in the URL Types as the dappScheme.
+And then initialise the SDK, specifying `.deeplinking` as the transport type, passing the dapp's' scheme you added in the URL Types as the `dappScheme`.
 ```swift
 @ObservedObject var metamaskSDK = MetaMaskSDK.shared(
     appMetadata,
@@ -117,7 +116,7 @@ And then initialise the SDK, specifying `.deeplinking` as the transport type, pa
 Note that deeplink communication is only available from MetaMask Wallet version 7.21.0.
 
 #### Option 2: Socket Communication Layer
-Alternatively, the dapp can communicate with the MetaMask wallet via socket.
+Alternatively, by default, the dapp communicates with the MetaMask wallet via sockets.
 ```swift
 // To use deeplinking as transport layer
 @ObservedObject var metamaskSDK = MetaMaskSDK.shared(
