@@ -37,7 +37,6 @@ public class SocketClient: CommClient {
     
     private var isReady: Bool = false
     private var isReconnection = false
-    public var tearDownConnection: (() -> Void)?
     public var onClientsTerminated: (() -> Void)?
 
     public var handleResponse: (([String: Any]) -> Void)?
@@ -458,7 +457,7 @@ extension SocketClient {
         var parameters: [String: Any] = ["id": id]
 
         switch event {
-        case .connectionRequest:
+        case .connectionRequest, .sdkRpcRequest:
             let additionalParams: [String: Any] = [
                 "commLayer": "socket",
                 "sdkVersion": SDKInfo.version,
