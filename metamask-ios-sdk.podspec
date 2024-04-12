@@ -19,9 +19,9 @@ The iOS MetaMask SDK enables native iOS apps to interact with the Ethereum block
   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   
   s.vendored_frameworks = 'Sources/metamask-ios-sdk/Frameworks/Ecies.xcframework'
-  # Starscream does not compile,
-  #s.dependency 'Socket.IO-Client-Swift', '~> 16.1.0'
+  # Temporal solution while awaiting Starscream to fix an issue we reported
   s.dependency 'Socket.IO-Client-Swift', :git => 'https://github.com/elefantel/socket.io-client-swift', :branch => 'main'
+  #s.dependency 'Socket.IO-Client-Swift', '~> 16.1.0'
 
 
 end
