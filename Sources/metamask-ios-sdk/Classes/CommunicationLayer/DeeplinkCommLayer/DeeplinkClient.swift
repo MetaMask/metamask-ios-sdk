@@ -111,10 +111,9 @@ public class DeeplinkClient: CommClient {
                 .reconnectionRequest,
                 .connectionAuthorised,
                 .connectionRejected,
-                .sdkRpcRequest,
                 .sdkRpcRequestDone:
             break
-        case .connectionRequest:
+        case .connectionRequest, .sdkRpcRequest:
             let additionalParams: [String: Any] = [
                 "commLayer": "deeplinking",
                 "sdkVersion": SDKInfo.version,

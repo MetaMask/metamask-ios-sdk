@@ -34,31 +34,12 @@ public class Ethereum {
     var commClient: CommClient
     private var track: ((Event, [String: Any]) -> Void)?
     
-    private var appMetaDataValidationError: EthereumPublisher? {
-        guard
-            let urlString = commClient.appMetadata?.url,
-            let url = URL(string: urlString),
-            url.host != nil,
-            url.scheme != nil
-        else {
-            return RequestError.failWithError(.invalidUrlError)
-        }
-        
-        if commClient.appMetadata?.name.isEmpty ?? true {
-            return RequestError.failWithError(.invalidTitleError)
-        }
-        return nil
-    }
-    
     private init(commClient: CommClient, track: @escaping ((Event, [String: Any]) -> Void)) {
         self.track = track
         self.commClient = commClient
         self.commClient.trackEvent = trackEvent
-        //self.commClient.terminateConnection()
         self.commClient.handleResponse = handleMessage
-        //self.commClient.tearDownConnection = disconnect
-        //self.commClient.receiveResponse = receiveResponse
-        //self.commClient.onClientsTerminated = terminateConnection
+        (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
     }
     
     public static func shared(commClient: CommClient,
