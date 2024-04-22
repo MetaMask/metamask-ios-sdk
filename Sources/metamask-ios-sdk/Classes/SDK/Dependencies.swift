@@ -11,7 +11,7 @@ public final class Dependencies {
     public lazy var network: any Networking = Network()
     public lazy var tracker: Tracking = Analytics(network: network, debug: true)
     public lazy var store: SecureStore = Keychain(service: SDKInfo.bundleIdentifier ?? UUID().uuidString)
-    public lazy var sessionManager: SessionManager = SessionManager(store: store, sessionDuration: 24 * 3600 * 7)
+    public lazy var sessionManager: SessionManager = SessionManager(store: store, sessionDuration: 24 * 3600 * 30)
     
     public func ethereum(transport: Transport) -> Ethereum {
         let client: CommClient
