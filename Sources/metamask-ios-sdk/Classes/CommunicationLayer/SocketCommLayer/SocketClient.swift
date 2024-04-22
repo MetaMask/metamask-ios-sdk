@@ -347,21 +347,8 @@ private extension SocketClient {
 
 extension SocketClient {
     func sendOriginatorInfo() {
-        let originatorInfo = OriginatorInfo(
-            title: appMetadata?.name,
-            url: appMetadata?.url,
-            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
-            platform: SDKInfo.platform,
-            apiVersion: SDKInfo.version
-        )
-
-        let requestInfo = RequestInfo(
-            type: "originator_info",
-            originator: originatorInfo,
-            originatorInfo: originatorInfo
-        )
-
-        sendMessage(requestInfo, encrypt: true)
+        let originatorInfo = originatorInfo()
+        sendMessage(originatorInfo, encrypt: true)
     }
     
     public func send(_ message: String, encrypt: Bool) {

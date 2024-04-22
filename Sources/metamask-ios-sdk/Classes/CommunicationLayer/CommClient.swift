@@ -26,7 +26,8 @@ public extension CommClient {
         let originatorInfo = OriginatorInfo(
             title: appMetadata?.name,
             url: appMetadata?.url,
-            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
+            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon, 
+            dappId: SDKInfo.bundleIdentifier,
             platform: SDKInfo.platform,
             apiVersion: SDKInfo.version
         )

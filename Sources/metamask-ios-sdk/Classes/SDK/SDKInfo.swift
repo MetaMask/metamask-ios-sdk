@@ -17,8 +17,8 @@ public enum SDKInfo {
     }
     
     /// The bundle identifier of the dapp
-    public static var bundleIdentifier: String {
-        Bundle.main.bundleIdentifier ?? UUID().uuidString
+    public static var bundleIdentifier: String? {
+        Bundle.main.bundleIdentifier
     }
     
     /// The platform OS on which the SDK is run e.g `ios, ipados`
