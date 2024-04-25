@@ -7,7 +7,7 @@ import XCTest
 import metamask_ios_sdk
 
 class CryptoTests: XCTestCase {
-    //var crypt
+
     override func setUp() {
         super.setUp()
     }

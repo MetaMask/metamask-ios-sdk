@@ -24,6 +24,8 @@
 		D14FA2F429E576EB00F3A059 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */; };
 		D14FA2F629E578B200F3A059 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F529E578B200F3A059 /* ViewExtension.swift */; };
 		D14FA2F829E57B6900F3A059 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14FA2F729E57B6900F3A059 /* ToastView.swift */; };
+		D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15F6AE62BD7AF2D005048F3 /* DeeplinkManagerTests.swift */; };
+		D15F6AE92BD9276B005048F3 /* DeeplinkClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15F6AE82BD9276B005048F3 /* DeeplinkClientTests.swift */; };
 		D1896062296C3F9500216307 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1896061296C3F9500216307 /* NetworkView.swift */; };
 		D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */; };
 		D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */; };
@@ -69,6 +71,8 @@
 		D14FA2F329E576EB00F3A059 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		D14FA2F529E578B200F3A059 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		D14FA2F729E57B6900F3A059 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		D15F6AE62BD7AF2D005048F3 /* DeeplinkManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkManagerTests.swift; sourceTree = "<group>"; };
+		D15F6AE82BD9276B005048F3 /* DeeplinkClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkClientTests.swift; sourceTree = "<group>"; };
 		D1896061296C3F9500216307 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
 		D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStorageTests.swift; sourceTree = "<group>"; };
 		D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfigTests.swift; sourceTree = "<group>"; };
@@ -150,6 +154,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D15F6AE62BD7AF2D005048F3 /* DeeplinkManagerTests.swift */,
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 				D1A258DC2AF42A720019321C /* CryptoTests.swift */,
@@ -157,6 +162,7 @@
 				D190A48E2AFA2958000A1AA8 /* SecureStorageTests.swift */,
 				D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */,
 				D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */,
+				D15F6AE82BD9276B005048F3 /* DeeplinkClientTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -422,7 +428,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
 				D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */,
+				D15F6AE92BD9276B005048F3 /* DeeplinkClientTests.swift in Sources */,
 				D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */,
