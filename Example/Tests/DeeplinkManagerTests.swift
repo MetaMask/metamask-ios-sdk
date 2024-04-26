@@ -47,13 +47,22 @@ class DeeplinkManagerTests: XCTestCase {
         XCTAssert(deeplink == Deeplink.connect(pubkey: pubkey, channelId: channelId, request: nil))
     }
     
+    func testConnectDeeplinkHasRequest() {
+        let pubkey = "asdfghjkl"
+        let channelId = "2468"
+        let request = "This is a json request".base64Encode() ?? ""
+        let url = "target://connect?scheme=testdapp&pubkey=\(pubkey)&channelId=\(channelId)&request=\(request)"
+        let deeplink = deeplinkManager.getDeeplink(url)
+        XCTAssert(deeplink == Deeplink.connect(pubkey: pubkey, channelId: channelId, request: request))
+    }
+    
     func testMessageDeeplinkHasCorrectMessageAndPubkey() {
         let pubkey = "asdfghjkl"
         let channelId = "2468"
         let message = "base64EncodedRequest"
         let url = "target://mmsdk?scheme=testdapp&message=\(message)&pubkey=\(pubkey)&channelId=\(channelId)"
         let deeplink = deeplinkManager.getDeeplink(url)
-        XCTAssert(deeplink == Deeplink.mmsdk(message: message, pubkey: pubkey, channelId: nil))
+        XCTAssert(deeplink == Deeplink.mmsdk(message: message, pubkey: pubkey, channelId: channelId))
     }
     
     func testDeeplinkMissingSchemeIsInvalid() {

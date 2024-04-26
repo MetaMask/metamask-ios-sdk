@@ -3,7 +3,7 @@ use_frameworks!
 platform :ios, '15.0'
 
 target 'metamask-ios-sdk_Example' do
-  pod 'metamask-ios-sdk'
+  pod 'metamask-ios-sdk', :path => '../'
   
   target 'metamask-ios-sdk_Tests' do
     inherit! :search_paths

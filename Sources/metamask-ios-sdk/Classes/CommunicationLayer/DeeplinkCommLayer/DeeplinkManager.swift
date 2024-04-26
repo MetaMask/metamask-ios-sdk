@@ -7,8 +7,13 @@ import UIKit
 import Foundation
 
 public class DeeplinkManager {
-    var onReceiveMessage: ((String) -> Void)?
+    public var onReceiveMessage: ((String) -> Void)?
     var decryptMessage: ((String) throws -> String?)?
+
+    public init(onReceiveMessage: ( (String) -> Void)? = nil, decryptMessage: ( (String) -> String?)? = nil) {
+        self.onReceiveMessage = onReceiveMessage
+        self.decryptMessage = decryptMessage
+    }
     
     public func handleUrl(_ url: URL)  {
         handleUrl(url.absoluteString)
@@ -28,7 +33,7 @@ public class DeeplinkManager {
         }
     }
     
-    func getDeeplink(_ link: String) -> Deeplink? {
+    public func getDeeplink(_ link: String) -> Deeplink? {
         
         guard let url = URL(string: link) else {
             Logging.error("DeeplinkManager:: Deeplink has invalid url")
@@ -50,12 +55,17 @@ public class DeeplinkManager {
             return nil
         }
         
+        let pubkey = components.queryItems?.first(where: { $0.name == "pubkey" })?.value
+
         if action == Deeplink.connect {            
             guard let channelId: String = components.queryItems?.first(where: { $0.name == "channelId" })?.value else {
                 Logging.error("DeeplinkManager:: Connect step missing channelId")
                 return nil
             }
-            return .connect(pubkey: nil, channelId: channelId, request: nil)
+            
+            let request = components.queryItems?.first(where: { $0.name == "request" })?.value
+
+            return .connect(pubkey: pubkey, channelId: channelId, request: request)
             
         } else if action == Deeplink.mmsdk {
             guard let message = components.queryItems?.first(where: { $0.name == "message" })?.value else {
@@ -63,7 +73,9 @@ public class DeeplinkManager {
                 return nil
             }
 
-            return .mmsdk(message: message, pubkey: nil, channelId: nil)
+            let channelId = components.queryItems?.first(where: { $0.name == "channelId" })?.value
+
+            return .mmsdk(message: message, pubkey: pubkey, channelId: channelId)
         }
 
         return nil

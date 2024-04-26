@@ -28,9 +28,9 @@ public class DeeplinkClient: CommClient {
         }
     }
     
-    var requestJobs: [RequestJob] = []
+    public var requestJobs: [RequestJob] = []
     
-    init(session: SessionManager,
+    public init(session: SessionManager,
          keyExchange: KeyExchange,
          deeplinkManager: DeeplinkManager,
          dappScheme: String
@@ -141,7 +141,7 @@ extension DeeplinkClient {
         requestJobs.append(job)
     }
     
-    func runQueuedJobs() {
+    public func runQueuedJobs() {
         while !requestJobs.isEmpty {
             let job = requestJobs.popLast()
             job?()

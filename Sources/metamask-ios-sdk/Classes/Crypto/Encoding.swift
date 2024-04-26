@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension String {
+public extension String {
     // Encode a string to base64
     func base64Encode() -> String? {
         guard let data = data(using: .utf8) else { return nil }
