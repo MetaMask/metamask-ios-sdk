@@ -15,10 +15,10 @@ public enum Deeplink: Equatable {
 
         public static func == (lhs: Deeplink, rhs: Deeplink) -> Bool {
         switch (lhs, rhs) {
-        case let (.mmsdk(message1, pubkey1, channelId1), .mmsdk(message2, pubkey2, channelId2)):
-            return message1 == message2 && pubkey1 == pubkey2 && channelId1 == channelId2
-        case let (.connect(pubkey1, channelId1, request1), .connect(pubkey2, channelId2, request2)):
-            return pubkey1 == pubkey2 && channelId1 == channelId2 && request1 == request2
+        case let (.mmsdk(messageLhs, pubkeyLhs, channelIdLhs), .mmsdk(messageRhs, pubkeyRhs, channelIdRhs)):
+            return messageLhs == messageRhs && pubkeyLhs == pubkeyRhs && channelIdLhs == channelIdRhs
+        case let (.connect(pubkeyLhs, channelIdLhs, requestLhs), .connect(pubkeyRhs, channelIdRhs, requestRhs)):
+            return pubkeyLhs == pubkeyRhs && channelIdLhs == channelIdRhs && requestLhs == requestRhs
         default:
             return false
         }
