@@ -13,7 +13,7 @@ class SDKWrapper {
 
 public class MetaMaskSDK: ObservableObject {
     private var tracker: Tracking = Analytics.live
-    private let ethereum: Ethereum
+    private var ethereum: Ethereum!
     
     /// The active/selected MetaMask account chain
     @Published public var chainId: String = ""
@@ -81,6 +81,10 @@ public class MetaMaskSDK: ObservableObject {
             return metamaskSdk
         }
         return sdk
+    }
+    
+    public func updateTransportLayer(_ transport: Transport) {
+        self.ethereum.updateTransportLayer(transport)
     }
 }
 

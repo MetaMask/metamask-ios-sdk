@@ -52,6 +52,21 @@ public class Ethereum {
         return ethereum
     }
     
+    func updateTransportLayer(_ transport: Transport) {
+        disconnect()
+        
+        switch transport {
+        case .deeplinking(let dappScheme):
+            commClient = Dependencies.shared.deeplinkClient(dappScheme: dappScheme)
+        case .socket:
+            commClient = Dependencies.shared.socketClient
+            (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
+        }
+        
+        commClient.trackEvent = trackEvent
+        commClient.handleResponse = handleMessage
+    }
+    
     private func trackEvent(event: Event, parameters: [String: Any]) {
         track?(event, parameters)
     }

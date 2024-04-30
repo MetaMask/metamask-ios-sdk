@@ -39,7 +39,7 @@ public final class Dependencies {
         }
     )
     
-    private func deeplinkClient(dappScheme: String) -> DeeplinkClient {
+    public func deeplinkClient(dappScheme: String) -> DeeplinkClient {
         DeeplinkClient(
             session: sessionManager,
             keyExchange: keyExchange,
