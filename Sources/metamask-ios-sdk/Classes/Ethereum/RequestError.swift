@@ -13,7 +13,13 @@ public struct RequestError: Codable, Error {
 
     public init(from info: [String: Any]) {
         code = info["code"] as? Int ?? -1
-        message = info["message"] as? String ?? ErrorType(rawValue: code)?.message ?? ""
+        if let msg = info["message"] as? String ?? ErrorType(rawValue: code)?.message {
+            message = msg
+        } else if ErrorType.isServerError(code) {
+            message = ErrorType.serverError.message
+        } else {
+            message = "Something went wrong"
+        }
     }
 
     public var localizedDescription: String {
@@ -60,6 +66,9 @@ public struct RequestError: Codable, Error {
 
 public extension RequestError {
     var codeType: ErrorType {
-        ErrorType(rawValue: code) ?? .unknownError
+        guard let errorType = ErrorType(rawValue: code) else {
+            return ErrorType.isServerError(code) ? .serverError : .unknownError
+        }
+        return errorType
     }
 }
