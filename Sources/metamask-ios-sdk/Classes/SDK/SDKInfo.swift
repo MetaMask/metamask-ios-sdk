@@ -25,4 +25,13 @@ public enum SDKInfo {
     public static var platform: String {
         UIDevice.current.systemName.lowercased()
     }
+    
+    // Checks if Dapp is configured for Deeplink communication layer
+    public static func isConfiguredForURLScheme(_ scheme: String) -> Bool {
+        guard let urlTypes = sdkBundle["CFBundleURLTypes"] as? [AnyObject],
+            let urlTypeDictionary = urlTypes.first as? [String: AnyObject],
+            let urlSchemes = urlTypeDictionary["CFBundleURLSchemes"] as? [String]
+        else { return false }
+        return urlSchemes.contains(scheme)
+    }
 }

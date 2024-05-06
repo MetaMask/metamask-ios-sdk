@@ -11,20 +11,25 @@ extension Notification.Name {
     static let Connection = Notification.Name("connection")
 }
 
+private let DAPP_SCHEME = "dubdapp"
+
 @MainActor
 struct ConnectView: View {
-    // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
-    @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
-        appMetadata,
-        transport: .deeplinking(dappScheme: "dubdapp"),
-        sdkOptions: nil // SDKOptions(infuraAPIKey: "1234")
-    )
+    @State var selectedTransport: Transport = .deeplinking(dappScheme: DAPP_SCHEME)
+    @State private var dappScheme: String = DAPP_SCHEME
 
     private static let appMetadata = AppMetadata(
         name: "Dub Dapp",
         url: "https://dubdapp.com",
         iconUrl: "https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png"
     )
+    
+    // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
+    @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
+                    appMetadata,
+                    transport: .deeplinking(dappScheme: DAPP_SCHEME),
+                    sdkOptions: nil // SDKOptions(infuraAPIKey: "####")
+                )
 
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
@@ -69,6 +74,24 @@ struct ConnectView: View {
                             Spacer()
                             Text(metaMaskSDK.account)
                                 .modifier(TextCaption())
+                        }
+                    }
+                }
+                
+                if #available(iOS 17.0, *) {
+                    Section {
+                        Picker("Transport Layer", selection: $selectedTransport) {
+                            Text("Socket").tag(Transport.socket)
+                            Text("Deeplinking").tag(Transport.deeplinking(dappScheme: dappScheme))
+                        }
+                        .onChange(of: selectedTransport, initial: false, { _, newValue in
+                            metaMaskSDK.updateTransportLayer(newValue)
+                        })
+                        
+                        if case .deeplinking(_) = selectedTransport {
+                            TextField("Dapp Scheme", text: $dappScheme)
+                                .frame(minHeight: 32)
+                                .modifier(TextCurvature())
                         }
                     }
                 }
