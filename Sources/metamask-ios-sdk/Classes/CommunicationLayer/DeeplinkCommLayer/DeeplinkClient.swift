@@ -149,7 +149,6 @@ extension DeeplinkClient {
     }
     
     public func sendMessage(_ message: String, encrypt: Bool) {
-        Logging.log("Mpendulo:: Sending message: \(message)")
         let base64Encoded = message.base64Encode() ?? ""
         
         let deeplink: Deeplink = .mmsdk(

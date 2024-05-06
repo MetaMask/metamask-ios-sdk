@@ -11,10 +11,12 @@ extension Notification.Name {
     static let Connection = Notification.Name("connection")
 }
 
+private let DAPP_SCHEME = "dubdapp"
+
 @MainActor
 struct ConnectView: View {
-    @State var selectedTransport: Transport = .socket
-    @State private var dappScheme: String = "dubdapp"
+    @State var selectedTransport: Transport = .deeplinking(dappScheme: DAPP_SCHEME)
+    @State private var dappScheme: String = DAPP_SCHEME
 
     private static let appMetadata = AppMetadata(
         name: "Dub Dapp",
@@ -25,8 +27,8 @@ struct ConnectView: View {
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
                     appMetadata,
-                    transport: .deeplinking(dappScheme: "dubdapp"),
-                    sdkOptions: nil
+                    transport: .deeplinking(dappScheme: DAPP_SCHEME),
+                    sdkOptions: nil // SDKOptions(infuraAPIKey: "####")
                 )
 
     @State private var connected: Bool = false
@@ -85,10 +87,9 @@ struct ConnectView: View {
                         .onChange(of: selectedTransport, initial: false, { _, newValue in
                             metaMaskSDK.updateTransportLayer(newValue)
                         })
-
-                        if selectedTransport != .socket {
+                        
+                        if case .deeplinking(_) = selectedTransport {
                             TextField("Dapp Scheme", text: $dappScheme)
-                                .modifier(TextCaption())
                                 .frame(minHeight: 32)
                                 .modifier(TextCurvature())
                         }
