@@ -662,6 +662,7 @@ public class Ethereum {
                 let accounts = event["accounts"] as? [String],
                 let selectedAddress = accounts.first {
                 updateAccount(selectedAddress)
+                sendResult(selectedAddress, id: Ethereum.CONNECTION_ID)
             }
             return
         }
