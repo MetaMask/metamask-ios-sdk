@@ -32,6 +32,8 @@ public class MetaMaskSDK: ObservableObject {
         }
     }
     
+    public var transport: Transport
+    
     public var networkUrl: String {
         get {
             (ethereum.commClient as? SocketClient)?.networkUrl ?? ""
@@ -56,6 +58,7 @@ public class MetaMaskSDK: ObservableObject {
 
     private init(appMetadata: AppMetadata, transport: Transport, enableDebug: Bool, sdkOptions: SDKOptions?) {
         self.ethereum = Dependencies.shared.ethereum(transport: transport)
+        self.transport = transport
         self.ethereum.delegate = self
         self.ethereum.sdkOptions = sdkOptions
         self.ethereum.updateMetadata(appMetadata)
@@ -67,7 +70,7 @@ public class MetaMaskSDK: ObservableObject {
         (ethereum.commClient as? DeeplinkClient)?.handleUrl(url)
     }
     
-    public static func shared(_ appMetadata: AppMetadata, 
+    public static func shared(_ appMetadata: AppMetadata,
                               transport: Transport = .socket,
                               enableDebug: Bool = true,
                               sdkOptions: SDKOptions?) -> MetaMaskSDK {

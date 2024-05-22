@@ -25,7 +25,7 @@ public final class Dependencies {
         
         return Ethereum.shared(commClient: client) { event, parameters in
             self.trackEvent(event, parameters: parameters)
-        }
+        }.updateTransportLayer(transport)
     }
     
     public lazy var keyExchange: KeyExchange = KeyExchange()

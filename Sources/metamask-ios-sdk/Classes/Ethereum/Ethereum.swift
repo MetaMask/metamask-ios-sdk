@@ -52,8 +52,12 @@ public class Ethereum {
         return ethereum
     }
     
-    func updateTransportLayer(_ transport: Transport) {
+    public var transport: Transport = .socket
+    
+    @discardableResult
+    func updateTransportLayer(_ transport: Transport) -> Ethereum {
         disconnect()
+        self.transport = transport
         
         switch transport {
         case .deeplinking(let dappScheme):
@@ -65,6 +69,7 @@ public class Ethereum {
         
         commClient.trackEvent = trackEvent
         commClient.handleResponse = handleMessage
+        return self
     }
     
     private func trackEvent(event: Event, parameters: [String: Any]) {
@@ -159,18 +164,70 @@ public class Ethereum {
         )
         connected = true
         
-        if commClient is SocketClient {
+        switch transport {
+        case .socket:
             commClient.connect(with: nil)
-            return request(connectWithRequest)
+            
+            // React Native SDK has request params as Data
+            if let paramsData = req.params as? Data {
+                let reqJson = String(data: paramsData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                let requestItem: EthereumRequest = EthereumRequest(
+                    id: req.id,
+                    method: req.method,
+                    params: reqJson
+                )
+                
+                let connectWithParams = [requestItem]
+                let connectRequest = EthereumRequest(
+                    id: connectWithRequest.id,
+                    method: connectWithRequest.method,
+                    params: connectWithParams
+                )
+                return request(connectRequest)
+            } else {
+                return request(connectWithRequest)
+            }
+        case .deeplinking(_):
+            let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
+            submittedRequests[connectWithRequest.id] = submittedRequest
+            let publisher = submittedRequests[connectWithRequest.id]?.publisher
+            
+            // React Native SDK has request params as Data
+            if let paramsData = req.params as? Data {
+                do {
+                    let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
+                    
+                    let requestDict: [String: Any] = [
+                        "id": req.id,
+                        "method": req.method,
+                        "params": params
+                        ]
+                    
+                    let jsonData = try JSONSerialization.data(withJSONObject: requestDict)
+                    let jsonParams = try JSONSerialization.jsonObject(with: jsonData, options: [])
+
+                    let connectWithParams = [jsonParams]
+                    
+                    let connectWithDict: [String: Any] = [
+                        "id": connectWithRequest.id,
+                        "method": connectWithRequest.method,
+                        "params": connectWithParams
+                        ]
+                    
+                    let connectWithData = try JSONSerialization.data(withJSONObject: connectWithDict)
+                    
+                    let connectWithJson = String(data: connectWithData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                    
+                    commClient.connect(with: connectWithJson)
+                } catch {
+                    Logging.error("Ethereum:: error: \(error.localizedDescription)")
+                }
+            } else {
+                let requestJson = connectWithRequest.toJsonString() ?? ""
+                commClient.connect(with: requestJson)
+            }
+            return publisher
         }
-        
-        let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
-        submittedRequests[connectWithRequest.id] = submittedRequest
-        let publisher = submittedRequests[connectWithRequest.id]?.publisher
-        let requestJson = connectWithRequest.toJsonString() ?? ""
-        
-        commClient.connect(with: requestJson)
-        return publisher
     }
     
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
@@ -253,7 +310,7 @@ public class Ethereum {
         await ethereumRequest(method: .ethGetTransactionCount, params: [address, tagOrblockNumber])
     }
     
-    func addEthereumChain(chainId: String, 
+    func addEthereumChain(chainId: String,
                           chainName: String,
                           rpcUrls: [String],
                           iconUrls: [String]?,
@@ -338,8 +395,32 @@ public class Ethereum {
                 "from": "mobile",
                 "method": request.method
             ])
-            if commClient is SocketClient {
-                (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
+            
+            switch transport {
+            case .socket:
+                // React Native SDK has request params as Data
+                if let paramsData = request.params as? Data {
+                    do {
+                        let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
+                        
+                        let requestDict: [String: Any] = [
+                            "id": request.id,
+                            "method": request.method,
+                            "params": params
+                            ]
+                        
+                        let requestData = try JSONSerialization.data(withJSONObject: requestDict)
+                        
+                        
+                        let requestJson = String(data: requestData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        
+                        commClient.sendMessage(requestJson, encrypt: true)
+                    } catch {
+                        Logging.error("Ethereum:: error: \(error.localizedDescription)")
+                    }
+                } else {
+                    (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
+                }
                 
                 let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
                 let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
@@ -347,13 +428,35 @@ public class Ethereum {
                 if authorise && !skipAuthorisation {
                     (commClient as? SocketClient)?.requestAuthorisation()
                 }
-            } else {
-                guard let requestJson = request.toJsonString() else {
-                    Logging.error("Ethereum:: could not convert request to JSON: \(request)")
-                    return
-                } 
                 
-                commClient.sendMessage(requestJson, encrypt: true)
+            case .deeplinking(_):
+                // React Native SDK has request params as Data
+                if let paramsData = request.params as? Data {
+                    do {
+                        let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
+                        
+                        let requestDict: [String: Any] = [
+                            "id": request.id,
+                            "method": request.method,
+                            "params": params
+                            ]
+                        
+                        let jsonData = try JSONSerialization.data(withJSONObject: requestDict)
+                        let requestJson = String(data: jsonData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        
+                        commClient.sendMessage(requestJson, encrypt: true)
+                    } catch {
+                        Logging.error("Ethereum:: error: \(error.localizedDescription)")
+                        return
+                    }
+                } else {
+                    guard let requestJson = request.toJsonString() else {
+                        Logging.error("Ethereum:: could not convert request to JSON: \(request)")
+                            return
+                        }
+                                    
+                    commClient.sendMessage(requestJson, encrypt: true)
+                }
             }
         }
     }
@@ -465,23 +568,71 @@ public class Ethereum {
         }
     }
     
-    func batchRequest<T: CodableData>(_ params: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
-        let batchRequest = EthereumRequest(
-            method: EthereumMethod.metamaskBatch.rawValue,
-            params: params)
-
-        return await withCheckedContinuation { continuation in
-            request(batchRequest)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success([]))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
+    func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
+        
+        // React Native SDK has request params as Data
+        if let _ = requests.first?.params as? Data {
+            var requestDicts: [[String: Any]] = []
+            
+            for request in requests {
+                if let paramData = request.params as? Data {
+                    do {
+                        let requestParams = try JSONSerialization.jsonObject(with: paramData, options: [])
+                        
+                        let dict: [String: Any] = [
+                            "id": request.id,
+                            "method": request.method,
+                            "params": requestParams
+                        ]
+                        requestDicts.append(dict)
+                    } catch {
+                        Logging.error("Ethereum:: error: \(error.localizedDescription)")
+                        return .failure(RequestError(from: ["message": error.localizedDescription]))
                     }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success(result as? [String] ?? []))
-                }).store(in: &cancellables)
+                }
+            }
+            
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: requestDicts)
+                let batchReq = EthereumRequest(
+                    method: EthereumMethod.metamaskBatch.rawValue,
+                    params: jsonData)
+                
+                return await withCheckedContinuation { continuation in
+                    request(batchReq)?
+                        .sink(receiveCompletion: { completion in
+                            switch completion {
+                            case .finished:
+                                continuation.resume(returning: .success([]))
+                            case .failure(let error):
+                                continuation.resume(returning: .failure(error))
+                            }
+                        }, receiveValue: { result in
+                            continuation.resume(returning: .success(result as? [String] ?? []))
+                        }).store(in: &cancellables)
+                }
+            } catch {
+                Logging.error("Ethereum:: error: \(error.localizedDescription)")
+                return .failure(RequestError(from: ["message": error.localizedDescription]))
+            }
+        } else {
+            let batchRequest = EthereumRequest(
+                method: EthereumMethod.metamaskBatch.rawValue,
+                params: requests)
+
+            return await withCheckedContinuation { continuation in
+                request(batchRequest)?
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .finished:
+                            continuation.resume(returning: .success([]))
+                        case .failure(let error):
+                            continuation.resume(returning: .failure(error))
+                        }
+                    }, receiveValue: { result in
+                        continuation.resume(returning: .success(result as? [String] ?? []))
+                    }).store(in: &cancellables)
+            }
         }
     }
     
