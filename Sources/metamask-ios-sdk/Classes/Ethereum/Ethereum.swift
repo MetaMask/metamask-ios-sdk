@@ -168,7 +168,6 @@ public class Ethereum {
         case .socket:
             commClient.connect(with: nil)
             
-            // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 let reqJson = String(data: paramsData, encoding: .utf8)?.trimEscapingChars() ?? ""
                 let requestItem: EthereumRequest = EthereumRequest(
@@ -192,7 +191,6 @@ public class Ethereum {
             submittedRequests[connectWithRequest.id] = submittedRequest
             let publisher = submittedRequests[connectWithRequest.id]?.publisher
             
-            // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 do {
                     let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
@@ -214,9 +212,7 @@ public class Ethereum {
                         "params": connectWithParams
                         ]
                     
-                    let connectWithData = try JSONSerialization.data(withJSONObject: connectWithDict)
-                    
-                    let connectWithJson = String(data: connectWithData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                    let connectWithJson = json(from: connectWithDict) ?? ""
                     
                     commClient.connect(with: connectWithJson)
                 } catch {
@@ -228,6 +224,10 @@ public class Ethereum {
             }
             return publisher
         }
+    }
+    
+    private func handleConnectWithRequest<T: CodableData>(_ req: EthereumRequest<T>) {
+        
     }
     
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
@@ -409,10 +409,7 @@ public class Ethereum {
                             "params": params
                             ]
                         
-                        let requestData = try JSONSerialization.data(withJSONObject: requestDict)
-                        
-                        
-                        let requestJson = String(data: requestData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        let requestJson = json(from: requestDict) ?? ""
                         
                         commClient.sendMessage(requestJson, encrypt: true)
                     } catch {
@@ -441,8 +438,7 @@ public class Ethereum {
                             "params": params
                             ]
                         
-                        let jsonData = try JSONSerialization.data(withJSONObject: requestDict)
-                        let requestJson = String(data: jsonData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        let requestJson = json(from: requestDict) ?? ""
                         
                         commClient.sendMessage(requestJson, encrypt: true)
                     } catch {

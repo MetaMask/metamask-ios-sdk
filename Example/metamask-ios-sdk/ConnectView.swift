@@ -15,7 +15,7 @@ private let DAPP_SCHEME = "dubdapp"
 
 @MainActor
 struct ConnectView: View {
-    @State var selectedTransport: Transport = .deeplinking(dappScheme: DAPP_SCHEME)
+    @State var selectedTransport: Transport = .socket//.deeplinking(dappScheme: DAPP_SCHEME)
     @State private var dappScheme: String = DAPP_SCHEME
 
     private static let appMetadata = AppMetadata(
@@ -27,7 +27,7 @@ struct ConnectView: View {
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
                     appMetadata,
-                    transport: .deeplinking(dappScheme: DAPP_SCHEME),
+                    transport: .socket,//.deeplinking(dappScheme: DAPP_SCHEME),
                     sdkOptions: nil // SDKOptions(infuraAPIKey: "####")
                 )
 
@@ -223,11 +223,11 @@ struct ConnectView: View {
         showProgressView = false
         
         switch result {
+        case .success(_):
+            status = "Online"
         case let .failure(error):
             errorMessage = error.localizedDescription
             showError = true
-        default:
-            break
         }
     }
 }
