@@ -223,11 +223,11 @@ struct ConnectView: View {
         showProgressView = false
         
         switch result {
+        case .success(_):
+            status = "Online"
         case let .failure(error):
             errorMessage = error.localizedDescription
             showError = true
-        default:
-            break
         }
     }
 }

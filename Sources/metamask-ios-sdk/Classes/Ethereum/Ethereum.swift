@@ -214,9 +214,7 @@ public class Ethereum {
                         "params": connectWithParams
                         ]
                     
-                    let connectWithData = try JSONSerialization.data(withJSONObject: connectWithDict)
-                    
-                    let connectWithJson = String(data: connectWithData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                    let connectWithJson = json(from: connectWithDict) ?? ""
                     
                     commClient.connect(with: connectWithJson)
                 } catch {
@@ -409,10 +407,7 @@ public class Ethereum {
                             "params": params
                             ]
                         
-                        let requestData = try JSONSerialization.data(withJSONObject: requestDict)
-                        
-                        
-                        let requestJson = String(data: requestData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        let requestJson = json(from: requestDict) ?? ""
                         
                         commClient.sendMessage(requestJson, encrypt: true)
                     } catch {
@@ -441,8 +436,7 @@ public class Ethereum {
                             "params": params
                             ]
                         
-                        let jsonData = try JSONSerialization.data(withJSONObject: requestDict)
-                        let requestJson = String(data: jsonData, encoding: .utf8)?.trimEscapingChars() ?? ""
+                        let requestJson = json(from: requestDict) ?? ""
                         
                         commClient.sendMessage(requestJson, encrypt: true)
                     } catch {
