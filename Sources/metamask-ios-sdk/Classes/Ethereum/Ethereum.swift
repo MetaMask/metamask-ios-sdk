@@ -168,6 +168,7 @@ public class Ethereum {
         case .socket:
             commClient.connect(with: nil)
             
+            // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 let reqJson = String(data: paramsData, encoding: .utf8)?.trimEscapingChars() ?? ""
                 let requestItem: EthereumRequest = EthereumRequest(
@@ -191,6 +192,7 @@ public class Ethereum {
             submittedRequests[connectWithRequest.id] = submittedRequest
             let publisher = submittedRequests[connectWithRequest.id]?.publisher
             
+            // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 do {
                     let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
@@ -224,10 +226,6 @@ public class Ethereum {
             }
             return publisher
         }
-    }
-    
-    private func handleConnectWithRequest<T: CodableData>(_ req: EthereumRequest<T>) {
-        
     }
     
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
