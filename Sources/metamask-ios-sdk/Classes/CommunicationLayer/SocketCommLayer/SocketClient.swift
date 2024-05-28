@@ -367,7 +367,7 @@ extension SocketClient {
         }
     }
 
-    public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool) {
+    public func sendMessage<T: CodableData>(_ message: T, encrypt: Bool, options: [String: String] = [:]) {
         if encrypt && !keyExchange.keysExchanged {
             addRequest { [weak self] in
                 guard let self = self else { return }

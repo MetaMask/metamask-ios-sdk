@@ -409,7 +409,7 @@ public class Ethereum {
                         
                         let requestJson = json(from: requestDict) ?? ""
                         
-                        commClient.sendMessage(requestJson, encrypt: true)
+                        commClient.sendMessage(requestJson, encrypt: true, options: [:])
                     } catch {
                         Logging.error("Ethereum:: error: \(error.localizedDescription)")
                     }
@@ -438,7 +438,7 @@ public class Ethereum {
                         
                         let requestJson = json(from: requestDict) ?? ""
                         
-                        commClient.sendMessage(requestJson, encrypt: true)
+                        commClient.sendMessage(requestJson, encrypt: true, options: ["account": account, "chainId": chainId])
                     } catch {
                         Logging.error("Ethereum:: error: \(error.localizedDescription)")
                         return
@@ -449,7 +449,7 @@ public class Ethereum {
                             return
                         }
                                     
-                    commClient.sendMessage(requestJson, encrypt: true)
+                    commClient.sendMessage(requestJson, encrypt: true, options: ["account": account, "chainId": chainId])
                 }
             }
         }
