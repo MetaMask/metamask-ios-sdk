@@ -18,7 +18,7 @@ public protocol CommClient {
     func disconnect()
     func clearSession()
     func addRequest(_ job: @escaping RequestJob)
-    func sendMessage(_ message: String, encrypt: Bool)
+    func sendMessage(_ message: String, encrypt: Bool, options: [String: String])
 }
 
 public extension CommClient {

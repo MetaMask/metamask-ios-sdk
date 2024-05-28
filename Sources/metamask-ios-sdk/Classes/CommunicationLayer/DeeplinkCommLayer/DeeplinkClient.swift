@@ -75,7 +75,7 @@ public class DeeplinkClient: CommClient {
         deeplinkManager.handleUrl(url)
     }
     
-    func sendMessage(_ deeplink: Deeplink) {
+    func sendMessage(_ deeplink: Deeplink, options: [String: String]) {
         switch deeplink {
         case .connect(_, let channelId, let request):
             let originatorInfo = originatorInfo().toJsonString()?.base64Encode() ?? ""
@@ -85,7 +85,9 @@ public class DeeplinkClient: CommClient {
             }
             sendMessage(message)
         case .mmsdk(let message, _, let channelId):
-            let message = "mmsdk?scheme=\(dappScheme)&message=\(message)&channelId=\(channelId ?? "")"
+            let account = options["account"] ?? ""
+            let chainId = options["chainId"] ?? ""
+            let message = "mmsdk?scheme=\(dappScheme)&message=\(message)&channelId=\(channelId ?? "")&account=\(account)@\(chainId)"
             Logging.log("DeeplinkClient:: Sending message \(message)")
             sendMessage(message)
         }
@@ -98,7 +100,7 @@ public class DeeplinkClient: CommClient {
             pubkey: nil,
             channelId: channelId,
             request: request
-        ))
+        ), options: [:])
     }
     
     public func track(event: Event) {
@@ -148,7 +150,7 @@ extension DeeplinkClient {
         }
     }
     
-    public func sendMessage(_ message: String, encrypt: Bool) {
+    public func sendMessage(_ message: String, encrypt: Bool, options: [String: String]) {
         let base64Encoded = message.base64Encode() ?? ""
         
         let deeplink: Deeplink = .mmsdk(
@@ -156,7 +158,7 @@ extension DeeplinkClient {
             pubkey: nil,
             channelId: channelId
         )
-        sendMessage(deeplink)
+        sendMessage(deeplink, options: options)
     }
     
     public func handleMessage(_ message: String) {
