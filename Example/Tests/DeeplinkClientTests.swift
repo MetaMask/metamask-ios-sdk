@@ -4,7 +4,7 @@
 //
 
 import XCTest
-import metamask_ios_sdk
+@testable import metamask_ios_sdk
 
 class DeeplinkClientTests: XCTestCase {
     var deeplinkClient: DeeplinkClient!
