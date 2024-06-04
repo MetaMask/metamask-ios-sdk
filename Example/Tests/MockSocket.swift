@@ -1,5 +1,5 @@
 //
-//  MockSocketClient.swift
+//  MockSocket.swift
 //  metamask-ios-sdk_Tests
 //
 
@@ -7,7 +7,7 @@ import Foundation
 @testable import metamask_ios_sdk
 import SocketIO
 
-class MockSocketClient: SocketProtocol {
+class MockSocket: SocketProtocol {
     var status: SocketIOStatus = .notConnected
     var connectCalled = false
     var disconnectCalled = false

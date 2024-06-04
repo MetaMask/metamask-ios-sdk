@@ -10,6 +10,6 @@ class MockSocketManager: SocketManagerProtocol {
     var standardSocket: SocketProtocol
     
     init() {
-        standardSocket = MockSocketClient()
+        standardSocket = MockSocket()
     }
 }

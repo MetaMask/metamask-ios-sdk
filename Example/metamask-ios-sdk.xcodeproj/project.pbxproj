@@ -33,7 +33,7 @@
 		D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DC2AF42A720019321C /* CryptoTests.swift */; };
 		D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
-		D1ED4E512C0DC811001AC6E0 /* MockSocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocketClient.swift */; };
+		D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */; };
 		D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */; };
 		D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */; };
 		F11C6352C0DDAA47A02C88A4 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */; };
@@ -83,7 +83,7 @@
 		D1A258DC2AF42A720019321C /* CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTests.swift; sourceTree = "<group>"; };
 		D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
-		D1ED4E502C0DC811001AC6E0 /* MockSocketClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketClient.swift; sourceTree = "<group>"; };
+		D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocket.swift; sourceTree = "<group>"; };
 		D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketManager.swift; sourceTree = "<group>"; };
 		D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketChannelTests.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -169,7 +169,7 @@
 				D190A4902AFA2988000A1AA8 /* SessionConfigTests.swift */,
 				D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */,
 				D15F6AE82BD9276B005048F3 /* DeeplinkClientTests.swift */,
-				D1ED4E502C0DC811001AC6E0 /* MockSocketClient.swift */,
+				D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */,
 				D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */,
 				D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */,
 			);
@@ -439,7 +439,7 @@
 			files = (
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
-				D1ED4E512C0DC811001AC6E0 /* MockSocketClient.swift in Sources */,
+				D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */,
 				D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */,
 				D15F6AE92BD9276B005048F3 /* DeeplinkClientTests.swift in Sources */,
 				D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */,

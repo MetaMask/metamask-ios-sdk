@@ -8,14 +8,14 @@ import XCTest
 
 class SocketChannelTests: XCTestCase {
     var socketChannel: SocketChannel!
-    var mockSocket: MockSocketClient!
+    var mockSocket: MockSocket!
     var mockSocketManager: MockSocketManager!
     
     override func setUp() {
         super.setUp()
         mockSocketManager = MockSocketManager()
         socketChannel = SocketChannel(url: "http://mockurl.com")
-        mockSocket = mockSocketManager.standardSocket as? MockSocketClient
+        mockSocket = mockSocketManager.standardSocket as? MockSocket
         socketChannel.socket = mockSocket
         socketChannel.socketManager = mockSocketManager
     }
