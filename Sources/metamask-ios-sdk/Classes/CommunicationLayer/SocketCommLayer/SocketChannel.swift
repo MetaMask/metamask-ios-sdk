@@ -5,7 +5,7 @@
 import SocketIO
 import Foundation
 
-public class SocketChannel: CommunicationChannel {
+public class SocketChannel {
     public typealias ChannelData = SocketData
     public typealias EventType = SocketClientEvent
     
@@ -23,8 +23,8 @@ public class SocketChannel: CommunicationChannel {
     
     private var _networkUrl: String
 
-    private var socket: SocketIOClient!
-    private var socketManager: SocketManager!
+    var socket: SocketProtocol!
+    var socketManager: SocketManagerProtocol!
     
 
     public init(url: String = Endpoint.SERVER_URL) {
@@ -52,7 +52,7 @@ public class SocketChannel: CommunicationChannel {
                 options
             ]
         )
-        socket = socketManager.defaultSocket
+        socket = socketManager.standardSocket
     }
 }
 
@@ -60,7 +60,7 @@ public class SocketChannel: CommunicationChannel {
 
 extension SocketChannel {
     public func connect() {
-        socket.connect()
+        socket.connect(withPayload: nil)
     }
 
     public func disconnect() {
@@ -92,6 +92,6 @@ extension SocketChannel {
     }
 
     public func emit(_ event: String, _ item: SocketData) {
-        socket.emit(event, item)
+        socket.emit(event, item, completion: nil)
     }
 }
