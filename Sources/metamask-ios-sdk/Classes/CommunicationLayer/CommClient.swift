@@ -10,10 +10,10 @@ public typealias RequestJob = () -> Void
 public protocol CommClient {
     var appMetadata: AppMetadata? { get set }
     var sessionDuration: TimeInterval { get set }
-    
+
     var trackEvent: ((Event, [String: Any]) -> Void)? { get set }
     var handleResponse: (([String: Any]) -> Void)? { get set }
-    
+
     func connect(with request: String?)
     func disconnect()
     func clearSession()
@@ -26,7 +26,7 @@ public extension CommClient {
         let originatorInfo = OriginatorInfo(
             title: appMetadata?.name,
             url: appMetadata?.url,
-            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon, 
+            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
             dappId: SDKInfo.bundleIdentifier,
             platform: SDKInfo.platform,
             apiVersion: SDKInfo.version

@@ -21,7 +21,7 @@ public struct EthereumRequest<T: CodableData>: RPCRequest {
         self.params = params
     }
 
-    public init(id: String = TimestampGenerator.timestamp(), 
+    public init(id: String = TimestampGenerator.timestamp(),
                 method: EthereumMethod,
                 params: T = "") {
         self.id = id

@@ -9,7 +9,7 @@ import Foundation
 public enum Deeplink: Equatable {
     case mmsdk(message: String, pubkey: String?, channelId: String?)
     case connect(pubkey: String?, channelId: String, request: String?)
-    
+
     static let mmsdk = "mmsdk"
     static let connect = "connect"
 

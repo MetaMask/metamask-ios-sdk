@@ -9,10 +9,10 @@ public struct AppMetadata {
     public let url: String
     public let iconUrl: String?
     public let base64Icon: String?
-    
+
     var platform: String = "ios"
 
-    public init(name: String, 
+    public init(name: String,
                 url: String,
                 iconUrl: String? = nil,
                 base64Icon: String? = nil) {

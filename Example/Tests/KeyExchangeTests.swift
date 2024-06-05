@@ -7,17 +7,7 @@ import XCTest
 @testable import metamask_ios_sdk
 
 class KeyExchangeTests: XCTestCase {
-    //var crypt
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
     func testKeyExchangeInitialization() {
         let keyExchange = KeyExchange()
 
@@ -75,7 +65,7 @@ class KeyExchangeTests: XCTestCase {
             } catch {
                 XCTFail("Message could not be decoded: \(error)")
             }
-            
+
         } catch {
             XCTFail("Encryption or decryption failed with error: \(error)")
         }

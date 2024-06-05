@@ -19,7 +19,7 @@ struct SignView: View {
     @State private var showError = false
     @State var isConnectAndSign = false
     @State var isChainedSigning = false
-    
+
     private let signButtonTitle = "Sign"
     private let connectAndSignButtonTitle = "Connect & Sign"
 
@@ -48,10 +48,8 @@ struct SignView: View {
                     ZStack {
                         Button {
                             Task {
-                                await 
-                                if isConnectAndSign { connectAndSign() }
-                                else if isChainedSigning { signChainedMessages() }
-                                else { signMessage() }
+                                await
+                                if isConnectAndSign { connectAndSign() } else if isChainedSigning { signChainedMessages() } else { signMessage() }
                             }
                         } label: {
                             Text(isConnectAndSign ? connectAndSignButtonTitle : signButtonTitle)
@@ -59,7 +57,7 @@ struct SignView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         if showProgressView {
                             ProgressView()
                                 .scaleEffect(1.5, anchor: .center)
@@ -83,7 +81,7 @@ struct SignView: View {
             updateMessage()
         }
     }
-    
+
     func updateMessage() {
         if isChainedSigning {
             let chainedSigningMessages: [String] = [
@@ -96,7 +94,7 @@ struct SignView: View {
             signMessage = "{\"domain\":{\"name\":\"Ether Mail\",\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\",\"version\":\"1\"},\"message\":{\"contents\":\"Hello, Linda!\",\"from\":{\"name\":\"Aliko\",\"wallets\":[\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\",\"0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF\"]},\"to\":[{\"name\":\"Linda\",\"wallets\":[\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\",\"0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57\",\"0xB0B0b0b0b0b0B000000000000000000000000000\"]}]},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Group\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"members\",\"type\":\"Person[]\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person[]\"},{\"name\":\"contents\",\"type\":\"string\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallets\",\"type\":\"address[]\"}]}}"
         } else {
             let jsonData = "{\"types\": {\"EIP712Domain\": [{ \"name\": \"name\", \"type\": \"string\" },{ \"name\": \"version\", \"type\": \"string\" },{ \"name\": \"chainId\", \"type\": \"uint256\" },{ \"name\": \"verifyingContract\", \"type\": \"address\" }],\"Person\": [{ \"name\": \"name\", \"type\": \"string\" },{ \"name\": \"wallet\", \"type\": \"address\" }],\"Mail\": [{ \"name\": \"from\", \"type\": \"Person\" },{ \"name\": \"to\", \"type\": \"Person\" },{ \"name\": \"contents\", \"type\": \"string\" }]},\"primaryType\": \"Mail\",\"domain\": {\"name\": \"Ether Mail\",\"version\": \"1\",\"chainId\": \"\(metamaskSDK.chainId)\",\"verifyingContract\": \"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\"},\"message\": {\"from\": { \"name\": \"Kinno\", \"wallet\": \"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\" },\"to\": { \"name\": \"Bob\", \"wallet\": \"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\" },\"contents\": \"Hello, Busa!\"}}".data(using: .utf8)!
-            
+
             do {
                 let decoder = JSONDecoder()
                 let signParams = try decoder.decode(SignContractParameter.self, from: jsonData)
@@ -114,7 +112,7 @@ struct SignView: View {
         showProgressView = true
         let requestResult = await metamaskSDK.signTypedDataV4(typedData: signMessage, address: account)
         showProgressView = false
-        
+
         switch requestResult {
         case let .success(value):
             result = value
@@ -124,34 +122,34 @@ struct SignView: View {
             showError = true
         }
     }
-    
+
     func signChainedMessages() async {
         let from = metamaskSDK.account
         let helloWorldParams: [String] = [ChainedSigningMessage.helloWorld, from]
         let transactionDataParams: [String] = [ChainedSigningMessage.transactionData, from]
         let byeWorldParams: [String] = [ChainedSigningMessage.byeWorld, from]
-        
+
         let helloWorldSignRequest = EthereumRequest(
             method: .personalSign,
             params: helloWorldParams
         )
-        
+
         let transactionDataSignRequest = EthereumRequest(
             method: .personalSign,
             params: transactionDataParams
         )
-        
+
         let byeWorldSignRequest = EthereumRequest(
             method: .personalSign,
             params: byeWorldParams
         )
-        
+
         let requestBatch: [EthereumRequest] = [helloWorldSignRequest, transactionDataSignRequest, byeWorldSignRequest]
-        
+
         showProgressView = true
         let requestResult = await metamaskSDK.batchRequest(requestBatch)
         showProgressView = false
-        
+
         switch requestResult {
         case let .success(value):
             result = value.joined(separator: "\n======================\n")
@@ -161,12 +159,12 @@ struct SignView: View {
             showError = true
         }
     }
-    
+
     func connectAndSign() async {
         showProgressView = true
         let connectSignResult = await metamaskSDK.connectAndSign(message: signMessage)
         showProgressView = false
-        
+
         switch connectSignResult {
         case let .success(value):
             result = value

@@ -33,7 +33,7 @@ public enum KeyExchangeError: Error {
 public struct KeyExchangeMessage: CodableData, Mappable {
     public let type: KeyExchangeType
     public let pubkey: String?
-    
+
     public init(type: KeyExchangeType, pubkey: String?) {
         self.type = type
         self.pubkey = pubkey
@@ -84,7 +84,7 @@ public class KeyExchange {
         if message.type == .start {
             keysExchanged = false
         }
-        
+
         if let publicKey = message.pubkey {
             setTheirPublicKey(publicKey)
             keysExchanged = true
@@ -153,7 +153,7 @@ public class KeyExchange {
             publicKey: theirPublicKey
         )
     }
-    
+
     public func encrypt(_ message: String) throws -> String {
         guard let theirPublicKey = theirPublicKey else {
             throw KeyExchangeError.keysNotExchanged

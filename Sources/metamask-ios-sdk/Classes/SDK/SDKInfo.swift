@@ -15,17 +15,17 @@ public enum SDKInfo {
     public static var version: String {
         sdkBundle["CFBundleShortVersionString"] as? String ?? ""
     }
-    
+
     /// The bundle identifier of the dapp
     public static var bundleIdentifier: String? {
         Bundle.main.bundleIdentifier
     }
-    
+
     /// The platform OS on which the SDK is run e.g `ios, ipados`
     public static var platform: String {
         UIDevice.current.systemName.lowercased()
     }
-    
+
     // Checks if Dapp is configured for Deeplink communication layer
     public static func isConfiguredForURLScheme(_ scheme: String) -> Bool {
         guard let urlTypes = sdkBundle["CFBundleURLTypes"] as? [AnyObject],

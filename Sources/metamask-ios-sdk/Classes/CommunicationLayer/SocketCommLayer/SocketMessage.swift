@@ -12,7 +12,7 @@ enum DecodingError: Error {
 public struct SocketMessage<T: CodableData>: CodableData, Mappable {
     public let id: String
     public let message: T
-    
+
     public init(id: String, message: T) {
         self.id = id
         self.message = message
@@ -21,10 +21,10 @@ public struct SocketMessage<T: CodableData>: CodableData, Mappable {
     public func socketRepresentation() -> NetworkData {
         [
             "id": id,
-            "message": try? message.socketRepresentation(),
+            "message": try? message.socketRepresentation()
         ]
     }
-    
+
     func toDictionary() -> [String: Any]? {
         let encoder = JSONEncoder()
         do {

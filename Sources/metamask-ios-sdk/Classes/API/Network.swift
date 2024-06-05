@@ -14,12 +14,12 @@ public protocol Networking: ObservableObject {
 
 public class Network: Networking {
     public init() {}
-    
+
     private var additionalHeaders: [String: String] = [
         "Accept": "application/json",
         "Content-Type": "application/json"
     ]
-    
+
     public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
             throw NetworkError.invalidUrl
@@ -35,7 +35,7 @@ public class Network: Networking {
     public func post(_ parameters: [String: Any], endpoint: Endpoint) async throws -> Data {
         try await post(parameters, endpoint: endpoint.url)
     }
-    
+
     public func post(_ parameters: [String: Any], endpoint: String) async throws -> Data {
         guard let url = URL(string: endpoint) else {
             throw NetworkError.invalidUrl
@@ -50,7 +50,7 @@ public class Network: Networking {
         let response = try await URLSession.shared.data(for: request)
         return response.0
     }
-    
+
     public func addHeaders(_ headers: [String: String]) {
         additionalHeaders.merge(headers) { (_, new) in new }
     }
@@ -60,7 +60,7 @@ public class Network: Networking {
         for (key, value) in additionalHeaders {
             request.addValue(value, forHTTPHeaderField: key)
         }
-        
+
         return request
     }
 }

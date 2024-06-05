@@ -3,7 +3,6 @@
 //  metamask-ios-sdk
 //
 
-
 import Foundation
 
 public protocol Mappable: Codable { }
@@ -24,12 +23,12 @@ public extension Mappable {
             return nil
         }
     }
-    
+
     func toJsonString() -> String? {
         let encoder = JSONEncoder()
         do {
             let jsonData = try encoder.encode(self)
-            return String(data: jsonData, encoding: .utf8)//?.trimEscapingChars()
+            return String(data: jsonData, encoding: .utf8)// ?.trimEscapingChars()
         } catch {
             Logging.error("Error encoding JSON: \(error)")
             return nil

@@ -17,8 +17,4 @@ class ViewController: UIViewController {
         view.addSubview(childView.view)
         childView.didMove(toParent: self)
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
 }

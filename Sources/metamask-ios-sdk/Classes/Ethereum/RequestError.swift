@@ -25,35 +25,35 @@ public struct RequestError: Codable, Error {
     public var localizedDescription: String {
         message
     }
-    
+
     public static var connectError: RequestError {
         RequestError(from: [
             "code": -101,
             "message": "Not connected. Please call connect(:Dapp) first"
         ])
     }
-    
+
     public static var invalidUrlError: RequestError {
         RequestError(from: [
             "code": -101,
             "message": "Please use a valid url in AppMetaData"
         ])
     }
-    
+
     public static var invalidTitleError: RequestError {
         RequestError(from: [
             "code": -101,
             "message": "Please use a valid name in AppMetaData"
         ])
     }
-    
+
     public static var invalidBatchRequestError: RequestError {
         RequestError(from: [
             "code": -101,
             "message": "Something went wrong, check that your requests are valid"
         ])
     }
-    
+
     static func failWithError(_ error: RequestError) -> EthereumPublisher {
         let passthroughSubject = PassthroughSubject<Any, RequestError>()
         let publisher: EthereumPublisher = passthroughSubject

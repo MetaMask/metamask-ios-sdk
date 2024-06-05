@@ -7,7 +7,7 @@ import SwiftUI
 
 struct ToastView: View {
     let message: String
-    
+
     var body: some View {
         VStack {
             Text(message)

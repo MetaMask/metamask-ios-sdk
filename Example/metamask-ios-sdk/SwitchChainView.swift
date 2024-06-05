@@ -30,18 +30,18 @@ struct SwitchChainView: View {
         var secondarButton: Alert.Button?
         var dismissButton: Alert.Button?
     }
-    
+
     enum Network: String, CaseIterable, Identifiable {
         case avalanche = "0xa86a"
         case ethereum = "0x1"
         case polygon = "0x89"
-        
+
         var id: Self { self }
-        
+
         var chainId: String {
             rawValue
         }
-        
+
         var name: String {
             switch self {
                 case .polygon: return "Polygon"
@@ -49,7 +49,7 @@ struct SwitchChainView: View {
                 case .avalanche: return "Avalanche"
             }
         }
-        
+
         var symbol: String {
             switch self {
                 case .polygon: return "MATIC"
@@ -57,7 +57,7 @@ struct SwitchChainView: View {
                 case .avalanche: return "AVAX"
             }
         }
-        
+
         var rpcUrls: [String] {
             switch self {
             case .polygon: return ["https://polygon-rpc.com"]
@@ -65,7 +65,7 @@ struct SwitchChainView: View {
             default: return []
             }
         }
-        
+
         static func chain(for chainId: String) -> String {
             self.allCases.first(where: { $0.rawValue == chainId })?.name ?? ""
         }
@@ -128,9 +128,9 @@ struct SwitchChainView: View {
     func switchEthereumChain() async {
         let switchChainResult = await metamaskSDK.switchEthereumChain(chainId: networkSelection
             .chainId)
-        
+
         switch switchChainResult {
-        case .success(_):
+        case .success:
             alert = AlertInfo(
                 id: .success,
                 title: "Success",
@@ -175,7 +175,7 @@ struct SwitchChainView: View {
                 symbol: networkSelection.symbol,
                 decimals: 18)
         )
-        
+
         switch addChainResult {
         case .success:
             alert = AlertInfo(
