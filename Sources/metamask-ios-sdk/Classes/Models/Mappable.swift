@@ -28,7 +28,7 @@ public extension Mappable {
         let encoder = JSONEncoder()
         do {
             let jsonData = try encoder.encode(self)
-            return String(data: jsonData, encoding: .utf8)// ?.trimEscapingChars()
+            return String(data: jsonData, encoding: .utf8)
         } catch {
             Logging.error("Error encoding JSON: \(error)")
             return nil

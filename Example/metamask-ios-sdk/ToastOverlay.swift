@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-struct ToastOverlay<ToastContent>: View where ToastContent : View {
+struct ToastOverlay<ToastContent>: View where ToastContent: View {
     let content: ToastContent
     @Binding var isPresented: Bool
 

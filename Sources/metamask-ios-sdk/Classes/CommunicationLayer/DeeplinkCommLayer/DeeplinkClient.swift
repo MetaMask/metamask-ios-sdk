@@ -13,7 +13,7 @@ public class DeeplinkClient: CommClient {
     private let dappScheme: String
 
     public var appMetadata: AppMetadata?
-    public var trackEvent: ((Event, [String : Any]) -> Void)?
+    public var trackEvent: ((Event, [String: Any]) -> Void)?
     public var handleResponse: (([String: Any]) -> Void)?
 
     private let keyExchange: KeyExchange

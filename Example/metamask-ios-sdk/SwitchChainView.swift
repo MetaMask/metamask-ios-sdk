@@ -99,7 +99,7 @@ struct SwitchChainView: View {
                         .frame(maxWidth: .infinity, maxHeight: 32)
                 }
                 .alert(item: $alert, content: { info in
-                    if let _ = info.dismissButton {
+                    if info.dismissButton != nil {
                         return Alert(
                             title: Text(info.title),
                             message: Text(info.message),

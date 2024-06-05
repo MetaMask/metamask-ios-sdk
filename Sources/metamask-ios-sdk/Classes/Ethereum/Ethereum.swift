@@ -564,7 +564,7 @@ public class Ethereum {
     func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
 
         // React Native SDK has request params as Data
-        if let _ = requests.first?.params as? Data {
+        if (requests.first?.params as? Data != nil) {
             var requestDicts: [[String: Any]] = []
 
             for request in requests {

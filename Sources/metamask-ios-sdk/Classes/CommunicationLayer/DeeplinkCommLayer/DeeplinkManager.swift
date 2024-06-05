@@ -40,7 +40,7 @@ public class DeeplinkManager {
             return nil
         }
 
-        guard let _ = url.scheme else {
+        guard url.scheme != nil else {
             Logging.error("DeeplinkManager:: Deeplink is missing scheme")
             return nil
         }
