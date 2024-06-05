@@ -18,22 +18,22 @@ public class Ethereum {
     private static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
     private var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
-    
+
     var sdkOptions: SDKOptions?
-    
+
     weak var delegate: EthereumEventsDelegate?
 
     private var connected: Bool = false
-    
+
     /// The active/selected MetaMask account chain
     private var chainId: String = ""
-    
+
     /// The active/selected MetaMask account address
     private var account: String = ""
-    
+
     var commClient: CommClient
     private var track: ((Event, [String: Any]) -> Void)?
-    
+
     private init(commClient: CommClient, track: @escaping ((Event, [String: Any]) -> Void)) {
         self.track = track
         self.commClient = commClient
@@ -41,7 +41,7 @@ public class Ethereum {
         self.commClient.handleResponse = handleMessage
         (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
     }
-    
+
     public static func shared(commClient: CommClient,
                               trackEvent: @escaping ((Event, [String: Any]) -> Void)) -> Ethereum {
         guard let ethereum = EthereumWrapper.shared.ethereum else {
@@ -51,14 +51,14 @@ public class Ethereum {
         }
         return ethereum
     }
-    
+
     public var transport: Transport = .socket
-    
+
     @discardableResult
     func updateTransportLayer(_ transport: Transport) -> Ethereum {
         disconnect()
         self.transport = transport
-        
+
         switch transport {
         case .deeplinking(let dappScheme):
             commClient = Dependencies.shared.deeplinkClient(dappScheme: dappScheme)
@@ -66,40 +66,40 @@ public class Ethereum {
             commClient = Dependencies.shared.socketClient
             (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
         }
-        
+
         commClient.trackEvent = trackEvent
         commClient.handleResponse = handleMessage
         return self
     }
-    
+
     private func trackEvent(event: Event, parameters: [String: Any]) {
         track?(event, parameters)
     }
-    
+
     func updateMetadata(_ metadata: AppMetadata) {
         commClient.appMetadata = metadata
     }
-    
+
     // MARK: Session Management
-    
+
     @discardableResult
     /// Connect to MetaMask mobile wallet. This method must be called first and once, to establish a connection before any requests can be made
     /// - Returns: A Combine publisher that will emit a connection result or error once a response is received
     func connect() -> EthereumPublisher? {
         commClient.connect(with: nil)
         connected = true
-        
+
         if commClient is SocketClient {
             return requestAccounts()
         }
-        
+
         let submittedRequest = SubmittedRequest(method: "")
         submittedRequests[Ethereum.CONNECTION_ID] = submittedRequest
         let publisher = submittedRequests[Ethereum.CONNECTION_ID]?.publisher
 
         return publisher
     }
-    
+
     @discardableResult
     func connect() async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
@@ -116,30 +116,30 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
-    
+
     func connectAndSign(message: String) -> EthereumPublisher? {
         let connectSignRequest = EthereumRequest(
             method: .metaMaskConnectSign,
             params: [message]
         )
         connected = true
-        
+
         if commClient is SocketClient {
             commClient.connect(with: nil)
             return request(connectSignRequest)
         }
-        
+
         let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
         submittedRequests[connectSignRequest.id] = submittedRequest
         let publisher = submittedRequests[connectSignRequest.id]?.publisher
 
         let requestJson = connectSignRequest.toJsonString() ?? ""
-        
+
         commClient.connect(with: requestJson)
-        
+
         return publisher
     }
-    
+
     func connectAndSign(message: String) async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             connectAndSign(message: message)?
@@ -155,7 +155,7 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
-    
+
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) -> EthereumPublisher? {
         let params: [EthereumRequest] = [req]
         let connectWithRequest = EthereumRequest(
@@ -163,11 +163,11 @@ public class Ethereum {
             params: params
         )
         connected = true
-        
+
         switch transport {
         case .socket:
             commClient.connect(with: nil)
-            
+
             // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 let reqJson = String(data: paramsData, encoding: .utf8)?.trimEscapingChars() ?? ""
@@ -176,7 +176,7 @@ public class Ethereum {
                     method: req.method,
                     params: reqJson
                 )
-                
+
                 let connectWithParams = [requestItem]
                 let connectRequest = EthereumRequest(
                     id: connectWithRequest.id,
@@ -187,35 +187,35 @@ public class Ethereum {
             } else {
                 return request(connectWithRequest)
             }
-        case .deeplinking(_):
+        case .deeplinking:
             let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
             submittedRequests[connectWithRequest.id] = submittedRequest
             let publisher = submittedRequests[connectWithRequest.id]?.publisher
-            
+
             // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
                 do {
                     let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
-                    
+
                     let requestDict: [String: Any] = [
                         "id": req.id,
                         "method": req.method,
                         "params": params
                         ]
-                    
+
                     let jsonData = try JSONSerialization.data(withJSONObject: requestDict)
                     let jsonParams = try JSONSerialization.jsonObject(with: jsonData, options: [])
 
                     let connectWithParams = [jsonParams]
-                    
+
                     let connectWithDict: [String: Any] = [
                         "id": connectWithRequest.id,
                         "method": connectWithRequest.method,
                         "params": connectWithParams
                         ]
-                    
+
                     let connectWithJson = json(from: connectWithDict) ?? ""
-                    
+
                     commClient.connect(with: connectWithJson)
                 } catch {
                     Logging.error("Ethereum:: error: \(error.localizedDescription)")
@@ -227,7 +227,7 @@ public class Ethereum {
             return publisher
         }
     }
-    
+
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             connectWith(req)?
@@ -243,45 +243,45 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
-    
+
     // MARK: Convenience Methods
-    
+
     func getChainId() async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethChainId, params: [String]())
     }
-    
+
     func getEthAccounts() async -> Result<[String], RequestError> {
         await ethereumRequest(method: .ethAccounts, params: [String]())
     }
-    
+
     func getEthGasPrice() async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethGasPrice)
     }
-    
+
     func getEthBalance(address: String, block: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethGetBalance, params: [address, block])
     }
-    
+
     func getEthBlockNumber() async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethBlockNumber)
     }
-    
+
     func getEthEstimateGas() async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethEstimateGas)
     }
-    
+
     func getWeb3ClientVersion() async -> Result<String, RequestError> {
         await ethereumRequest(method: .web3ClientVersion, params: [String]())
     }
-    
+
     func personalSign(message: String, address: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .personalSign, params: [address, message])
     }
-    
+
     func signTypedDataV4(typedData: String, address: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethSignTypedDataV4, params: [address, typedData])
     }
-    
+
     func sendTransaction(from: String, to: String, amount: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethSendTransaction, params: [
             [
@@ -291,23 +291,23 @@ public class Ethereum {
             ]
         ])
     }
-    
+
     func sendRawTransaction(signedTransaction: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethSendRawTransaction, params: [signedTransaction])
     }
-    
+
     func getBlockTransactionCountByNumber(blockNumber: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethGetBlockTransactionCountByNumber, params: [blockNumber])
     }
-    
+
     func getBlockTransactionCountByHash(blockHash: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethGetBlockTransactionCountByHash, params: [blockHash])
     }
-    
+
     func getTransactionCount(address: String, tagOrblockNumber: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethGetTransactionCount, params: [address, tagOrblockNumber])
     }
-    
+
     func addEthereumChain(chainId: String,
                           chainName: String,
                           rpcUrls: [String],
@@ -315,7 +315,6 @@ public class Ethereum {
                           blockExplorerUrls: [String]?,
                           nativeCurrency: NativeCurrency) async -> Result<String, RequestError> {
 
-        
         return await ethereumRequest(method: .addEthereumChain, params: [
                 AddChainParameters(
                     chainId: chainId,
@@ -327,23 +326,23 @@ public class Ethereum {
                 )
         ])
     }
-    
+
     func switchEthereumChain(chainId: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .switchEthereumChain, params: [
             ["chainId": chainId]
         ])
     }
-    
+
     private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<String, RequestError> {
         let ethRequest = EthereumRequest(method: method, params: params)
         return await request(ethRequest)
     }
-    
+
     private func ethereumRequest<T: CodableData>(method: EthereumMethod, params: T = "") async -> Result<[String], RequestError> {
         let ethRequest = EthereumRequest(method: method, params: params)
         return await request(ethRequest)
     }
-    
+
     /// Disconnect dapp
     func disconnect() {
         updateChainId("")
@@ -351,29 +350,29 @@ public class Ethereum {
         connected = false
         commClient.disconnect()
     }
-    
+
     func clearSession() {
         updateAccount("")
         updateChainId("")
         connected = false
         commClient.clearSession()
     }
-    
+
     func terminateConnection() {
         if connected {
             track?(.connectionRejected, [:])
         }
-        
+
         let error = RequestError(from: ["message": "The connection request has been rejected"])
-        submittedRequests.forEach { key, value in
+        submittedRequests.forEach { key, _ in
             submittedRequests[key]?.error(error)
         }
         submittedRequests.removeAll()
         disconnect()
     }
-    
+
     // MARK: Request Sending
-    
+
     func sendRequest(_ request: any RPCRequest) {
         if
             EthereumMethod.isReadOnly(request.methodType),
@@ -393,22 +392,22 @@ public class Ethereum {
                 "from": "mobile",
                 "method": request.method
             ])
-            
+
             switch transport {
             case .socket:
                 // React Native SDK has request params as Data
                 if let paramsData = request.params as? Data {
                     do {
                         let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
-                        
+
                         let requestDict: [String: Any] = [
                             "id": request.id,
                             "method": request.method,
                             "params": params
                             ]
-                        
+
                         let requestJson = json(from: requestDict) ?? ""
-                        
+
                         commClient.sendMessage(requestJson, encrypt: true, options: [:])
                     } catch {
                         Logging.error("Ethereum:: error: \(error.localizedDescription)")
@@ -416,28 +415,28 @@ public class Ethereum {
                 } else {
                     (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
                 }
-                
+
                 let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
                 let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
-                
+
                 if authorise && !skipAuthorisation {
                     (commClient as? SocketClient)?.requestAuthorisation()
                 }
-                
-            case .deeplinking(_):
+
+            case .deeplinking:
                 // React Native SDK has request params as Data
                 if let paramsData = request.params as? Data {
                     do {
                         let params = try JSONSerialization.jsonObject(with: paramsData, options: [])
-                        
+
                         let requestDict: [String: Any] = [
                             "id": request.id,
                             "method": request.method,
                             "params": params
                             ]
-                        
+
                         let requestJson = json(from: requestDict) ?? ""
-                        
+
                         commClient.sendMessage(requestJson, encrypt: true, options: ["account": account, "chainId": chainId])
                     } catch {
                         Logging.error("Ethereum:: error: \(error.localizedDescription)")
@@ -448,57 +447,57 @@ public class Ethereum {
                         Logging.error("Ethereum:: could not convert request to JSON: \(request)")
                             return
                         }
-                                    
+
                     commClient.sendMessage(requestJson, encrypt: true, options: ["account": account, "chainId": chainId])
                 }
             }
         }
     }
-    
+
     @discardableResult
     private func requestAccounts() -> EthereumPublisher? {
         let requestAccountsRequest = EthereumRequest(
             id: Ethereum.CONNECTION_ID,
             method: .ethRequestAccounts
         )
-        
+
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
         submittedRequests[requestAccountsRequest.id] = submittedRequest
         let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
-        
+
         commClient.addRequest { [weak self] in
             self?.sendRequest(requestAccountsRequest)
         }
-        
+
         return publisher
     }
-    
+
     private func createChainIdRequest() -> EthereumRequest<String> {
         let chainIdRequest = EthereumRequest(
             method: .ethChainId
         )
-        
+
         let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
         submittedRequests[chainIdRequest.id] = submittedRequest
-        
+
         return chainIdRequest
     }
-    
+
     @discardableResult
     private func requestChainId() -> EthereumPublisher? {
         let chainIdRequest = EthereumRequest(
             method: .ethChainId
         )
-        
+
         let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
         submittedRequests[chainIdRequest.id] = submittedRequest
         let publisher = submittedRequests[chainIdRequest.id]?.publisher
-        
+
         sendRequest(chainIdRequest)
-        
+
         return publisher
     }
-    
+
     @discardableResult
     /// Performs and Ethereum remote procedural call (RPC)
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
@@ -516,7 +515,7 @@ public class Ethereum {
             let submittedRequest = SubmittedRequest(method: request.method)
             submittedRequests[id] = submittedRequest
             let publisher = submittedRequests[id]?.publisher
-            
+
             if connected {
                 sendRequest(request)
             } else {
@@ -529,7 +528,7 @@ public class Ethereum {
             return publisher
         }
     }
-    
+
     func request(_ req: any RPCRequest) async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
             request(req)?
@@ -545,7 +544,7 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
-    
+
     func request(_ req: any RPCRequest) async -> Result<[String], RequestError> {
         return await withCheckedContinuation { continuation in
             request(req)?
@@ -561,18 +560,18 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
-    
+
     func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
-        
+
         // React Native SDK has request params as Data
-        if let _ = requests.first?.params as? Data {
+        if (requests.first?.params as? Data != nil) {
             var requestDicts: [[String: Any]] = []
-            
+
             for request in requests {
                 if let paramData = request.params as? Data {
                     do {
                         let requestParams = try JSONSerialization.jsonObject(with: paramData, options: [])
-                        
+
                         let dict: [String: Any] = [
                             "id": request.id,
                             "method": request.method,
@@ -585,13 +584,13 @@ public class Ethereum {
                     }
                 }
             }
-            
+
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: requestDicts)
                 let batchReq = EthereumRequest(
                     method: EthereumMethod.metamaskBatch.rawValue,
                     params: jsonData)
-                
+
                 return await withCheckedContinuation { continuation in
                     request(batchReq)?
                         .sink(receiveCompletion: { completion in
@@ -629,32 +628,32 @@ public class Ethereum {
             }
         }
     }
-    
+
     // MARK: Request Receiving
     private func updateChainId(_ id: String) {
         chainId = id
         delegate?.chainIdChanged(id)
     }
-    
+
     private func updateAccount(_ account: String) {
         self.account = account
         delegate?.accountChanged(account)
     }
-    
+
     func sendResult(_ result: Any, id: String) {
         submittedRequests[id]?.send(result)
         submittedRequests.removeValue(forKey: id)
     }
-    
+
     func sendError(_ error: RequestError, id: String) {
         submittedRequests[id]?.error(error)
         submittedRequests.removeValue(forKey: id)
-        
+
         if error.codeType == .unauthorisedRequest {
             clearSession()
         }
     }
-    
+
     func handleMessage(_ message: [String: Any]) {
         if let id = message["id"] {
             if let identifier: Int64 = id as? Int64 {
@@ -667,43 +666,42 @@ public class Ethereum {
             receiveEvent(message)
         }
     }
-    
+
     func receiveResponse(_ data: [String: Any], id: String) {
         guard let request = submittedRequests[id] else { return }
-        
+
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
             let method = EthereumMethod(rawValue: request.method)
             if
                 method == .ethRequestAccounts,
-                requestError.codeType == .userRejectedRequest
-            {
+                requestError.codeType == .userRejectedRequest {
                 track?(.connectionRejected, [:])
             }
             sendError(requestError, id: id)
-            
+
             // metamask_connectSign & metamask_connectwith can have both error & result
             // if connection is approved but rpc request is denied
             let accounts = data["accounts"] as? [String] ?? []
-            
+
             if let account = accounts.first {
                 updateAccount(account)
                 sendResult(account, id: id)
             }
-            
+
             if let chainId = data["chainId"] as? String {
                 updateChainId(chainId)
                 sendResult(chainId, id: id)
             }
-    
+
             return
         }
-        
+
         track?(.sdkRpcRequestDone, [
             "from": "mobile",
             "method": request.method
         ])
-        
+
         guard
             let method = EthereumMethod(rawValue: request.method),
             EthereumMethod.isResultMethod(method) else {
@@ -714,17 +712,17 @@ public class Ethereum {
             }
             return
         }
-        
+
         switch method {
         case .getMetamaskProviderState:
             let result: [String: Any] = data["result"] as? [String: Any] ?? [:]
             let accounts = result["accounts"] as? [String] ?? []
-            
+
             if let account = accounts.first {
                 updateAccount(account)
                 sendResult(account, id: id)
             }
-            
+
             if let chainId = result["chainId"] as? String {
                 updateChainId(chainId)
                 sendResult(chainId, id: id)
@@ -758,7 +756,7 @@ public class Ethereum {
                 result.count == 2,
                 let accounts = result.first as? [String],
                 let chainId = result[1] as? String {
-                
+
                 if let account = accounts.first {
                     updateAccount(account)
                 }
@@ -770,31 +768,30 @@ public class Ethereum {
             if let chainId = data["chainId"] as? String {
                 updateChainId(chainId)
             }
-            
+
             if
                 let accounts = data["accounts"] as? [String],
                 let selectedAddress = accounts.first {
                 updateAccount(selectedAddress)
             }
-            
+
             if let result = data["result"] {
                 sendResult(result, id: id)
             }
         }
     }
-    
+
     func receiveEvent(_ event: [String: Any]) {
         if let error = event["error"] as? [String: Any] {
             Logging.error("Ethereum:: receive error: \(error)")
             let requestError = RequestError(from: error)
-            
-            if requestError.codeType == .userRejectedRequest
-            {
+
+            if requestError.codeType == .userRejectedRequest {
                 track?(.connectionRejected, [:])
             }
             sendError(requestError, id: Ethereum.CONNECTION_ID)
         }
-        
+
         guard
             let method = event["method"] as? String,
             let ethMethod = EthereumMethod(rawValue: method)
@@ -802,7 +799,7 @@ public class Ethereum {
             if let chainId = event["chainId"] as? String {
                 updateChainId(chainId)
             }
-            
+
             if
                 let accounts = event["accounts"] as? [String],
                 let selectedAddress = accounts.first {
@@ -811,7 +808,7 @@ public class Ethereum {
             }
             return
         }
-        
+
         switch ethMethod {
         case .metaMaskAccountsChanged:
             let accounts: [String] = event["params"] as? [String] ?? []
@@ -820,7 +817,7 @@ public class Ethereum {
             }
         case .metaMaskChainChanged:
             let params: [String: Any] = event["params"] as? [String: Any] ?? [:]
-            
+
             if let chainId = params["chainId"] as? String {
                 updateChainId(chainId)
             }

@@ -26,7 +26,7 @@ struct ReadOnlyCallsView: View {
             ZStack {
                 VStack(spacing: 16) {
                     Spacer()
-                    
+
                     VStack {
                         Button {
                             Task {
@@ -38,11 +38,11 @@ struct ReadOnlyCallsView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         Text(balanceResult)
                             .modifier(TextCaption())
                     }
-                    
+
                     VStack {
                         Button {
                             Task {
@@ -54,11 +54,11 @@ struct ReadOnlyCallsView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         Text(gasPriceResult)
                             .modifier(TextCaption())
                     }
-                    
+
                     VStack {
                         Button {
                             Task {
@@ -70,13 +70,13 @@ struct ReadOnlyCallsView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         Text(web3ClientVersionResult)
                             .modifier(TextCaption())
                     }
                 }
                 .padding(.horizontal)
-                
+
                 if showProgressView {
                     ProgressView()
                         .scaleEffect(1.5, anchor: .center)
@@ -107,7 +107,7 @@ struct ReadOnlyCallsView: View {
         showProgressView = true
         let requestResult = await metamaskSDK.request(getBalanceRequest)
         showProgressView = false
-        
+
         switch requestResult {
         case let .success(value):
             balanceResult = value
@@ -117,7 +117,7 @@ struct ReadOnlyCallsView: View {
             showError = true
         }
     }
-    
+
     func getGasPrice() async {
         let params: [String] = []
         let getGasPriceRequest = EthereumRequest(
@@ -128,7 +128,7 @@ struct ReadOnlyCallsView: View {
         showProgressView = true
         let requestResult = await metamaskSDK.request(getGasPriceRequest)
         showProgressView = false
-        
+
         switch requestResult {
         case let .success(value):
             gasPriceResult = value
@@ -138,7 +138,7 @@ struct ReadOnlyCallsView: View {
             showError = true
         }
     }
-    
+
     func getWeb3ClientVersion() async {
         let params: [String] = []
         let getWeb3ClientVersionRequest = EthereumRequest(
@@ -149,7 +149,7 @@ struct ReadOnlyCallsView: View {
         showProgressView = true
         let requestResult = await metamaskSDK.request(getWeb3ClientVersionRequest)
         showProgressView = false
-        
+
         switch requestResult {
         case let .success(value):
             web3ClientVersionResult = value

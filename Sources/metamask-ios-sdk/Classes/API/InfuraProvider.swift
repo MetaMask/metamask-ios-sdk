@@ -8,12 +8,12 @@ import Foundation
 public class InfuraProvider {
     private let infuraAPIKey: String
     private let network: any Networking
-    
+
     public init(infuraAPIKey: String, network: any Networking = Network()) {
         self.infuraAPIKey = infuraAPIKey
         self.network = network
     }
-    
+
     func endpoint(for chainId: String) -> String? {
         let rpcUrls: [String: String] = [
                 // ###### Ethereum ######
@@ -67,43 +67,43 @@ public class InfuraProvider {
                 // Mainnet
                 "0xa4ec": "https://celo-mainnet.infura.io/v3/\(infuraAPIKey)",
                 // Alfajores Testnet
-                "0xaef3": "https://celo-alfajores.infura.io/v3/\(infuraAPIKey)",
+                "0xaef3": "https://celo-alfajores.infura.io/v3/\(infuraAPIKey)"
             ]
         return rpcUrls[chainId]
     }
-    
+
     public func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
         Logging.log("InfuraProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
-        
+
         let params: [String: Any] = [
             "method": request.method,
             "jsonrpc": "2.0",
             "id": request.id,
             "params": request.params
         ]
-        
+
         guard let endpoint = endpoint(for: chainId) else {
             Logging.error("InfuraProvider:: Infura endpoint for chainId \(chainId) is not available")
             return nil
         }
-        
+
         let devicePlatformInfo = DeviceInfo.platformDescription
         network.addHeaders([
             "Metamask-Sdk-Info": "Sdk/iOS SdkVersion/\(SDKInfo.version) Platform/\(devicePlatformInfo) dApp/\(appMetadata.url) dAppTitle/\(appMetadata.name)"
         ]
         )
-        
+
         do {
             let response = try await network.post(params, endpoint: endpoint)
             let json: [String: Any] = try JSONSerialization.jsonObject(
                 with: response,
                 options: []
             ) as? [String: Any] ?? [:]
-            
+
             if let result = json["result"] {
                 return result
             }
-            
+
             Logging.error("InfuraProvider:: could not get result from response \(json)")
             return nil
         } catch {

@@ -24,7 +24,7 @@ public enum ErrorType: Int {
     case serverError = -32603 // Could be one of many outcomes
     case parseError = -32700 // JSON RPC 2.0 Parse error
     case unknownError = -1 // check RequestError.code instead
-    
+
     static func isServerError(_ code: Int) -> Bool {
         code < -32000 && code >= -32099
     }

@@ -14,8 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         return true
     }
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         if URLComponents(url: url, resolvingAgainstBaseURL: true)?.host == "mmsdk" {
             MetaMaskSDK.sharedInstance?.handleUrl(url)
         } else {

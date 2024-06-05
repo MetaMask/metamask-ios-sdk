@@ -3,7 +3,6 @@
 //  metamask-ios-sdk
 //
 
-
 import Foundation
 
 public struct AddChainParameters: CodableData {

@@ -33,17 +33,16 @@ func json(from value: Any) -> String? {
             return value
         }
     }
-    
+
     // Decode any nested JSON strings recursively in the input dictionary
     let decodedJsonObject = decodeNestedJson(value)
-    
+
     // Step 3: Convert the cleaned dictionary back to a JSON string
     guard let cleanedJsonData = try? JSONSerialization.data(withJSONObject: decodedJsonObject, options: []),
           let cleanedJsonString = String(data: cleanedJsonData, encoding: .utf8) else {
         Logging.error("Failed to serialize cleaned JSON dictionary")
         return nil
     }
-    
+
     return cleanedJsonString
 }
-

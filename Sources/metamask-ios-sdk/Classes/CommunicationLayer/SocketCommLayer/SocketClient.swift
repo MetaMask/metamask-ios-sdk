@@ -18,7 +18,7 @@ public class SocketClient: CommClient {
     public var isConnected: Bool {
         channel.isConnected
     }
-    
+
     public var networkUrl: String {
         get {
             channel.networkUrl
@@ -26,7 +26,7 @@ public class SocketClient: CommClient {
             channel.networkUrl = newValue
         }
     }
-    
+
     public var sessionDuration: TimeInterval {
         get {
             session.sessionDuration
@@ -34,18 +34,18 @@ public class SocketClient: CommClient {
             session.sessionDuration = newValue
         }
     }
-    
+
     private var isReady: Bool = false
     private var isReconnection = false
     public var onClientsTerminated: (() -> Void)?
 
     public var handleResponse: (([String: Any]) -> Void)?
     public var trackEvent: ((Event, [String: Any]) -> Void)?
-    
+
     var requestJobs: [RequestJob] = []
-    
+
     public var useDeeplinks: Bool = true
-    
+
     private var _deeplinkUrl: String {
         useDeeplinks ? "metamask:/" : "https://metamask.app.link"
     }
@@ -62,7 +62,7 @@ public class SocketClient: CommClient {
         self.session = session
         self.trackEvent = trackEvent
     }
-    
+
     func setupClient() {
         let sessionInfo = session.fetchSessionConfig()
         channelId = sessionInfo.0.sessionId
@@ -74,7 +74,7 @@ public class SocketClient: CommClient {
 
     public func connect(with request: String?) {
         if channel.isConnected { return }
-        
+
         setupClient()
         if isReconnection {
             track(event: .reconnectionRequest)
@@ -90,20 +90,20 @@ public class SocketClient: CommClient {
         channel.tearDown()
         session.clear()
     }
-    
+
     public func clearSession() {
         channelId = ""
         session.clear()
         disconnect()
         keyExchange.reset()
     }
-    
+
     private func initiateKeyExchange() {
         keyExchange.reset()
         let keyExchangeStartMessage = KeyExchangeMessage(type: .start, pubkey: nil)
         sendMessage(keyExchangeStartMessage, encrypt: false)
     }
-    
+
     public func requestAuthorisation() {
         deeplinkToMetaMask()
     }
@@ -115,7 +115,7 @@ extension SocketClient {
     public func addRequest(_ job: @escaping RequestJob) {
         requestJobs.append(job)
     }
-    
+
     func runJobs() {
         while !requestJobs.isEmpty {
             let job = requestJobs.popLast()
@@ -138,7 +138,7 @@ private extension SocketClient {
 
         // MARK: Clients connected event
 
-        channel.on(ClientEvent.clientsConnected(on: channelId)) { data in
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { _ in
             Logging.log("Clients connected")
 
             // for debug purposes only
@@ -183,7 +183,7 @@ private extension SocketClient {
             if !self.isValidMessage(message: message) {
                 return
             }
-            
+
             if !self.keyExchange.keysExchanged {
                 // Exchange keys
                 self.handleReceiveKeyExchange(message)
@@ -193,7 +193,7 @@ private extension SocketClient {
             }
         }
     }
-    
+
     func isValidMessage(message: [String: Any]) -> Bool {
         if
             let message = message["message"] as? [String: Any],
@@ -201,17 +201,17 @@ private extension SocketClient {
             if type == "ping" {
                 return false
             }
-            
+
             if type.contains("key_handshake") {
                 return true
             } else if !keyExchange.keysExchanged {
                 return false
             }
         }
-        
+
         return true
     }
-    
+
     func isKeyExchangeMessage(_ message: [String: Any]) -> Bool {
         if
             let msg = message["message"] as? [String: Any],
@@ -219,7 +219,7 @@ private extension SocketClient {
             type.contains("key_handshake") {
             return true
         }
-        
+
         return false
     }
 
@@ -249,14 +249,14 @@ private extension SocketClient {
 private extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         let keyExchangeMessage: SocketMessage<KeyExchangeMessage>
-        
+
         do {
             keyExchangeMessage = try SocketMessage<KeyExchangeMessage>.message(from: message)
         } catch {
             initiateKeyExchange()
             return
         }
-        
+
         guard let nextKeyExchangeMessage = keyExchange.nextMessage(keyExchangeMessage.message) else {
             track(event: .connected)
             return
@@ -274,7 +274,7 @@ private extension SocketClient {
             handleReceiveKeyExchange(msg)
             return
         }
-        
+
         do {
             let message = try SocketMessage<String>.message(from: msg)
             try handleEncryptedMessage(message)
@@ -306,7 +306,7 @@ private extension SocketClient {
             as? [String: Any] ?? [:]
         handleResponseMessage(json)
     }
-    
+
     func handleResponseMessage(_ json: [String: Any]) {
         if json["type"] as? String == "terminate" {
             disconnect()
@@ -350,18 +350,18 @@ extension SocketClient {
         let originatorInfo = originatorInfo()
         sendMessage(originatorInfo, encrypt: true)
     }
-    
+
     public func send(_ message: String, encrypt: Bool) {
         do {
             let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-            
+
             let message: SocketMessage = .init(
                 id: self.channelId,
                 message: encryptedMessage
             )
 
             self.channel.emit(ClientEvent.message, message)
-            
+
         } catch {
             Logging.error("\(error.localizedDescription)")
         }
@@ -372,7 +372,7 @@ extension SocketClient {
             addRequest { [weak self] in
                 guard let self = self else { return }
                 Logging.log("Resuming sending requests after reconnection")
-                
+
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
 
@@ -380,7 +380,7 @@ extension SocketClient {
                         id: self.channelId,
                         message: encryptedMessage
                     )
-                    
+
                     self.channel.emit(ClientEvent.message, message)
 
                 } catch {
@@ -396,17 +396,17 @@ extension SocketClient {
                 addRequest { [weak self] in
                     guard let self = self else { return }
                     Logging.log("Resuming sending requests")
-                    
+
                     do {
                         let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
-                        
+
                         let message: SocketMessage = .init(
                             id: self.channelId,
                             message: encryptedMessage
                         )
-                        
+
                         self.channel.emit(ClientEvent.message, message)
-                        
+
                     } catch {
                         Logging.error("\(error.localizedDescription)")
                     }
@@ -420,7 +420,7 @@ extension SocketClient {
                     )
 
                     channel.emit(ClientEvent.message, message)
-                    
+
                 } catch {
                     Logging.error("\(error.localizedDescription)")
                 }
@@ -430,7 +430,7 @@ extension SocketClient {
                 id: channelId,
                 message: message
             )
-            
+
             self.channel.emit(ClientEvent.message, message)
         }
     }
@@ -456,7 +456,7 @@ extension SocketClient {
         default:
             break
         }
-        
+
         trackEvent?(event, parameters)
     }
 }

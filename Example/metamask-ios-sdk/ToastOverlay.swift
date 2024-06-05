@@ -5,11 +5,10 @@
 
 import SwiftUI
 
-struct ToastOverlay<ToastContent>: View where ToastContent : View {
+struct ToastOverlay<ToastContent>: View where ToastContent: View {
     let content: ToastContent
     @Binding var isPresented: Bool
 
-    
     var body: some View {
         GeometryReader { geometry in
             VStack {

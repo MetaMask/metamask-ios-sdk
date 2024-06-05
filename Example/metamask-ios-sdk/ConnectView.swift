@@ -23,7 +23,7 @@ struct ConnectView: View {
         url: "https://dubdapp.com",
         iconUrl: "https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png"
     )
-    
+
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
                     appMetadata,
@@ -36,7 +36,7 @@ struct ConnectView: View {
 
     @State private var errorMessage = ""
     @State private var showError = false
-    
+
     @State private var connectAndSignResult = ""
     @State private var isConnect = true
     @State private var isConnectAndSign = false
@@ -77,7 +77,7 @@ struct ConnectView: View {
                         }
                     }
                 }
-                
+
                 if #available(iOS 17.0, *) {
                     Section {
                         Picker("Transport Layer", selection: $selectedTransport) {
@@ -87,8 +87,8 @@ struct ConnectView: View {
                         .onChange(of: selectedTransport, initial: false, { _, newValue in
                             metaMaskSDK.updateTransportLayer(newValue)
                         })
-                        
-                        if case .deeplinking(_) = selectedTransport {
+
+                        if case .deeplinking = selectedTransport {
                             TextField("Dapp Scheme", text: $dappScheme)
                                 .frame(minHeight: 32)
                                 .modifier(TextCurvature())
@@ -102,7 +102,7 @@ struct ConnectView: View {
                             NavigationLink("Sign") {
                                 SignView().environmentObject(metaMaskSDK)
                             }
-                            
+
                             NavigationLink("Chained signing") {
                                 SignView(isChainedSigning: true).environmentObject(metaMaskSDK)
                             }
@@ -114,7 +114,7 @@ struct ConnectView: View {
                             NavigationLink("Switch chain") {
                                 SwitchChainView().environmentObject(metaMaskSDK)
                             }
-                            
+
                             NavigationLink("Read-only RPCs") {
                                 ReadOnlyCallsView().environmentObject(metaMaskSDK)
                             }
@@ -138,7 +138,7 @@ struct ConnectView: View {
                                 .environmentObject(metaMaskSDK)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         Button {
                             isConnectAndSign = true
                         } label: {
@@ -153,7 +153,7 @@ struct ConnectView: View {
                                 .environmentObject(metaMaskSDK)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         ZStack {
                             Button {
                                 Task {
@@ -183,7 +183,7 @@ struct ConnectView: View {
                             .modifier(TextCaption())
                     }
                 }
-                
+
                 if !metaMaskSDK.account.isEmpty {
                     Section {
                         Button {
@@ -194,7 +194,7 @@ struct ConnectView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 32)
                         }
                         .modifier(ButtonStyle())
-                        
+
                         Button {
                             metaMaskSDK.disconnect()
                         } label: {
@@ -216,14 +216,14 @@ struct ConnectView: View {
             }
         }
     }
-    
+
     func connectSDK() async {
         showProgressView = true
         let result = await metaMaskSDK.connect()
         showProgressView = false
-        
+
         switch result {
-        case .success(_):
+        case .success:
             status = "Online"
         case let .failure(error):
             errorMessage = error.localizedDescription

@@ -20,7 +20,7 @@ public struct OriginatorInfo: CodableData {
             "icon": icon,
             "dappId": dappId,
             "platform": platform,
-            "apiVersion": apiVersion,
+            "apiVersion": apiVersion
         ]
     }
 }

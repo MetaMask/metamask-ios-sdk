@@ -8,7 +8,7 @@ import Foundation
 public class SocketChannel {
     public typealias ChannelData = SocketData
     public typealias EventType = SocketClientEvent
-    
+
     public var networkUrl: String {
         get {
             _networkUrl
@@ -16,16 +16,15 @@ public class SocketChannel {
             _networkUrl = newValue
         }
     }
-    
+
     public var isConnected: Bool {
         socket.status == .connected
     }
-    
+
     private var _networkUrl: String
 
     var socket: SocketProtocol!
     var socketManager: SocketManagerProtocol!
-    
 
     public init(url: String = Endpoint.SERVER_URL) {
         _networkUrl = url
@@ -66,7 +65,7 @@ extension SocketChannel {
     public func disconnect() {
         socket.disconnect()
     }
-    
+
     public func tearDown() {
         socket.removeAllHandlers()
     }

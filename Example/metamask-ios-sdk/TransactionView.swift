@@ -19,7 +19,7 @@ struct TransactionView: View {
     @State var isConnectWith: Bool = false
     @State private var sendTransactionTitle = "Send Transaction"
     @State private var connectWithSendTransactionTitle = "Connect & Send Transaction"
-    
+
     @State private var showProgressView = false
 
     var body: some View {
@@ -78,7 +78,7 @@ struct TransactionView: View {
                         )
                     }
                     .modifier(ButtonStyle())
-                    
+
                     if showProgressView {
                         ProgressView()
                             .scaleEffect(1.5, anchor: .center)
@@ -96,22 +96,22 @@ struct TransactionView: View {
             from: metamaskSDK.account,
             value: amount
         )
-        
+
         let parameters: [Transaction] = [transaction]
 
         let transactionRequest = EthereumRequest(
             method: .ethSendTransaction,
             params: parameters // eth_sendTransaction rpc call expects an array parameters object
         )
-        
+
         showProgressView = true
-        
+
         let transactionResult = isConnectWith
         ? await metamaskSDK.connectWith(transactionRequest)
         : await metamaskSDK.sendTransaction(from: metamaskSDK.account, to: to, amount: amount)
-        
+
         showProgressView = false
-        
+
         switch transactionResult {
         case let .success(value):
             result = value

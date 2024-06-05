@@ -8,7 +8,7 @@ import SocketIO
 
 class MockSocketManager: SocketManagerProtocol {
     var standardSocket: SocketProtocol
-    
+
     init() {
         standardSocket = MockSocket()
     }

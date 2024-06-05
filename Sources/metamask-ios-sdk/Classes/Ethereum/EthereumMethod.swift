@@ -71,7 +71,7 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
 
         return methods.contains(method)
     }
-    
+
     static func isReadOnly(_ method: EthereumMethod) -> Bool {
         !requiresAuthorisation(method)
     }
@@ -100,7 +100,7 @@ public enum EthereumMethod: String, CaseIterable, CodableData {
 
         return resultMethods.contains(method)
     }
-    
+
     static func isConnectMethod(_ method: EthereumMethod) -> Bool {
         let connectMethods: [EthereumMethod] = [
             .metaMaskConnectSign,
