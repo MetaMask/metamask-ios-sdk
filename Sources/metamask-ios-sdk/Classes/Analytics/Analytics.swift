@@ -32,6 +32,7 @@ public class Analytics: Tracking {
 
         var params = parameters
         params["event"] = event.name
+        Logging.log("Mpendulo:: Event params: \(params)")
 
         do {
             try await network.post(params, endpoint: .analytics)

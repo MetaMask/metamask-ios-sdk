@@ -36,6 +36,10 @@
 		D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */; };
 		D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */; };
 		D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */; };
+		D1ED4E5E2C11D260001AC6E0 /* MockSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */; };
+		D1ED4E602C11D36E001AC6E0 /* MockKeyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */; };
+		D1ED4E622C11D398001AC6E0 /* MockDeeplinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */; };
+		D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E632C11D8EE001AC6E0 /* MockURLOpener.swift */; };
 		F11C6352C0DDAA47A02C88A4 /* Pods_metamask_ios_sdk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +90,10 @@
 		D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocket.swift; sourceTree = "<group>"; };
 		D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketManager.swift; sourceTree = "<group>"; };
 		D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketChannelTests.swift; sourceTree = "<group>"; };
+		D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSessionManager.swift; sourceTree = "<group>"; };
+		D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockKeyExchange.swift; sourceTree = "<group>"; };
+		D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDeeplinkManager.swift; sourceTree = "<group>"; };
+		D1ED4E632C11D8EE001AC6E0 /* MockURLOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLOpener.swift; sourceTree = "<group>"; };
 		D5694CDE7AD78A1D52AC0870 /* Pods-metamask-ios-sdk_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Tests.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Tests/Pods-metamask-ios-sdk_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		E14C8784DEC2EFBD52C3BB8D /* Pods_metamask_ios_sdk_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F64C3CE55BBAE4908CF676A7 /* Pods-metamask-ios-sdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-metamask-ios-sdk_Example.debug.xcconfig"; path = "Target Support Files/Pods-metamask-ios-sdk_Example/Pods-metamask-ios-sdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -172,6 +180,10 @@
 				D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */,
 				D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */,
 				D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */,
+				D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */,
+				D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */,
+				D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */,
+				D1ED4E632C11D8EE001AC6E0 /* MockURLOpener.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -441,10 +453,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
+				D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
 				D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */,
+				D1ED4E622C11D398001AC6E0 /* MockDeeplinkManager.swift in Sources */,
 				D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */,
+				D1ED4E5E2C11D260001AC6E0 /* MockSessionManager.swift in Sources */,
 				D15F6AE92BD9276B005048F3 /* DeeplinkClientTests.swift in Sources */,
+				D1ED4E602C11D36E001AC6E0 /* MockKeyExchange.swift in Sources */,
 				D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */,

@@ -8,26 +8,99 @@ import XCTest
 
 class DeeplinkClientTests: XCTestCase {
     var deeplinkClient: DeeplinkClient!
-    var deeplinkManager: DeeplinkManager!
+    var mockDeeplinkManager: MockDeeplinkManager!
 
     var secureStore: SecureStore!
-    var keyExchange: KeyExchange!
-    var sessionManager: SessionManager!
+    var mockURLOpener: MockURLOpener!
+    var mockKeyExchange: MockKeyExchange!
+    var mockSessionManager: MockSessionManager!
 
     private let DAPP_SCHEME = "testDapp"
 
     override func setUp() {
         super.setUp()
-        deeplinkManager = DeeplinkManager()
+        mockDeeplinkManager = MockDeeplinkManager()
 
         secureStore = Keychain(service: "com.example.deeplinkTestKeychain")
-        keyExchange = KeyExchange()
-        sessionManager = SessionManager(store: secureStore, sessionDuration: 3600)
+        mockKeyExchange = MockKeyExchange()
+        mockURLOpener = MockURLOpener()
+        mockSessionManager = MockSessionManager(store: secureStore, sessionDuration: 3600)
         deeplinkClient = DeeplinkClient(
-            session: sessionManager,
-            keyExchange: keyExchange,
-            deeplinkManager: deeplinkManager,
-            dappScheme: DAPP_SCHEME)
+            session: mockSessionManager,
+            keyExchange: mockKeyExchange,
+            deeplinkManager: mockDeeplinkManager,
+            dappScheme: DAPP_SCHEME,
+            urlOpener: mockURLOpener
+        )
+    }
+    
+    func testSetupClient() {
+        XCTAssertEqual(deeplinkClient.channelId, "mockSessionId")
+    }
+    
+    func testSetupCallbacks() {
+        XCTAssertNotNil(deeplinkClient.deeplinkManager.onReceiveMessage)
+        XCTAssertNotNil(deeplinkClient.deeplinkManager.decryptMessage)
+    }
+    
+    func testClearSession() {
+        deeplinkClient.clearSession()
+        XCTAssertTrue(mockSessionManager.clearCalled)
+        XCTAssertTrue(mockSessionManager.fetchSessionConfigCalled)
+        XCTAssertEqual(deeplinkClient.channelId, "mockSessionId")
+    }
+    
+    func testGetSessionDuration() {
+        XCTAssertEqual(deeplinkClient.sessionDuration, 3600)
+    }
+    
+    func testSetSessionDuration() {
+        deeplinkClient.sessionDuration = 60
+        XCTAssertEqual(deeplinkClient.sessionDuration, 60)
+    }
+    
+    func testHandleUrl() {
+        let url = URL(string: "https://example.com")!
+        deeplinkClient.handleUrl(url)
+        XCTAssertTrue(mockDeeplinkManager.handleUrlCalled)
+    }
+    
+    func testConnect() {
+        deeplinkClient.connect(with: "testRequest")
+        let openedUrl = mockURLOpener.openedURL?.absoluteString ?? ""
+        XCTAssertTrue(openedUrl.contains("metamask://connect?"))
+        XCTAssertTrue(openedUrl.contains("?scheme=testDapp"))
+        XCTAssertTrue(openedUrl.contains("&channelId=mockSessionId"))
+        XCTAssertTrue(openedUrl.contains("&comm=deeplinking"))
+        XCTAssertTrue(openedUrl.contains("&request=testRequest"))
+    }
+    
+    func testSendMessage() {
+        deeplinkClient.sendMessage("testMessage")
+        XCTAssertEqual(mockURLOpener.openedURL?.absoluteString, "metamask://testMessage")
+    }
+    
+    func testSendMessageWithDeeplink() {
+        let account = "testAccount"
+        let chainId = "0x1"
+        let options: [String: String] = ["account": account, "chainId": chainId]
+        deeplinkClient.sendMessage(.mmsdk(message: "testMessage", pubkey: nil, channelId: "testChannelId"), options: options)
+        let openedUrl = mockURLOpener.openedURL?.absoluteString ?? ""
+        let expectedDeeplink = "metamask://mmsdk?scheme=testDapp&message=testMessage&channelId=testChannelId&account=\(account)@\(chainId)"
+        XCTAssertEqual(openedUrl, expectedDeeplink)
+    }
+    
+    func testSendStringMessageWithOptions() {
+        let account = "testAccount"
+        let chainId = "0x1"
+        let message = "testMessage"
+        let based64Message = message.base64Encode() ?? ""
+        let options: [String: String] = ["account": account, "chainId": chainId]
+        
+        deeplinkClient.sendMessage(message, encrypt: false, options: options)
+        let openedUrl = mockURLOpener.openedURL?.absoluteString ?? ""
+        let expectedDeeplink = "metamask://mmsdk?scheme=testDapp&message=\(based64Message)&channelId=mockSessionId&account=\(account)@\(chainId)"
+        XCTAssertEqual(openedUrl, expectedDeeplink)
     }
 
     func testConnectIsTracked() {
