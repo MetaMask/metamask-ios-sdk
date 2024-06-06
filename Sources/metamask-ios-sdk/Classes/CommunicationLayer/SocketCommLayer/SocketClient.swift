@@ -440,22 +440,15 @@ extension SocketClient {
 
 extension SocketClient {
     public func track(event: Event) {
-        let id = channelId
-        var parameters: [String: Any] = ["id": id]
-
-        switch event {
-        case .connectionRequest, .sdkRpcRequest:
-            let additionalParams: [String: Any] = [
-                "commLayer": "socket",
-                "sdkVersion": SDKInfo.version,
-                "url": appMetadata?.url ?? "",
-                "title": appMetadata?.name ?? "",
-                "platform": SDKInfo.platform
-            ]
-            parameters.merge(additionalParams) { current, _ in current }
-        default:
-            break
-        }
+        let parameters: [String: Any] = [
+            "id": channelId,
+            "commLayer": "socket",
+            "sdkVersion": SDKInfo.version,
+            "url": appMetadata?.url ?? "",
+            "dappId": SDKInfo.bundleIdentifier ?? "N/A",
+            "title": appMetadata?.name ?? "",
+            "platform": SDKInfo.platform
+        ]
 
         trackEvent?(event, parameters)
     }

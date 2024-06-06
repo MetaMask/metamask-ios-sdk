@@ -103,27 +103,15 @@ public class DeeplinkClient: CommClient {
     }
 
     public func track(event: Event) {
-        let id = channelId
-        var parameters: [String: Any] = ["id": id]
-
-        switch event {
-        case .connected,
-                .disconnected,
-                .reconnectionRequest,
-                .connectionAuthorised,
-                .connectionRejected,
-                .sdkRpcRequestDone:
-            break
-        case .connectionRequest, .sdkRpcRequest:
-            let additionalParams: [String: Any] = [
-                "commLayer": "deeplinking",
-                "sdkVersion": SDKInfo.version,
-                "url": appMetadata?.url ?? "",
-                "title": appMetadata?.name ?? "",
-                "platform": SDKInfo.platform
-            ]
-            parameters.merge(additionalParams) { current, _ in current }
-        }
+        let parameters: [String: Any] = [
+            "id": channelId,
+            "commLayer": "socket",
+            "sdkVersion": SDKInfo.version,
+            "url": appMetadata?.url ?? "",
+            "dappId": SDKInfo.bundleIdentifier ?? "N/A",
+            "title": appMetadata?.name ?? "",
+            "platform": SDKInfo.platform
+        ]
 
         trackEvent?(event, parameters)
     }
