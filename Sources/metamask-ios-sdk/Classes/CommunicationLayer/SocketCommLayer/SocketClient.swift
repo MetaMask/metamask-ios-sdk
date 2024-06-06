@@ -445,7 +445,7 @@ extension SocketClient {
             "commLayer": "socket",
             "sdkVersion": SDKInfo.version,
             "url": appMetadata?.url ?? "",
-            "dappId": SDKInfo.bundleIdentifier ?? "",
+            "dappId": SDKInfo.bundleIdentifier ?? "N/A",
             "title": appMetadata?.name ?? "",
             "platform": SDKInfo.platform
         ]
