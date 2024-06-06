@@ -21,7 +21,7 @@ class KeyExchangeTests: XCTestCase {
         super.tearDown()
     }
     
-    func testDecodingStart() throws {
+    func testDecodingKeyHandshakeStart() throws {
         let json = "\"key_handshake_start\""
         let data = json.data(using: .utf8)!
         
@@ -33,7 +33,7 @@ class KeyExchangeTests: XCTestCase {
         }
     }
     
-    func testDecodingSyn() throws {
+    func testDecodingKeyHandshakeSyn() throws {
         let json = "\"key_handshake_SYN\""
         let data = json.data(using: .utf8)!
         
@@ -45,25 +45,25 @@ class KeyExchangeTests: XCTestCase {
         }
     }
     
-    func testDecodingAck() throws {
-        let json = "\"key_handshake_ACK\""
-        let data = json.data(using: .utf8)!
-        
-        do {
-            let decodedValue: KeyExchangeType = try JSONDecoder().decode(KeyExchangeType.self, from: data)
-            XCTAssertEqual(decodedValue, .ack)
-        } catch {
-            XCTFail("Message could not be decoded: \(error)")
-        }
-    }
-    
-    func testDecodingSynAck() throws {
+    func testDecodingKeyHandshakeSynAck() throws {
         let json = "\"key_handshake_SYNACK\""
         let data = json.data(using: .utf8)!
         
         do {
             let decodedValue: KeyExchangeType = try JSONDecoder().decode(KeyExchangeType.self, from: data)
             XCTAssertEqual(decodedValue, .synack)
+        } catch {
+            XCTFail("Message could not be decoded: \(error)")
+        }
+    }
+    
+    func testDecodingKeyHandshakeAck() throws {
+        let json = "\"key_handshake_ACK\""
+        let data = json.data(using: .utf8)!
+        
+        do {
+            let decodedValue: KeyExchangeType = try JSONDecoder().decode(KeyExchangeType.self, from: data)
+            XCTAssertEqual(decodedValue, .ack)
         } catch {
             XCTFail("Message could not be decoded: \(error)")
         }
