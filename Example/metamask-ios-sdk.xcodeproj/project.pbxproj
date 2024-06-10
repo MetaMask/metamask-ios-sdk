@@ -36,6 +36,7 @@
 		D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */; };
 		D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */; };
 		D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */; };
+		D1ED4E5C2C11AB3E001AC6E0 /* EthereumRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E5B2C11AB3E001AC6E0 /* EthereumRequestTests.swift */; };
 		D1ED4E5E2C11D260001AC6E0 /* MockSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */; };
 		D1ED4E602C11D36E001AC6E0 /* MockKeyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */; };
 		D1ED4E622C11D398001AC6E0 /* MockDeeplinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */; };
@@ -90,6 +91,7 @@
 		D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocket.swift; sourceTree = "<group>"; };
 		D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketManager.swift; sourceTree = "<group>"; };
 		D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketChannelTests.swift; sourceTree = "<group>"; };
+		D1ED4E5B2C11AB3E001AC6E0 /* EthereumRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumRequestTests.swift; sourceTree = "<group>"; };
 		D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSessionManager.swift; sourceTree = "<group>"; };
 		D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockKeyExchange.swift; sourceTree = "<group>"; };
 		D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDeeplinkManager.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */,
 				D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */,
 				D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */,
+				D1ED4E5B2C11AB3E001AC6E0 /* EthereumRequestTests.swift */,
 				D1ED4E5D2C11D260001AC6E0 /* MockSessionManager.swift */,
 				D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */,
 				D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */,
@@ -452,6 +455,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1ED4E5C2C11AB3E001AC6E0 /* EthereumRequestTests.swift in Sources */,
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
 				D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
