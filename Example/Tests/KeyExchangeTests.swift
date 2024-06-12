@@ -172,7 +172,7 @@ class KeyExchangeTests: XCTestCase {
         let pubkey = "0xabcdefgh"
         let messageWithPublickKey = KeyExchangeMessage(type: .start, pubkey: pubkey)
         XCTAssertEqual(keyExchange.theirPublicKey, nil)
-        let nextMessage = keyExchange.nextMessage(messageWithPublickKey)
+        let _ = keyExchange.nextMessage(messageWithPublickKey)
         XCTAssertEqual(keyExchange.theirPublicKey, pubkey)
     }
     
@@ -180,7 +180,7 @@ class KeyExchangeTests: XCTestCase {
         let pubkey = "0xabcdefgh"
         let messageWithPublickKey = KeyExchangeMessage(type: .start, pubkey: pubkey)
         XCTAssertFalse(keyExchange.keysExchanged)
-        let nextMessage = keyExchange.nextMessage(messageWithPublickKey)
+        let _ = keyExchange.nextMessage(messageWithPublickKey)
         XCTAssertTrue(keyExchange.keysExchanged)
     }
     

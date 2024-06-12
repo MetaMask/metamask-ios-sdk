@@ -9,15 +9,16 @@ import Foundation
 public class DeeplinkClient: CommClient {
 
     private let session: SessionManager
-    private var channelId: String = ""
-    private let dappScheme: String
+    var channelId: String = ""
+    let dappScheme: String
+    let urlOpener: URLOpener
 
     public var appMetadata: AppMetadata?
     public var trackEvent: ((Event, [String: Any]) -> Void)?
     public var handleResponse: (([String: Any]) -> Void)?
 
-    private let keyExchange: KeyExchange
-    private let deeplinkManager: DeeplinkManager
+    let keyExchange: KeyExchange
+    let deeplinkManager: DeeplinkManager
 
     public var sessionDuration: TimeInterval {
         get {
@@ -30,14 +31,16 @@ public class DeeplinkClient: CommClient {
     public var requestJobs: [RequestJob] = []
 
     public init(session: SessionManager,
-         keyExchange: KeyExchange,
-         deeplinkManager: DeeplinkManager,
-         dappScheme: String
+                keyExchange: KeyExchange,
+                deeplinkManager: DeeplinkManager,
+                dappScheme: String,
+                urlOpener: URLOpener = DefaultURLOpener()
     ) {
         self.session = session
         self.keyExchange = keyExchange
         self.deeplinkManager = deeplinkManager
         self.dappScheme = dappScheme
+        self.urlOpener = urlOpener
         setupClient()
         setupCallbacks()
     }
@@ -58,16 +61,14 @@ public class DeeplinkClient: CommClient {
         setupClient()
     }
 
-    private func sendMessage(_ message: String) {
+    func sendMessage(_ message: String) {
         let deeplink = "metamask://\(message)"
         guard
             let urlString = deeplink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
-
-        DispatchQueue.main.async {
-            UIApplication.shared.open(url)
-        }
+        
+        urlOpener.open(url)
     }
 
     public func handleUrl(_ url: URL) {
