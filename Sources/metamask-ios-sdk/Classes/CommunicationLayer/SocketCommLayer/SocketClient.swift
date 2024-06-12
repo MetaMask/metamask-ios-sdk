@@ -12,6 +12,7 @@ public class SocketClient: CommClient {
     private let session: SessionManager
     let keyExchange: KeyExchange
     private let channel: SocketChannel
+    let urlOpener: URLOpener
 
     var channelId: String = ""
 
@@ -61,9 +62,11 @@ public class SocketClient: CommClient {
     init(session: SessionManager,
          channel: SocketChannel = SocketChannel(),
          keyExchange: KeyExchange = KeyExchange(),
+         urlOpener: URLOpener = DefaultURLOpener(),
          trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
         self.channel = channel
+        self.urlOpener = urlOpener
         self.keyExchange = keyExchange
         self.trackEvent = trackEvent
     }
@@ -335,16 +338,14 @@ extension SocketClient {
 
 // MARK: Deeplinking
 
-private extension SocketClient {
+extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
 
-        DispatchQueue.main.async {
-            UIApplication.shared.open(url)
-        }
+        urlOpener.open(url)
     }
 }
 
