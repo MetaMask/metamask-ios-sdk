@@ -37,6 +37,7 @@
 		D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */; };
 		D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DC2AF42A720019321C /* CryptoTests.swift */; };
 		D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */; };
+		D1A304252C1B7C21000FB863 /* EthereumConnectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
 		D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */; };
 		D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */; };
@@ -97,6 +98,7 @@
 		D190A4AE2AFE3A2A000A1AA8 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		D1A258DC2AF42A720019321C /* CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTests.swift; sourceTree = "<group>"; };
 		D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
+		D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumConnectTests.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
 		D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocket.swift; sourceTree = "<group>"; };
 		D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketManager.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				D10EEF032C1711580005E31A /* TestCodableData.swift */,
 				D10EEF052C19CB5B0005E31A /* EthereumTests.swift */,
 				D10EEF072C19D3020005E31A /* MockCommClient.swift */,
+				D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -473,6 +476,7 @@
 				D1ED4E5C2C11AB3E001AC6E0 /* EthereumRequestTests.swift in Sources */,
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
 				D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */,
+				D1A304252C1B7C21000FB863 /* EthereumConnectTests.swift in Sources */,
 				D10EEF022C1707540005E31A /* SocketClientTests.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
 				D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */,

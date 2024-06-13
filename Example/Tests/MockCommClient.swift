@@ -7,6 +7,7 @@ import metamask_ios_sdk
 
 class MockCommClient: CommClient {
     var connectCalled = false
+    var disConnectCalled = false
     
     var appMetadata: AppMetadata?
     
@@ -21,11 +22,11 @@ class MockCommClient: CommClient {
     }
     
     func disconnect() {
-        
+        disConnectCalled = true
     }
     
     func clearSession() {
-        
+        disConnectCalled = true
     }
     
     func addRequest(_ job: @escaping RequestJob) {

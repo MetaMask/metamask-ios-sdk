@@ -15,21 +15,21 @@ protocol EthereumEventsDelegate: AnyObject {
 
 public class Ethereum {
     static let CONNECTION_ID = TimestampGenerator.timestamp()
-    private static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
-    private var submittedRequests: [String: SubmittedRequest] = [:]
+    static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
+    var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
 
     var sdkOptions: SDKOptions?
 
     weak var delegate: EthereumEventsDelegate?
 
-    private var connected: Bool = false
+    var connected: Bool = false
 
     /// The active/selected MetaMask account chain
-    private var chainId: String = ""
+    var chainId: String = ""
 
     /// The active/selected MetaMask account address
-    private var account: String = ""
+    var account: String = ""
 
     var commClient: CommClient
     private var track: ((Event, [String: Any]) -> Void)?
