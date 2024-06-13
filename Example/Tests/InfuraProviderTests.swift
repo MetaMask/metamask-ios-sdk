@@ -94,13 +94,13 @@ class InfuraProviderTests: XCTestCase {
             return responseData ?? Data()
         }
         
-        func fetch<T>(_ Type: T.Type, endpoint: Endpoint) async throws -> T where T : Decodable {
+        public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
             return responseData as! T
         }
 
             
         func addHeaders(_ headers: [String : String]) {
-            // Mock implementation
+            
         }
     }
 }
