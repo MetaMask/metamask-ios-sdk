@@ -53,11 +53,9 @@ public class SocketChannel {
         )
         socket = socketManager.standardSocket
     }
-}
-
-// MARK: Session
-
-extension SocketChannel {
+    
+    // MARK: Session
+    
     public func connect() {
         socket.connect(withPayload: nil)
     }
@@ -69,11 +67,8 @@ extension SocketChannel {
     public func tearDown() {
         socket.removeAllHandlers()
     }
-}
-
-// MARK: Events
-
-extension SocketChannel {
+    
+    // MARK: Events
     public func on(_ event: SocketClientEvent, completion: @escaping ([Any]) -> Void) {
         socket.on(clientEvent: event, callback: { data, _ in
             DispatchQueue.main.async {
@@ -90,7 +85,7 @@ extension SocketChannel {
         })
     }
 
-    public func emit(_ event: String, _ item: SocketData) {
+    public func emit(_ event: String, _ item: CodableData) {
         socket.emit(event, item, completion: nil)
     }
 }

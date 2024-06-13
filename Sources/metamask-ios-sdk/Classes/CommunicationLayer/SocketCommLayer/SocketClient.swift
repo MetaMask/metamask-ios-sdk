@@ -10,8 +10,9 @@ import Foundation
 public class SocketClient: CommClient {
     public var appMetadata: AppMetadata?
     private let session: SessionManager
-    private var keyExchange = KeyExchange()
-    private let channel = SocketChannel()
+    let keyExchange: KeyExchange
+    private let channel: SocketChannel
+    let urlOpener: URLOpener
 
     var channelId: String = ""
 
@@ -35,8 +36,8 @@ public class SocketClient: CommClient {
         }
     }
 
-    private var isReady: Bool = false
-    private var isReconnection = false
+    var isReady: Bool = false
+    var isReconnection = false
     public var onClientsTerminated: (() -> Void)?
 
     public var handleResponse: (([String: Any]) -> Void)?
@@ -58,8 +59,15 @@ public class SocketClient: CommClient {
             + keyExchange.pubkey
     }
 
-    init(session: SessionManager, trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
+    init(session: SessionManager,
+         channel: SocketChannel = SocketChannel(),
+         keyExchange: KeyExchange = KeyExchange(),
+         urlOpener: URLOpener = DefaultURLOpener(),
+         trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
+        self.channel = channel
+        self.urlOpener = urlOpener
+        self.keyExchange = keyExchange
         self.trackEvent = trackEvent
     }
 
@@ -126,7 +134,7 @@ extension SocketClient {
 
 // MARK: Event handling
 
-private extension SocketClient {
+extension SocketClient {
     func handleConnection() {
         let channelId = channelId
 
@@ -246,7 +254,7 @@ private extension SocketClient {
 
 // MARK: Message handling
 
-private extension SocketClient {
+extension SocketClient {
     func handleReceiveKeyExchange(_ message: [String: Any]) {
         let keyExchangeMessage: SocketMessage<KeyExchangeMessage>
 
@@ -330,16 +338,14 @@ private extension SocketClient {
 
 // MARK: Deeplinking
 
-private extension SocketClient {
+extension SocketClient {
     func deeplinkToMetaMask() {
         guard
             let urlString = deeplinkUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let url = URL(string: urlString)
         else { return }
 
-        DispatchQueue.main.async {
-            UIApplication.shared.open(url)
-        }
+        urlOpener.open(url)
     }
 }
 

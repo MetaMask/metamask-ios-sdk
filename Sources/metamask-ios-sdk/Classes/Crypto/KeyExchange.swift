@@ -57,7 +57,7 @@ public class KeyExchange {
     public private(set) var theirPublicKey: String?
 
     private let encyption: Crypto.Type
-    public private(set) var keysExchanged: Bool = false
+    var keysExchanged: Bool = false
 
     public init(encryption: Crypto.Type = Ecies.self) {
         encyption = encryption
@@ -85,7 +85,9 @@ public class KeyExchange {
             keysExchanged = false
         }
 
-        if let publicKey = message.pubkey {
+        if 
+            let publicKey = message.pubkey,
+            !publicKey.isEmpty {
             setTheirPublicKey(publicKey)
             keysExchanged = true
         }

@@ -16,6 +16,9 @@
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		D107588D293F289500D6C66B /* SignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588C293F289500D6C66B /* SignView.swift */; };
 		D107588F293F385700D6C66B /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D107588E293F385700D6C66B /* TransactionView.swift */; };
+		D10EEF002C16FD1A0005E31A /* MockSocketChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEEFF2C16FD1A0005E31A /* MockSocketChannel.swift */; };
+		D10EEF022C1707540005E31A /* SocketClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF012C1707540005E31A /* SocketClientTests.swift */; };
+		D10EEF042C1711580005E31A /* TestCodableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF032C1711580005E31A /* TestCodableData.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
 		D131DF902B5957440055EF13 /* ReadOnlyCallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */; };
 		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
@@ -71,6 +74,9 @@
 		B2B1A0B6AF24D27CD8868401 /* Pods_metamask_ios_sdk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_metamask_ios_sdk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D107588C293F289500D6C66B /* SignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignView.swift; sourceTree = "<group>"; };
 		D107588E293F385700D6C66B /* TransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
+		D10EEEFF2C16FD1A0005E31A /* MockSocketChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketChannel.swift; sourceTree = "<group>"; };
+		D10EEF012C1707540005E31A /* SocketClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketClientTests.swift; sourceTree = "<group>"; };
+		D10EEF032C1711580005E31A /* TestCodableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCodableData.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
 		D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyCallsView.swift; sourceTree = "<group>"; };
 		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
@@ -187,6 +193,9 @@
 				D1ED4E5F2C11D36E001AC6E0 /* MockKeyExchange.swift */,
 				D1ED4E612C11D398001AC6E0 /* MockDeeplinkManager.swift */,
 				D1ED4E632C11D8EE001AC6E0 /* MockURLOpener.swift */,
+				D10EEEFF2C16FD1A0005E31A /* MockSocketChannel.swift */,
+				D10EEF012C1707540005E31A /* SocketClientTests.swift */,
+				D10EEF032C1711580005E31A /* TestCodableData.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -458,8 +467,10 @@
 				D1ED4E5C2C11AB3E001AC6E0 /* EthereumRequestTests.swift in Sources */,
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
 				D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */,
+				D10EEF022C1707540005E31A /* SocketClientTests.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
 				D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */,
+				D10EEF042C1711580005E31A /* TestCodableData.swift in Sources */,
 				D1ED4E622C11D398001AC6E0 /* MockDeeplinkManager.swift in Sources */,
 				D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */,
 				D1ED4E5E2C11D260001AC6E0 /* MockSessionManager.swift in Sources */,
@@ -469,6 +480,7 @@
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */,
 				D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */,
+				D10EEF002C16FD1A0005E31A /* MockSocketChannel.swift in Sources */,
 				D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */,
 				D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */,
 			);
