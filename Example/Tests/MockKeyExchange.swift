@@ -30,7 +30,7 @@ class MockKeyExchange: KeyExchange {
         return "encrypted \(message)"
     }
     
-    override func encryptMessage<T: CodableData>(_ message: T) throws -> String {
+    override func encryptMessage<T: Codable>(_ message: T) throws -> String {
         if throwEncryptError {
             throw CryptoError.encryptionFailure
         }

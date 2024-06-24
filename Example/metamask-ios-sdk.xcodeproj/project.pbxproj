@@ -20,9 +20,10 @@
 		D10EEF022C1707540005E31A /* SocketClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF012C1707540005E31A /* SocketClientTests.swift */; };
 		D10EEF042C1711580005E31A /* TestCodableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF032C1711580005E31A /* TestCodableData.swift */; };
 		D10EEF062C19CB5B0005E31A /* EthereumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF052C19CB5B0005E31A /* EthereumTests.swift */; };
-		D10EEF082C19D3020005E31A /* MockCommClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF072C19D3020005E31A /* MockCommClient.swift */; };
+		D10EEF082C19D3020005E31A /* MockDeeplinkCommClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10EEF072C19D3020005E31A /* MockDeeplinkCommClient.swift */; };
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
 		D131DF902B5957440055EF13 /* ReadOnlyCallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */; };
+		D13A05A82C296BCE008EB011 /* MockEthereumDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */; };
 		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
 		D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1494FEA2970149B002D36D6 /* SwitchChainView.swift */; };
@@ -38,7 +39,13 @@
 		D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DC2AF42A720019321C /* CryptoTests.swift */; };
 		D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */; };
 		D1A304252C1B7C21000FB863 /* EthereumConnectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */; };
+		D1A304282C1B7E72000FB863 /* InfuraProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A304262C1B7E72000FB863 /* InfuraProviderTests.swift */; };
+		D1A304292C1B7E72000FB863 /* MockNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A304272C1B7E72000FB863 /* MockNetwork.swift */; };
+		D1A3042B2C1B7F2B000FB863 /* MockInfuraProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A3042A2C1B7F2B000FB863 /* MockInfuraProvider.swift */; };
 		D1EA931D29538C570078F088 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EA931C29538C570078F088 /* TextStyle.swift */; };
+		D1EC4CB22C1C60D300501119 /* MockCommClientFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EC4CB12C1C60D300501119 /* MockCommClientFactory.swift */; };
+		D1EC4CB42C1C619800501119 /* MockSocketCommClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EC4CB32C1C619800501119 /* MockSocketCommClient.swift */; };
+		D1EC4CB62C1C724300501119 /* MockCommClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1EC4CB52C1C724300501119 /* MockCommClient.swift */; };
 		D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */; };
 		D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */; };
 		D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */; };
@@ -81,9 +88,10 @@
 		D10EEF012C1707540005E31A /* SocketClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketClientTests.swift; sourceTree = "<group>"; };
 		D10EEF032C1711580005E31A /* TestCodableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCodableData.swift; sourceTree = "<group>"; };
 		D10EEF052C19CB5B0005E31A /* EthereumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumTests.swift; sourceTree = "<group>"; };
-		D10EEF072C19D3020005E31A /* MockCommClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCommClient.swift; sourceTree = "<group>"; };
+		D10EEF072C19D3020005E31A /* MockDeeplinkCommClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDeeplinkCommClient.swift; sourceTree = "<group>"; };
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
 		D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyCallsView.swift; sourceTree = "<group>"; };
+		D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEthereumDelegate.swift; sourceTree = "<group>"; };
 		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
 		D1494FEA2970149B002D36D6 /* SwitchChainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchChainView.swift; sourceTree = "<group>"; };
@@ -99,7 +107,13 @@
 		D1A258DC2AF42A720019321C /* CryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTests.swift; sourceTree = "<group>"; };
 		D1A258DE2AF432E20019321C /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
 		D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumConnectTests.swift; sourceTree = "<group>"; };
+		D1A304262C1B7E72000FB863 /* InfuraProviderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfuraProviderTests.swift; sourceTree = "<group>"; };
+		D1A304272C1B7E72000FB863 /* MockNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockNetwork.swift; sourceTree = "<group>"; };
+		D1A3042A2C1B7F2B000FB863 /* MockInfuraProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockInfuraProvider.swift; sourceTree = "<group>"; };
 		D1EA931C29538C570078F088 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
+		D1EC4CB12C1C60D300501119 /* MockCommClientFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCommClientFactory.swift; sourceTree = "<group>"; };
+		D1EC4CB32C1C619800501119 /* MockSocketCommClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketCommClient.swift; sourceTree = "<group>"; };
+		D1EC4CB52C1C724300501119 /* MockCommClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCommClient.swift; sourceTree = "<group>"; };
 		D1ED4E502C0DC811001AC6E0 /* MockSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocket.swift; sourceTree = "<group>"; };
 		D1ED4E522C0DCD2C001AC6E0 /* MockSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocketManager.swift; sourceTree = "<group>"; };
 		D1ED4E542C0E053C001AC6E0 /* SocketChannelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketChannelTests.swift; sourceTree = "<group>"; };
@@ -182,6 +196,8 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D1A304262C1B7E72000FB863 /* InfuraProviderTests.swift */,
+				D1A304272C1B7E72000FB863 /* MockNetwork.swift */,
 				D15F6AE62BD7AF2D005048F3 /* DeeplinkManagerTests.swift */,
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
@@ -203,8 +219,13 @@
 				D10EEF012C1707540005E31A /* SocketClientTests.swift */,
 				D10EEF032C1711580005E31A /* TestCodableData.swift */,
 				D10EEF052C19CB5B0005E31A /* EthereumTests.swift */,
-				D10EEF072C19D3020005E31A /* MockCommClient.swift */,
+				D10EEF072C19D3020005E31A /* MockDeeplinkCommClient.swift */,
 				D1A304242C1B7C20000FB863 /* EthereumConnectTests.swift */,
+				D1A3042A2C1B7F2B000FB863 /* MockInfuraProvider.swift */,
+				D1EC4CB12C1C60D300501119 /* MockCommClientFactory.swift */,
+				D1EC4CB32C1C619800501119 /* MockSocketCommClient.swift */,
+				D1EC4CB52C1C724300501119 /* MockCommClient.swift */,
+				D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -473,28 +494,35 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1A304292C1B7E72000FB863 /* MockNetwork.swift in Sources */,
 				D1ED4E5C2C11AB3E001AC6E0 /* EthereumRequestTests.swift in Sources */,
 				D1ED4E532C0DCD2C001AC6E0 /* MockSocketManager.swift in Sources */,
 				D1ED4E642C11D8EE001AC6E0 /* MockURLOpener.swift in Sources */,
 				D1A304252C1B7C21000FB863 /* EthereumConnectTests.swift in Sources */,
+				D13A05A82C296BCE008EB011 /* MockEthereumDelegate.swift in Sources */,
 				D10EEF022C1707540005E31A /* SocketClientTests.swift in Sources */,
 				D15F6AE72BD7CF58005048F3 /* DeeplinkManagerTests.swift in Sources */,
 				D1ED4E512C0DC811001AC6E0 /* MockSocket.swift in Sources */,
 				D10EEF042C1711580005E31A /* TestCodableData.swift in Sources */,
+				D1A3042B2C1B7F2B000FB863 /* MockInfuraProvider.swift in Sources */,
+				D1A304282C1B7E72000FB863 /* InfuraProviderTests.swift in Sources */,
 				D1ED4E622C11D398001AC6E0 /* MockDeeplinkManager.swift in Sources */,
+				D1EC4CB62C1C724300501119 /* MockCommClient.swift in Sources */,
 				D1A258DD2AF42A720019321C /* CryptoTests.swift in Sources */,
 				D1ED4E5E2C11D260001AC6E0 /* MockSessionManager.swift in Sources */,
 				D15F6AE92BD9276B005048F3 /* DeeplinkClientTests.swift in Sources */,
 				D1ED4E602C11D36E001AC6E0 /* MockKeyExchange.swift in Sources */,
 				D190A4912AFA2988000A1AA8 /* SessionConfigTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+				D1EC4CB42C1C619800501119 /* MockSocketCommClient.swift in Sources */,
 				D190A48F2AFA2958000A1AA8 /* SecureStorageTests.swift in Sources */,
+				D1EC4CB22C1C60D300501119 /* MockCommClientFactory.swift in Sources */,
 				D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */,
 				D10EEF062C19CB5B0005E31A /* EthereumTests.swift in Sources */,
 				D10EEF002C16FD1A0005E31A /* MockSocketChannel.swift in Sources */,
 				D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */,
 				D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */,
-				D10EEF082C19D3020005E31A /* MockCommClient.swift in Sources */,
+				D10EEF082C19D3020005E31A /* MockDeeplinkCommClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

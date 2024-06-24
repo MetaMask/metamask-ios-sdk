@@ -8,7 +8,7 @@ import Foundation
 
 typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
-protocol EthereumEventsDelegate: AnyObject {
+public protocol EthereumEventsDelegate: AnyObject {
     func chainIdChanged(_ chainId: String)
     func accountChanged(_ account: String)
 }
@@ -20,6 +20,7 @@ public class Ethereum {
     private var cancellables: Set<AnyCancellable> = []
 
     var sdkOptions: SDKOptions?
+    var infuraProvider: InfuraProvider?
 
     weak var delegate: EthereumEventsDelegate?
 
@@ -32,27 +33,46 @@ public class Ethereum {
     var account: String = ""
 
     var commClient: CommClient
+    public var transport: Transport
+    var commClientFactory: CommClientFactory
+    
     private var track: ((Event, [String: Any]) -> Void)?
+    
 
-    private init(commClient: CommClient, track: @escaping ((Event, [String: Any]) -> Void)) {
+    private init(transport: Transport,
+                 commClientFactory: CommClientFactory,
+                 infuraProvider: InfuraProvider? = nil,
+                 track: @escaping ((Event, [String: Any]) -> Void)) {
         self.track = track
-        self.commClient = commClient
+        self.transport = transport
+        switch transport {
+        case .socket:
+            self.commClient = commClientFactory.socketClient()
+        case .deeplinking(let dappScheme):
+            self.commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
+        }
+        self.commClientFactory = commClientFactory
+        self.infuraProvider = infuraProvider
         self.commClient.trackEvent = trackEvent
         self.commClient.handleResponse = handleMessage
-        (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
+        self.commClient.onClientsTerminated = terminateConnection
     }
 
-    public static func shared(commClient: CommClient,
+    public static func shared(transport: Transport,
+                              commClientFactory: CommClientFactory,
+                              infuraProvider: InfuraProvider? = nil,
                               trackEvent: @escaping ((Event, [String: Any]) -> Void)) -> Ethereum {
         guard let ethereum = EthereumWrapper.shared.ethereum else {
-            let ethereum = Ethereum(commClient: commClient, track: trackEvent)
+            let ethereum = Ethereum(
+                transport: transport,
+                commClientFactory: commClientFactory,
+                infuraProvider: infuraProvider,
+                track: trackEvent)
             EthereumWrapper.shared.ethereum = ethereum
             return ethereum
         }
         return ethereum
     }
-
-    public var transport: Transport = .socket
 
     @discardableResult
     func updateTransportLayer(_ transport: Transport) -> Ethereum {
@@ -61,10 +81,10 @@ public class Ethereum {
 
         switch transport {
         case .deeplinking(let dappScheme):
-            commClient = Dependencies.shared.deeplinkClient(dappScheme: dappScheme)
+            commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
         case .socket:
-            commClient = Dependencies.shared.socketClient
-            (self.commClient as? SocketClient)?.onClientsTerminated = terminateConnection
+            commClient = commClientFactory.socketClient()
+            commClient.onClientsTerminated = terminateConnection
         }
 
         commClient.trackEvent = trackEvent
@@ -376,9 +396,9 @@ public class Ethereum {
     func sendRequest(_ request: any RPCRequest) {
         if
             EthereumMethod.isReadOnly(request.methodType),
-            let sdkOptions = sdkOptions,
-            !sdkOptions.infuraAPIKey.isEmpty {
-            let infuraProvider = InfuraProvider(infuraAPIKey: sdkOptions.infuraAPIKey)
+            (infuraProvider != nil || sdkOptions?.infuraAPIKey != nil) {
+            
+            let infuraProvider: InfuraProvider = infuraProvider ?? InfuraProvider(infuraAPIKey: sdkOptions?.infuraAPIKey ?? "")
             Task {
                 if let result = await infuraProvider.sendRequest(
                     request,
@@ -413,14 +433,14 @@ public class Ethereum {
                         Logging.error("Ethereum:: error: \(error.localizedDescription)")
                     }
                 } else {
-                    (commClient as? SocketClient)?.sendMessage(request, encrypt: true)
+                    commClient.sendMessage(request, encrypt: true, options: [:])
                 }
 
                 let authorise = EthereumMethod.requiresAuthorisation(request.methodType)
                 let skipAuthorisation = request.methodType == .ethRequestAccounts && !account.isEmpty
 
                 if authorise && !skipAuthorisation {
-                    (commClient as? SocketClient)?.requestAuthorisation()
+                    commClient.requestAuthorisation()
                 }
 
             case .deeplinking:
@@ -503,7 +523,9 @@ public class Ethereum {
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
     func request(_ request: any RPCRequest) -> EthereumPublisher? {
-        if !connected && !EthereumMethod.isConnectMethod(request.methodType) {
+        let isConnectMethod = EthereumMethod.isConnectMethod(request.methodType)
+        
+        if !connected && !isConnectMethod {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect(with: nil)
                 connected = true
@@ -560,14 +582,22 @@ public class Ethereum {
                 }).store(in: &cancellables)
         }
     }
+    
+    private func isRequestParamData<T: CodableData>(_ request: EthereumRequest<T>?) -> Bool {
+        if let content = request?.params as? [Any], !content.isEmpty {
+            return content.first is Data
+        }
+        return request?.params is Data
+    }
 
     func batchRequest<T: CodableData>(_ requests: [EthereumRequest<T>]) async -> Result<[String], RequestError> {
 
         // React Native SDK has request params as Data
-        if (requests.first?.params as? Data != nil) {
+        if (isRequestParamData(requests.first)) {
             var requestDicts: [[String: Any]] = []
 
             for request in requests {
+
                 if let paramData = request.params as? Data {
                     do {
                         let requestParams = try JSONSerialization.jsonObject(with: paramData, options: [])

@@ -10,6 +10,7 @@ public typealias RequestJob = () -> Void
 public protocol CommClient {
     var appMetadata: AppMetadata? { get set }
     var sessionDuration: TimeInterval { get set }
+    var onClientsTerminated: (() -> Void)? { get set }
 
     var trackEvent: ((Event, [String: Any]) -> Void)? { get set }
     var handleResponse: (([String: Any]) -> Void)? { get set }
@@ -17,8 +18,9 @@ public protocol CommClient {
     func connect(with request: String?)
     func disconnect()
     func clearSession()
+    func requestAuthorisation()
     func addRequest(_ job: @escaping RequestJob)
-    func sendMessage(_ message: String, encrypt: Bool, options: [String: String])
+    func sendMessage<T: Codable>(_ message: T, encrypt: Bool, options: [String: String])
 }
 
 public extension CommClient {

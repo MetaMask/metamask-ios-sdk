@@ -10,28 +10,37 @@ import Combine
 class EthereumConnectTests: XCTestCase {
     
     var mockCommClient: MockCommClient!
+    var commClientFactory: CommClientFactory!
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
     
     override func setUp() {
         super.setUp()
         mockCommClient = MockCommClient()
+        commClientFactory = CommClientFactory()
         trackEventMock = { _, _ in }
-        ethereum = Ethereum.shared(commClient: mockCommClient, trackEvent: trackEventMock)
+        EthereumWrapper.shared.ethereum = nil
+        SDKWrapper.shared.sdk = nil
+        ethereum = Ethereum.shared(
+            transport: .socket,
+            commClientFactory: commClientFactory,
+            trackEvent: trackEventMock)
     }
 
     override func tearDown() {
         mockCommClient = nil
         trackEventMock = nil
         ethereum = nil
+        commClientFactory = nil
         EthereumWrapper.shared.ethereum = nil
+        SDKWrapper.shared.sdk = nil
         super.tearDown()
     }
 
     // Test the singleton instance creation
     func testSingletonInstance() {
-        let instance1 = Ethereum.shared(commClient: mockCommClient, trackEvent: trackEventMock)
-        let instance2 = Ethereum.shared(commClient: mockCommClient, trackEvent: trackEventMock)
+        let instance1 = Ethereum.shared(transport: .socket, commClientFactory: commClientFactory, trackEvent: trackEventMock)
+        let instance2 = Ethereum.shared(transport: .socket, commClientFactory: commClientFactory, trackEvent: trackEventMock)
         XCTAssert(instance1 === instance2)
     }
     
@@ -178,7 +187,7 @@ class EthereumConnectTests: XCTestCase {
             self?.ethereum.submittedRequests[submittedRequestId]?.send(["0x1234567"])
         }
         
-        await fulfillment(of: [expectation], timeout: 10.0)
+        await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testConnectAndSignAsyncFailure() async {
