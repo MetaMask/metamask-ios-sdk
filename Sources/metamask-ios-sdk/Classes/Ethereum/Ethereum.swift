@@ -8,7 +8,7 @@ import Foundation
 
 typealias EthereumPublisher = AnyPublisher<Any, RequestError>
 
-public protocol EthereumEventsDelegate: AnyObject {
+protocol EthereumEventsDelegate: AnyObject {
     func chainIdChanged(_ chainId: String)
     func accountChanged(_ account: String)
 }
@@ -36,7 +36,7 @@ public class Ethereum {
     public var transport: Transport
     var commClientFactory: CommClientFactory
     
-    private var track: ((Event, [String: Any]) -> Void)?
+    var track: ((Event, [String: Any]) -> Void)?
     
 
     private init(transport: Transport,
@@ -488,32 +488,6 @@ public class Ethereum {
         commClient.addRequest { [weak self] in
             self?.sendRequest(requestAccountsRequest)
         }
-
-        return publisher
-    }
-
-    private func createChainIdRequest() -> EthereumRequest<String> {
-        let chainIdRequest = EthereumRequest(
-            method: .ethChainId
-        )
-
-        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
-        submittedRequests[chainIdRequest.id] = submittedRequest
-
-        return chainIdRequest
-    }
-
-    @discardableResult
-    private func requestChainId() -> EthereumPublisher? {
-        let chainIdRequest = EthereumRequest(
-            method: .ethChainId
-        )
-
-        let submittedRequest = SubmittedRequest(method: chainIdRequest.method)
-        submittedRequests[chainIdRequest.id] = submittedRequest
-        let publisher = submittedRequests[chainIdRequest.id]?.publisher
-
-        sendRequest(chainIdRequest)
 
         return publisher
     }

@@ -24,6 +24,7 @@
 		D11D2F1B295075A3000E8003 /* Curvature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11D2F1A295075A3000E8003 /* Curvature.swift */; };
 		D131DF902B5957440055EF13 /* ReadOnlyCallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */; };
 		D13A05A82C296BCE008EB011 /* MockEthereumDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */; };
+		D13A05AA2C2B076B008EB011 /* EthereumConvenienceMethodsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A05A92C2B076B008EB011 /* EthereumConvenienceMethodsTests.swift */; };
 		D13A7535296E7EA0005EE461 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13A7534296E7EA0005EE461 /* ButtonStyle.swift */; };
 		D148AC75292FCF1B001791E5 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D148AC74292FCF1B001791E5 /* ConnectView.swift */; };
 		D1494FEB2970149B002D36D6 /* SwitchChainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1494FEA2970149B002D36D6 /* SwitchChainView.swift */; };
@@ -92,6 +93,7 @@
 		D11D2F1A295075A3000E8003 /* Curvature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curvature.swift; sourceTree = "<group>"; };
 		D131DF8F2B5957440055EF13 /* ReadOnlyCallsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyCallsView.swift; sourceTree = "<group>"; };
 		D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEthereumDelegate.swift; sourceTree = "<group>"; };
+		D13A05A92C2B076B008EB011 /* EthereumConvenienceMethodsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumConvenienceMethodsTests.swift; sourceTree = "<group>"; };
 		D13A7534296E7EA0005EE461 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		D148AC74292FCF1B001791E5 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
 		D1494FEA2970149B002D36D6 /* SwitchChainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchChainView.swift; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 				D1EC4CB32C1C619800501119 /* MockSocketCommClient.swift */,
 				D1EC4CB52C1C724300501119 /* MockCommClient.swift */,
 				D13A05A72C296BCE008EB011 /* MockEthereumDelegate.swift */,
+				D13A05A92C2B076B008EB011 /* EthereumConvenienceMethodsTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -519,6 +522,7 @@
 				D1EC4CB22C1C60D300501119 /* MockCommClientFactory.swift in Sources */,
 				D190A4AF2AFE3A2A000A1AA8 /* SessionManagerTests.swift in Sources */,
 				D10EEF062C19CB5B0005E31A /* EthereumTests.swift in Sources */,
+				D13A05AA2C2B076B008EB011 /* EthereumConvenienceMethodsTests.swift in Sources */,
 				D10EEF002C16FD1A0005E31A /* MockSocketChannel.swift in Sources */,
 				D1A258DF2AF432E20019321C /* KeyExchangeTests.swift in Sources */,
 				D1ED4E552C0E053C001AC6E0 /* SocketChannelTests.swift in Sources */,

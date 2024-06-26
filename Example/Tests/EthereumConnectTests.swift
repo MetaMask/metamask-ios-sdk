@@ -383,5 +383,63 @@ class EthereumConnectTests: XCTestCase {
         
         waitForExpectations(timeout: 2.0)
     }
+    
+    func testConnectWithAsync() async {
+        mockCommClient.connectCalled = false
+        ethereum.commClient = mockCommClient
+        
+        let expectation = self.expectation(description: "ConnectWith should return a value")
+        let dataParams = "testParams".data(using: .utf8)!
+        let request = EthereumRequest(method: "eth_signTypedData_v4", params: dataParams)
+        
+        Task {
+            let result = await ethereum.connectWith(request)
+            
+            XCTAssertTrue(self.mockCommClient.connectCalled)
+            switch result {
+            case .success:
+                XCTAssert(true)
+                expectation.fulfill()
+            case .failure:
+                XCTFail("Expected success but got failure")
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "metamask_connectwith" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?.send("0x1234567")
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+    
+    func testConnectWithAsyncFailure() async {
+        mockCommClient.connectCalled = false
+        ethereum.commClient = mockCommClient
+        
+        let expectation = self.expectation(description: "ConnectWith should fail")
+        let dataParams = "testParams".data(using: .utf8)!
+        let request = EthereumRequest(method: "eth_signTypedData_v4", params: dataParams)
+        
+        Task {
+            let result = await ethereum.connectWith(request)
+            
+            XCTAssertTrue(self.mockCommClient.connectCalled)
+            switch result {
+            case .success:
+                XCTFail("Expected failure but got success")
+            case .failure:
+                expectation.fulfill()
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "metamask_connectwith" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?
+                .error(RequestError(from: ["message": "Connect failed", "code": "-1"]))
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
 }
 

@@ -10,18 +10,25 @@ import Combine
 class EthereumTests: XCTestCase {
     var mockCommClientFactory: MockCommClientFactory!
     var mockNetwork: MockNetwork!
+    var mockEthereumDelegate: MockEthereumDelegate!
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
     var mockInfuraProvider: MockInfuraProvider!
     let infuraApiKey = "testApiKey"
+    var cancellables: Set<AnyCancellable>!
+    var trackedEvents: [(Event, [String: Any])] = []
     
     override func setUp() {
         super.setUp()
+        cancellables = []
         mockCommClientFactory = MockCommClientFactory()
-        trackEventMock = { _, _ in }
+        trackEventMock = { [weak self] event, params in
+            self?.trackedEvents.append((event, params))
+        }
         
         mockNetwork = MockNetwork()
         mockInfuraProvider = MockInfuraProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
+        mockEthereumDelegate = MockEthereumDelegate()
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
         ethereum = Ethereum.shared(
@@ -29,12 +36,15 @@ class EthereumTests: XCTestCase {
             commClientFactory: mockCommClientFactory,
             infuraProvider: mockInfuraProvider,
             trackEvent: trackEventMock)
+        ethereum.delegate = mockEthereumDelegate
     }
     
     override func tearDown() {
         trackEventMock = nil
+        cancellables = nil
         ethereum = nil
         mockNetwork = nil
+        mockEthereumDelegate = nil
         mockInfuraProvider = nil
         mockCommClientFactory = nil
         EthereumWrapper.shared.ethereum = nil
@@ -147,6 +157,118 @@ class EthereumTests: XCTestCase {
         }
     }
     
+    func testRequestAsyncSingleResult() async {
+        let expectation = self.expectation(description: "Request should return result")
+        let req = EthereumRequest(method: "personal_sign", params: ["0x12345", "0x1"])
+        ethereum.connected = true
+        
+        Task {
+            let result: Result<String, RequestError> = await ethereum.request(req)
+            
+            switch result {
+            case .success:
+                XCTAssert(true)
+                expectation.fulfill()
+            case .failure:
+                XCTFail("Expected success but got failure")
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "personal_sign" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?.send("0x1234567")
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+    
+    func testRequestAsyncSingleResultFailure() async {
+        let expectation = self.expectation(description: "Request should fail")
+        let req = EthereumRequest(method: "personal_sign", params: ["0x12345", "0x1"])
+        ethereum.connected = true
+        
+        Task {
+            let result: Result<String, RequestError> = await ethereum.request(req)
+            
+            switch result {
+            case .success:
+                XCTFail("Expected failure but got success")
+            case .failure:
+                expectation.fulfill()
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "personal_sign" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?
+                .error(RequestError(from: ["message": "Connect failed", "code": "-1"]))
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+    
+    func testRequestAsyncCollectionResult() async {
+        let expectation = self.expectation(description: "Request should return result")
+        let request1 = EthereumRequest(method: "personal_sign", params: [String: String]())
+        let request2 = EthereumRequest(method: "personal_sign", params: [String: String]())
+        let requests = [request1, request2]
+        let batchRequest = EthereumRequest(
+            method: EthereumMethod.metamaskBatch.rawValue,
+            params: requests)
+        
+        ethereum.connected = true
+        
+        Task {
+            let result: Result<[String], RequestError> = await ethereum.request(batchRequest)
+            
+            switch result {
+            case .success:
+                XCTAssert(true)
+                expectation.fulfill()
+            case .failure:
+                XCTFail("Expected success but got failure")
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "metamask_batch" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?.send(["0x1234567", "0x7654321"])
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+    
+    func testRequestAsyncCollectionResultFailure() async {
+        let expectation = self.expectation(description: "Request should fail")
+        let request1 = EthereumRequest(method: "personal_sign", params: [String: String]())
+        let request2 = EthereumRequest(method: "personal_sign", params: [String: String]())
+        let requests = [request1, request2]
+        let batchRequest = EthereumRequest(
+            method: EthereumMethod.metamaskBatch.rawValue,
+            params: requests)
+        
+        ethereum.connected = true
+        
+        Task {
+            let result: Result<[String], RequestError> = await ethereum.request(batchRequest)
+            
+            switch result {
+            case .success:
+                XCTFail("Expected failure but got success")
+            case .failure:
+                expectation.fulfill()
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            let submittedRequestId: String = self?.ethereum.submittedRequests.first(where: { $0.value.method == "metamask_batch" })?.key as? String ?? ""
+            self?.ethereum.submittedRequests[submittedRequestId]?
+                .error(RequestError(from: ["message": "Connect failed", "code": "-1"]))
+        }
+        
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+    
     func testUpdateTransportWithSocket() {
         ethereum.updateTransportLayer(.socket)
         
@@ -158,6 +280,8 @@ class EthereumTests: XCTestCase {
         
         XCTAssertTrue(ethereum.commClient is MockDeeplinkCommClient)
     }
+    
+    // MARK: Requests
     
     func testSendRequest() {
         let request = EthereumRequest(method: "personal_sign")
@@ -263,5 +387,280 @@ class EthereumTests: XCTestCase {
         ethereum.sendRequest(request)
         
         XCTAssertTrue((ethereum.commClient as? MockCommClient)?.requestAuthorisationCalled ?? false)
+    }
+    
+    // MARK: Responses
+    
+    func testReceiveResponseWithError() {
+        let requestId = "1"
+        let request = SubmittedRequest(method: "eth_requestAccounts")
+        ethereum.submittedRequests[requestId] = request
+
+        let errorData: [String: Any] = [
+            "error": ["message": "User rejected request", "code": -32000],
+            "accounts": ["0x1234"],
+            "chainId": "0x1"
+        ]
+
+        ethereum.receiveResponse(errorData, id: requestId)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertNil(ethereum.submittedRequests[requestId])
+    }
+    
+    func testReceiveResponseWithResultOnly() {
+        let requestId = "2"
+        let request = SubmittedRequest(method: "eth_chainId")
+        ethereum.submittedRequests[requestId] = request
+
+        let resultData: [String: Any] = [
+            "result": "0x1"
+        ]
+
+        ethereum.receiveResponse(resultData, id: requestId)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertNil(ethereum.submittedRequests[requestId])
+    }
+    
+    func testReceiveResponseWithoutErrorAndWithResult() {
+        let requestId = "3"
+        let request = SubmittedRequest(method: "eth_requestAccounts")
+        ethereum.submittedRequests[requestId] = request
+
+        let resultData: [String: Any] = [
+            "result": ["0x1234"]
+        ]
+
+        ethereum.receiveResponse(resultData, id: requestId)
+
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertNil(ethereum.submittedRequests[requestId])
+    }
+    
+    func testReceiveResponseWithoutErrorAndWithEmptyResult() {
+        let requestId = "4"
+        let request = SubmittedRequest(method: "eth_requestAccounts")
+        ethereum.submittedRequests[requestId] = request
+
+        let resultData: [String: Any] = [:]
+
+        ethereum.receiveResponse(resultData, id: requestId)
+
+        XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertFalse(mockEthereumDelegate.chainIdChangedCalled)
+    }
+    
+    func testReadOnlyMethodReceiveResponseWithResult() {
+        let requestId = "123"
+        let request = SubmittedRequest(method: "eth_getTransactionCount")
+        let expectation = self.expectation(description: "Result received")
+        ethereum.submittedRequests[requestId] = request
+        
+        let resultData: [String: Any] = ["result": "0x1a"]
+        
+        request.publisher?.sink(receiveCompletion: { _ in },
+                                receiveValue: { result in
+            XCTAssertEqual(result as? String, "0x1a")
+            expectation.fulfill()
+        }).store(in: &cancellables)
+
+        ethereum.receiveResponse(resultData, id: requestId)
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+    
+    func testReadOnlyMethodReceiveResponseWithoutResult() {
+        let requestId = "123"
+        let request = SubmittedRequest(method: "eth_getTransactionCount")
+        let expectation = self.expectation(description: "Result received")
+        ethereum.submittedRequests[requestId] = request
+        
+        let resultData: [String: Any] = [:]
+        
+        request.publisher?.sink(receiveCompletion: { _ in },
+                                receiveValue: { result in
+            XCTAssertNotNil(result)
+            expectation.fulfill()
+        }).store(in: &cancellables)
+
+        ethereum.receiveResponse(resultData, id: requestId)
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+    
+    func testGetProviderStateResult() {
+        let requestId = "246"
+        let request = SubmittedRequest(method: "metamask_getProviderState")
+        let expectation = self.expectation(description: "Result received")
+        ethereum.submittedRequests[requestId] = request
+        
+        let resultData: [String: Any] = ["result": [
+            "accounts": ["0x1234"],
+            "chainId": "0x1"
+            ]
+        ]
+        
+        request.publisher?.sink(receiveCompletion: { _ in },
+                                receiveValue: { result in
+            XCTAssertTrue(self.mockEthereumDelegate.chainIdChangedCalled)
+            XCTAssertTrue(self.mockEthereumDelegate.accountChangedCalled)
+            expectation.fulfill()
+        }).store(in: &cancellables)
+
+        ethereum.receiveResponse(resultData, id: requestId)
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+    
+    func testDefaultCaseResult() {
+        let requestId = "246"
+        let request = SubmittedRequest(method: "personal_sign")
+        let expectation = self.expectation(description: "Result received")
+        ethereum.submittedRequests[requestId] = request
+        
+        let resultData: [String: Any] = ["result": "0xdsgfyfyewveffvejj"
+        ]
+        
+        request.publisher?.sink(receiveCompletion: { _ in },
+                                receiveValue: { result in
+            XCTAssertEqual(result as? String, "0xdsgfyfyewveffvejj")
+            expectation.fulfill()
+        }).store(in: &cancellables)
+
+        ethereum.receiveResponse(resultData, id: requestId)
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+    
+    func testSignTypedDatV4Result() {
+        let requestId = "246"
+        let request = SubmittedRequest(method: "eth_signTypedData_v4")
+        let expectation = self.expectation(description: "Result received")
+        ethereum.submittedRequests[requestId] = request
+        
+        let resultData: [String: Any] = ["result": "0xdjbsddy3y3behfbvvf"]
+        
+        request.publisher?.sink(receiveCompletion: { _ in },
+                                receiveValue: { result in
+            XCTAssertEqual(result as? String, "0xdjbsddy3y3behfbvvf")
+            expectation.fulfill()
+        }).store(in: &cancellables)
+
+        ethereum.receiveResponse(resultData, id: requestId)
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+    
+    func testReceiveResponseWithMetamaskBatch() {
+        let requestId = Ethereum.BATCH_CONNECTION_ID
+        let request = SubmittedRequest(method: "metamask_batch")
+        ethereum.submittedRequests[requestId] = request
+
+        let resultData: [String: Any] = [
+            "result": [["0x1234"], "0x1"]
+        ]
+
+        ethereum.receiveResponse(resultData, id: requestId)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+    }
+    
+    // MARK: Events
+    func testReceiveEventWithError() {
+        let event: [String: Any] = [
+            "error": ["message": "User rejected request", "code": 4001]
+        ]
+
+        ethereum.receiveEvent(event)
+        
+        let trackedEvent = trackedEvents.first?.0
+        let params = trackedEvents.first?.1
+
+        XCTAssertEqual(trackedEvents.count, 1)
+        
+        XCTAssertEqual(trackedEvent, .connectionRejected)
+        XCTAssertEqual(params?.isEmpty, true)
+    }
+    
+    func testReceiveEventWithChainId() {
+        let event: [String: Any] = [
+            "chainId": "0x1"
+        ]
+
+        ethereum.receiveEvent(event)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.chainId, "0x1")
+    }
+    
+    func testReceiveEventWithAccounts() {
+        let event: [String: Any] = [
+            "accounts": ["0x1234"]
+        ]
+
+        ethereum.receiveEvent(event)
+
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.account, "0x1234")
+    }
+    
+    func testReceiveEventWithMetaMaskAccountsChanged() {
+        let event: [String: Any] = [
+            "method": "metamask_accountsChanged",
+            "params": ["0x1234"]
+        ]
+
+        ethereum.receiveEvent(event)
+
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.account, "0x1234")
+    }
+    
+    func testReceiveEventWithMetaMaskChainChanged() {
+        let event: [String: Any] = [
+            "method": "metamask_chainChanged",
+            "params": ["chainId": "0x1"]
+        ]
+
+        ethereum.receiveEvent(event)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.chainId, "0x1")
+    }
+    
+    
+    func testReceiveEventUnhandledCase() {
+        let event: [String: Any] = [
+            "method": "unhandled_method"
+        ]
+
+        ethereum.receiveEvent(event)
+
+        XCTAssertFalse(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
+    }
+    
+    func testHandleMessageWithInt64Id() {
+        let message: [String: Any] = [
+            "id": Int64(123),
+            "method": "metamask_chainChanged",
+            "params": ["chainId": "0x1"]
+        ]
+        
+        ethereum.handleMessage(message)
+        
+        XCTAssertFalse(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
+    }
+    
+    func testHandleMessageWithString() {
+        let message: [String: Any] = [
+            "id": "123",
+            "method": "metamask_chainChanged",
+            "params": ["chainId": "0x1"]
+        ]
+        
+        ethereum.handleMessage(message)
+        
+        XCTAssertFalse(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
     }
 }
