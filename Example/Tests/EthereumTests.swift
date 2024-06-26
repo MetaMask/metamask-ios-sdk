@@ -305,6 +305,19 @@ class EthereumTests: XCTestCase {
         XCTAssertTrue(((self.ethereum.commClient as? MockCommClient)?.sendMessageCalled) ?? false)
     }
     
+    func testDeeplinkingSendRequest() {
+        let params = [
+            "challenge": "0x506c65617365207369676e2074686973206d65737361676520746f20636f6e6669726d20796f7572206964656e746974792e",
+            "address": "0x4B0897b0513FdBeEc7C469D9aF4fA6C0752aBea7"
+        ]
+        
+        let request = EthereumRequest(method: "personal_sign", params: params)
+        ethereum.updateTransportLayer(.deeplinking(dappScheme: "testDapp"))
+        ethereum.sendRequest(request)
+        
+        XCTAssertTrue(((self.ethereum.commClient as? MockCommClient)?.sendMessageCalled) ?? false)
+    }
+    
     func testDeeplinkingSendRequestWithData() {
         guard let params: Data = "{\"chainId\":\"0x1\"}".data(using: .utf8) else {
             XCTFail("Could not obtain params  data")
