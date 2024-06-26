@@ -273,12 +273,14 @@ class EthereumTests: XCTestCase {
         ethereum.updateTransportLayer(.socket)
         
         XCTAssertTrue(ethereum.commClient is MockSocketCommClient)
+        XCTAssertTrue(ethereum.transport == .socket)
     }
     
     func testTransportWithDeeplinking() {
         ethereum.updateTransportLayer(.deeplinking(dappScheme: "testDapp"))
         
         XCTAssertTrue(ethereum.commClient is MockDeeplinkCommClient)
+        XCTAssertTrue(ethereum.transport == .deeplinking(dappScheme: "testDapp"))
     }
     
     // MARK: Requests
@@ -591,6 +593,20 @@ class EthereumTests: XCTestCase {
         XCTAssertEqual(mockEthereumDelegate.chainId, "0x1")
     }
     
+    func testChainIdIsUpdated() {
+        let event: [String: Any] = [
+            "chainId": "0x1"
+        ]
+
+        XCTAssertTrue(ethereum.chainId.isEmpty)
+        ethereum.receiveEvent(event)
+
+        
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.chainId, "0x1")
+        XCTAssertEqual(ethereum.chainId, "0x1")
+    }
+    
     func testReceiveEventWithAccounts() {
         let event: [String: Any] = [
             "accounts": ["0x1234"]
@@ -600,6 +616,19 @@ class EthereumTests: XCTestCase {
 
         XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
         XCTAssertEqual(mockEthereumDelegate.account, "0x1234")
+    }
+    
+    func testAccountsUpdated() {
+        let event: [String: Any] = [
+            "accounts": ["0x1234"]
+        ]
+
+        XCTAssertTrue(ethereum.account.isEmpty)
+        ethereum.receiveEvent(event)
+
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.account, "0x1234")
+        XCTAssertEqual(ethereum.account, "0x1234")
     }
     
     func testReceiveEventWithMetaMaskAccountsChanged() {
@@ -662,5 +691,11 @@ class EthereumTests: XCTestCase {
         
         XCTAssertFalse(mockEthereumDelegate.chainIdChangedCalled)
         XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
+    }
+    
+    func testInfuraProvider() {
+        XCTAssertTrue(ethereum.infuraProvider is MockInfuraProvider)
+        ethereum.infuraProvider = nil
+        XCTAssertNil(ethereum.infuraProvider)
     }
 }
