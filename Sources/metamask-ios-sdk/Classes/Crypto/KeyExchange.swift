@@ -134,7 +134,7 @@ public class KeyExchange {
         return true
     }
 
-    public func encryptMessage<T: CodableData>(_ message: T) throws -> String {
+    public func encryptMessage<T: Codable>(_ message: T) throws -> String {
         guard let theirPublicKey = theirPublicKey else {
             throw KeyExchangeError.keysNotExchanged
         }

@@ -9,7 +9,7 @@ enum DecodingError: Error {
     case invalidMessage
 }
 
-public struct SocketMessage<T: CodableData>: CodableData, Mappable {
+public struct SocketMessage<T: Codable>: CodableData, Mappable {
     public let id: String
     public let message: T
 
@@ -21,7 +21,7 @@ public struct SocketMessage<T: CodableData>: CodableData, Mappable {
     public func socketRepresentation() -> NetworkData {
         [
             "id": id,
-            "message": try? message.socketRepresentation()
+            "message": try? (message as? CodableData)?.socketRepresentation()
         ]
     }
 
