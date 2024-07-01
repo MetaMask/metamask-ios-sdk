@@ -46,7 +46,7 @@ public class SocketChannel {
         socketManager = SocketManager(
             socketURL: url,
             config: [
-                .log(false),
+                .log(true),
                 .forceWebsockets(true),
                 options
             ]

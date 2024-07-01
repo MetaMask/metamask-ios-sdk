@@ -171,11 +171,25 @@ extension SocketClient {
 
             Logging.log("SDK connected to server")
 
-            self.channel.emit(ClientEvent.joinChannel, channelId)
+            self.channel.emit(
+                ClientEvent.joinChannel,
+                ["channelId": channelId,"clientType": "dapp"])
 
             if !self.isReady {
                 self.deeplinkToMetaMask()
             }
+        }
+        
+        channel.on(ClientEvent.config(on: channelId)) { data in
+            Logging.log("Mpendulo:: Channel comm supports async comm, data: \(data)")
+        }
+        
+        channel.on("ack") { data in
+            Logging.log("Mpendulo:: Got ack Wallet supports async comm, data: \(data)")
+        }
+        
+        channel.on(ClientEvent.channelPersistence) { data in
+            Logging.log("Mpendulo:: The Wallet supports async comm, data: \(data)")
         }
     }
 
@@ -306,6 +320,7 @@ extension SocketClient {
 
     func handleEncryptedMessage(_ message: SocketMessage<String>) throws {
         let decryptedText = try keyExchange.decryptMessage(message.message)
+        Logging.log("Mpendulo:: decrypted: \(decryptedText)")
 
         let json: [String: Any] = try JSONSerialization.jsonObject(
             with: Data(decryptedText.utf8),
@@ -330,6 +345,8 @@ extension SocketClient {
         } else if json["type"] as? String == "wallet_info" {
             Logging.log("Received wallet info")
             isReady = true
+        } else if json["type"] as? String == "channel_persistence" {
+            Logging.log("Mpendulo:: Supports async session persistence \(json)")
         } else if let data = json["data"] as? [String: Any] {
             handleResponse?(data)
         }

@@ -18,15 +18,13 @@ struct ConnectView: View {
     @State var selectedTransport: Transport = .deeplinking(dappScheme: DAPP_SCHEME)
     @State private var dappScheme: String = DAPP_SCHEME
 
-    private static let appMetadata = AppMetadata(
-        name: "Dub Dapp",
-        url: "https://dubdapp.com",
-        iconUrl: "https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png"
-    )
-
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
-                    appMetadata,
+        AppMetadata(
+            name: "Dub Dapp",
+            url: "https://dubdapp.com",
+            iconUrl: "https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png"
+        ),
                     transport: .deeplinking(dappScheme: DAPP_SCHEME),
                     sdkOptions: nil // SDKOptions(infuraAPIKey: "####")
                 )
