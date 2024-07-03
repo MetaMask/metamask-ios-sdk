@@ -57,12 +57,15 @@ public class SocketClient: CommClient {
             + "&comm=socket"
             + "&pubkey="
             + keyExchange.pubkey
+            + "&v=2"
     }
+    
+    private var isV2Protocol: Bool = false
 
     init(session: SessionManager,
-         channel: SocketChannel = SocketChannel(),
-         keyExchange: KeyExchange = KeyExchange(),
-         urlOpener: URLOpener = DefaultURLOpener(),
+         channel: SocketChannel,
+         keyExchange: KeyExchange,
+         urlOpener: URLOpener,
          trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
         self.channel = channel
@@ -146,7 +149,7 @@ extension SocketClient {
 
         // MARK: Clients connected event
 
-        channel.on(ClientEvent.clientsConnected(on: channelId)) { _ in
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] _ in
             Logging.log("Clients connected")
 
             // for debug purposes only
@@ -155,6 +158,12 @@ extension SocketClient {
                 object: nil,
                 userInfo: ["value": "Clients Connected"]
             )
+            
+            if self?.keyExchange.isKeysExchangedViaV2Protocol ?? false {
+                Logging.log("Connected via v2 protocol")
+                self?.isReady = true
+                self?.runJobs()
+            }
         }
 
         // MARK: Socket connected event
@@ -180,16 +189,19 @@ extension SocketClient {
             }
         }
         
-        channel.on(ClientEvent.config(on: channelId)) { data in
-            Logging.log("Mpendulo:: Channel comm supports async comm, data: \(data)")
-        }
-        
-        channel.on("ack") { data in
-            Logging.log("Mpendulo:: Got ack Wallet supports async comm, data: \(data)")
-        }
-        
-        channel.on(ClientEvent.channelPersistence) { data in
-            Logging.log("Mpendulo:: The Wallet supports async comm, data: \(data)")
+        channel.on(ClientEvent.config(on: channelId)) { [weak self] data in
+            guard
+                let self = self,
+                let message = data.first as? [String: Bool],
+                let persistence = message["persistence"]
+            else { return }
+            
+            isV2Protocol = persistence
+            
+            if isV2Protocol {
+                isReady = true
+                Logging.log("SocketClient:: Channel supports protocol v2 communation")
+            }
         }
     }
 
@@ -206,7 +218,7 @@ extension SocketClient {
                 return
             }
 
-            if !self.keyExchange.keysExchanged {
+            if isKeyExchangeMessage(message) {
                 // Exchange keys
                 self.handleReceiveKeyExchange(message)
             } else {
@@ -261,7 +273,9 @@ extension SocketClient {
                 userInfo: ["value": "Clients Disconnected"]
             )
 
-            isReady = false
+            if !isV2Protocol && !keyExchange.isKeysExchangedViaV2Protocol {
+                isReady = false
+            }
         }
     }
 }
@@ -300,6 +314,14 @@ extension SocketClient {
         do {
             let message = try SocketMessage<String>.message(from: msg)
             try handleEncryptedMessage(message)
+            if let ackId = message.ackId {
+                Logging.log("Sending ackId \(ackId) for message id \(message.id)")
+                channel.emit("ack", [
+                    "ackId": ackId,
+                    "channelId": channelId,
+                    "clientType": message.clientType
+                ])
+            }
         } catch {
             switch error {
             case DecodingError.invalidMessage:
@@ -320,7 +342,6 @@ extension SocketClient {
 
     func handleEncryptedMessage(_ message: SocketMessage<String>) throws {
         let decryptedText = try keyExchange.decryptMessage(message.message)
-        Logging.log("Mpendulo:: decrypted: \(decryptedText)")
 
         let json: [String: Any] = try JSONSerialization.jsonObject(
             with: Data(decryptedText.utf8),
@@ -334,6 +355,8 @@ extension SocketClient {
         if json["type"] as? String == "terminate" {
             disconnect()
             onClientsTerminated?()
+            session.clear()
+            keyExchange.reset()
             Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
@@ -345,8 +368,6 @@ extension SocketClient {
         } else if json["type"] as? String == "wallet_info" {
             Logging.log("Received wallet info")
             isReady = true
-        } else if json["type"] as? String == "channel_persistence" {
-            Logging.log("Mpendulo:: Supports async session persistence \(json)")
         } else if let data = json["data"] as? [String: Any] {
             handleResponse?(data)
         }
@@ -414,7 +435,7 @@ extension SocketClient {
                 initiateKeyExchange()
             }
         } else if encrypt {
-            if !isReady {
+            if !isReady && !keyExchange.isKeysExchangedViaV2Protocol {
                 Logging.log("Connection not ready. Will send once wallet is open again")
                 addRequest { [weak self] in
                     guard let self = self else { return }

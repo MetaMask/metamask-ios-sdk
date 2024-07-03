@@ -20,10 +20,6 @@ public struct ClientEvent {
     public static var joinChannel: String {
         "join_channel"
     }
-    
-    public static var channelPersistence: String {
-        "channel_persistence"
-    }
 
     public static func clientsConnected(on channel: String) -> String {
         "clients_connected".appending("-").appending(channel)

@@ -11,18 +11,57 @@ enum DecodingError: Error {
 
 public struct SocketMessage<T: CodableData>: CodableData, Mappable {
     public let id: String
+    public var ackId: String?
     public let message: T
+    public var clientType: String = "dapp"
 
-    public init(id: String, message: T) {
+    public init(id: String, message: T, ackId: String? = nil, clientType: String = "dapp") {
         self.id = id
         self.message = message
+        self.ackId = ackId
+        self.clientType = clientType
+    }
+    
+    // Custom initializer for decoding
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        ackId = try container.decodeIfPresent(String.self, forKey: .ackId)
+        message = try container.decode(T.self, forKey: .message)
+        clientType = try container.decodeIfPresent(String.self, forKey: .clientType) ?? "dapp"
+    }
+    
+    // Custom method for encoding
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(ackId, forKey: .ackId)
+        try container.encode(message, forKey: .message)
+        try container.encode(clientType, forKey: .clientType)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case ackId
+        case message
+        case clientType
     }
 
     public func socketRepresentation() -> NetworkData {
-        [
-            "id": id,
-            "message": try? message.socketRepresentation()
-        ]
+        if let ack = ackId {
+            [
+                "id": id,
+                "ackId": ack,
+                "clientType": clientType,
+                "message": try? message.socketRepresentation()
+            ]
+        } else {
+            [
+                "id": id,
+                "clientType": clientType,
+                "message": try? message.socketRepresentation()
+            ]
+        }
     }
 
     func toDictionary() -> [String: Any]? {

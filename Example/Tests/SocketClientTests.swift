@@ -21,7 +21,7 @@ class SocketClientTests: XCTestCase {
         mockUrlOpener = MockURLOpener()
         secureStore = Keychain(service: "com.example.socketTestKeychain")
         mockSessionManager = MockSessionManager(store: secureStore, sessionDuration: 3600)
-        mockKeyExchange = MockKeyExchange()
+        mockKeyExchange = MockKeyExchange(storage: secureStore)
         mockSocketChannel = MockSocketChannel()
         
         socketClient = SocketClient(
@@ -35,6 +35,7 @@ class SocketClientTests: XCTestCase {
     
     override func tearDown() {
         mockUrlOpener = nil
+        secureStore.deleteAll()
         secureStore = nil
         socketClient = nil
         mockSessionManager = nil
@@ -129,6 +130,7 @@ class SocketClientTests: XCTestCase {
         + "&comm=socket"
         + "&pubkey="
         + pubkey
+        + "&v=2"
         XCTAssertEqual(openedUrl, expectedDeeplink)
     }
     
@@ -151,6 +153,7 @@ class SocketClientTests: XCTestCase {
         + "&comm=socket"
         + "&pubkey="
         + pubkey
+        + "&v=2"
         XCTAssertEqual(openedUrl, expectedDeeplink)
     }
     
@@ -179,12 +182,13 @@ class SocketClientTests: XCTestCase {
         XCTAssertEqual((mockSocketChannel.lastEmittedMessage as? SocketMessage<String>)?.message, "encrypted \(testMessage)")
     }
     
-    func testSendMessageEncryptedKeysExchangedNotReady() {
-        let keyExchangeMsg = KeyExchangeMessage(type: .ack, pubkey: "0x1234567")
+    func testSendMessageEncryptedKeysExchangedNotReadyInV1Protocol() {
+        let keyExchangeMsg = KeyExchangeMessage(type: .ack, pubkey: "0x1234567", v: 1)
         // force keysExchanged = true
         _ = mockKeyExchange.nextMessage(keyExchangeMsg)
         
         let testMessage = TestCodableData(id: "123", message: "test message")
+        
 
         socketClient.sendMessage(testMessage, encrypt: true)
 
@@ -192,6 +196,20 @@ class SocketClientTests: XCTestCase {
         
         // set client as ready
         socketClient.handleResponseMessage(["type": "ready"])
+        
+        XCTAssertEqual(mockSocketChannel.lastEmittedEvent, ClientEvent.message)
+        XCTAssertEqual((mockSocketChannel.lastEmittedMessage as? SocketMessage<String>)?.message, "encrypted \(testMessage)")
+    }
+    
+    func testSendMessageEncryptedKeysExchangedReadyInV2Protocol() {
+        let keyExchangeMsg = KeyExchangeMessage(type: .ack, pubkey: "0x1234567", v: 2)
+        // force keysExchanged = true
+        _ = mockKeyExchange.nextMessage(keyExchangeMsg)
+        
+        let testMessage = TestCodableData(id: "123", message: "test message")
+        
+
+        socketClient.sendMessage(testMessage, encrypt: true)
         
         XCTAssertEqual(mockSocketChannel.lastEmittedEvent, ClientEvent.message)
         XCTAssertEqual((mockSocketChannel.lastEmittedMessage as? SocketMessage<String>)?.message, "encrypted \(testMessage)")
@@ -229,7 +247,6 @@ class SocketClientTests: XCTestCase {
         let readyMessage: [String: Any] = ["type": "ready"]
         socketClient.handleResponseMessage(readyMessage)
     }
-    // encrypt !ready
     
     func testHandleResponseMessagePause() {
         let keyExchangeMsg = KeyExchangeMessage(type: .ack, pubkey: "0x1234567")
@@ -281,6 +298,26 @@ class SocketClientTests: XCTestCase {
         let terminateMessage: [String: Any] = ["type": "terminate"]
         
         socketClient.handleResponseMessage(terminateMessage)
+        
+        wait(for: [expectation], timeout: 1.0)
+    }
+    
+    func testClientsTerminatedDeletesSessionData() {
+        let keyExchangeMsg = KeyExchangeMessage(type: .ack, pubkey: "0x1234567")
+        // force keyexchange = true
+        _ = mockKeyExchange.nextMessage(keyExchangeMsg)
+        
+        let expectation = XCTestExpectation(description: "Handle terminate connection")
+        
+        socketClient.onClientsTerminated = {
+            expectation.fulfill()
+        }
+        
+        let terminateMessage: [String: Any] = ["type": "terminate"]
+        
+        socketClient.handleResponseMessage(terminateMessage)
+        XCTAssertNil(secureStore.string(for: "session_id"))
+        XCTAssertFalse(mockKeyExchange.keysExchanged)
         
         wait(for: [expectation], timeout: 1.0)
     }

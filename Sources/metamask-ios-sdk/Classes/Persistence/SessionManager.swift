@@ -51,6 +51,6 @@ public class SessionManager {
     }
 
     public func clear() {
-        store.deleteData(for: SESSION_KEY)
+        store.deleteAll()
     }
 }

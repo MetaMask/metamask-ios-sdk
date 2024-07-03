@@ -28,12 +28,15 @@ public final class Dependencies {
         }.updateTransportLayer(transport)
     }
 
-    public lazy var keyExchange: KeyExchange = KeyExchange()
+    public lazy var keyExchange: KeyExchange = KeyExchange(storage: store)
 
     public lazy var deeplinkManager: DeeplinkManager = DeeplinkManager()
 
     public lazy var socketClient: CommClient = SocketClient(
         session: sessionManager,
+        channel: SocketChannel(),
+        keyExchange: keyExchange,
+        urlOpener: DefaultURLOpener(),
         trackEvent: { event, parameters in
             self.trackEvent(event, parameters: parameters)
         }

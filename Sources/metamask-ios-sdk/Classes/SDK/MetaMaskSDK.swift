@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Combine
 import Foundation
 
@@ -64,6 +65,13 @@ public class MetaMaskSDK: ObservableObject {
         self.ethereum.updateMetadata(appMetadata)
         self.tracker.enableDebug = enableDebug
         setupAppLifeCycleObservers()
+    }
+    
+    public var isMetaMaskInstalled: Bool {
+        guard let url = URL(string: "metamask://") else {
+            return false
+        }
+        return UIApplication.shared.canOpenURL(url)
     }
 
     public func handleUrl(_ url: URL) {
