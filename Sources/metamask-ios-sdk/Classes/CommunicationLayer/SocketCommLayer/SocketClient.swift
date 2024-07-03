@@ -315,7 +315,6 @@ extension SocketClient {
             let message = try SocketMessage<String>.message(from: msg)
             try handleEncryptedMessage(message)
             if let ackId = message.ackId {
-                Logging.log("Sending ackId \(ackId) for message id \(message.id)")
                 channel.emit("ack", [
                     "ackId": ackId,
                     "channelId": channelId,
