@@ -53,13 +53,13 @@ public struct SocketMessage<T: Codable>: CodableData, Mappable {
                 "id": id,
                 "ackId": ack,
                 "clientType": clientType,
-                "message": try? message.socketRepresentation()
+                "message": try? (message as? CodableData)?.socketRepresentation()
             ]
         } else {
             [
                 "id": id,
                 "clientType": clientType,
-                "message": try? message.socketRepresentation()
+                "message": try? (message as? CodableData)?.socketRepresentation()
             ]
         }
     }
