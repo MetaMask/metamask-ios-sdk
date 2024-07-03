@@ -9,7 +9,7 @@ enum DecodingError: Error {
     case invalidMessage
 }
 
-public struct SocketMessage<T: CodableData>: CodableData, Mappable {
+public struct SocketMessage<T: Codable>: CodableData, Mappable {
     public let id: String
     public var ackId: String?
     public let message: T

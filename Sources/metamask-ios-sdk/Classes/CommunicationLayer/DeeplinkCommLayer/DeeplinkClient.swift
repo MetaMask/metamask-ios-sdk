@@ -16,6 +16,7 @@ public class DeeplinkClient: CommClient {
     public var appMetadata: AppMetadata?
     public var trackEvent: ((Event, [String: Any]) -> Void)?
     public var handleResponse: (([String: Any]) -> Void)?
+    public var onClientsTerminated: (() -> Void)?
 
     let keyExchange: KeyExchange
     let deeplinkManager: DeeplinkManager
@@ -59,6 +60,10 @@ public class DeeplinkClient: CommClient {
         track(event: .disconnected)
         session.clear()
         setupClient()
+    }
+    
+    public func requestAuthorisation() {
+        
     }
 
     func sendMessage(_ message: String) {
@@ -116,9 +121,7 @@ public class DeeplinkClient: CommClient {
 
         trackEvent?(event, parameters)
     }
-}
-
-extension DeeplinkClient {
+    
     public func disconnect() {
         track(event: .disconnected)
     }
@@ -138,7 +141,12 @@ extension DeeplinkClient {
         }
     }
 
-    public func sendMessage(_ message: String, encrypt: Bool, options: [String: String]) {
+    public func sendMessage<T>(_ message: T, encrypt: Bool, options: [String: String]) {
+        guard let message = message as? String else {
+            Logging.error("DeeplinkClient:: Expected message to be String, got \(type(of: message))")
+            return
+        }
+        
         let base64Encoded = message.base64Encode() ?? ""
 
         let deeplink: Deeplink = .mmsdk(
