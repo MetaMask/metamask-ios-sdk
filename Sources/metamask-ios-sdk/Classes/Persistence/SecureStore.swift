@@ -11,6 +11,9 @@ public protocol SecureStore {
 
     @discardableResult
     func deleteData(for key: String) -> Bool
+    
+    @discardableResult
+    func deleteAll() -> Bool
 
     @discardableResult
     func save(string: String, key: String) -> Bool
@@ -38,6 +41,12 @@ public struct Keychain: SecureStore {
 
     public func deleteData(for key: String) -> Bool {
         let request = deletionRequestForKey(key)
+        let status: OSStatus = SecItemDelete(request)
+        return status == errSecSuccess
+    }
+    
+    public func deleteAll() -> Bool {
+        let request = deletionRequestForAll()
         let status: OSStatus = SecItemDelete(request)
         return status == errSecSuccess
     }
@@ -101,6 +110,13 @@ public struct Keychain: SecureStore {
     private func deletionRequestForKey(_ key: String) -> CFDictionary {
         [
             kSecAttrAccount: key,
+            kSecAttrService: service,
+            kSecClass: kSecClassGenericPassword
+        ] as CFDictionary
+    }
+
+    private func deletionRequestForAll() -> CFDictionary {
+        [
             kSecAttrService: service,
             kSecClass: kSecClassGenericPassword
         ] as CFDictionary

@@ -22,7 +22,7 @@ class DeeplinkClientTests: XCTestCase {
         mockDeeplinkManager = MockDeeplinkManager()
 
         secureStore = Keychain(service: "com.example.deeplinkTestKeychain")
-        mockKeyExchange = MockKeyExchange()
+        mockKeyExchange = MockKeyExchange(storage: secureStore)
         mockURLOpener = MockURLOpener()
         mockSessionManager = MockSessionManager(store: secureStore, sessionDuration: 3600)
         deeplinkClient = DeeplinkClient(

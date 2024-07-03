@@ -32,4 +32,8 @@ public struct ClientEvent {
     public static func message(on channelId: String) -> String {
         "message".appending("-").appending(channelId)
     }
+    
+    public static func config(on channelId: String) -> String {
+        "config".appending("-").appending(channelId)
+    }
 }

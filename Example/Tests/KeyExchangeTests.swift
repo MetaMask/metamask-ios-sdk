@@ -9,14 +9,18 @@ import XCTest
 class KeyExchangeTests: XCTestCase {
     
     var keyExchange: KeyExchange!
+    var secureStore: SecureStore!
     
     override func setUp() {
         super.setUp()
-        keyExchange = KeyExchange()
+        secureStore = Keychain(service: "com.example.keyExchangeTestKeychain")
+        keyExchange = KeyExchange(storage: secureStore)
     }
 
     override func tearDown() {
         // Clean up after each test, delete data that might have been saved
+        secureStore.deleteAll()
+        secureStore = nil
         keyExchange = nil
         super.tearDown()
     }
@@ -125,12 +129,14 @@ class KeyExchangeTests: XCTestCase {
     func testKeyExchangeMessageSocketRepresentation() {
         let pubkey = "0xhexabcdefgh"
         let type: KeyExchangeType = .synack
-        let message = KeyExchangeMessage(type: type, pubkey: pubkey)
-        let socketRep = message.socketRepresentation() as? [String: String] ?? [:]
+        let message = KeyExchangeMessage(type: type, pubkey: pubkey, v: 2, clientType: "dapp")
+        let socketRep = message.socketRepresentation() as? [String: Any] ?? [:]
         XCTAssertEqual(message.type, type)
         XCTAssertEqual(message.pubkey, pubkey)
-        XCTAssertEqual(socketRep["type"], "key_handshake_SYNACK")
-        XCTAssertEqual(socketRep["pubkey"], pubkey)
+        XCTAssertEqual(socketRep["type"] as? String, "key_handshake_SYNACK")
+        XCTAssertEqual(socketRep["pubkey"] as? String, pubkey)
+        XCTAssertEqual(socketRep["v"] as? Int, 2)
+        XCTAssertEqual(socketRep["clientType"] as? String, "dapp")
     }
     
     func testNextStep() {
@@ -185,8 +191,10 @@ class KeyExchangeTests: XCTestCase {
     }
     
     func testStringEncryptAndDecryption() {
-        let keyExchangeAlice = KeyExchange()
-        let keyExchangeBob = KeyExchange()
+        let secureStore1: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain1")
+        let secureStore2: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain2")
+        let keyExchangeAlice = KeyExchange(storage: secureStore1)
+        let keyExchangeBob = KeyExchange(storage: secureStore2)
 
         // Exchange public keys between two parties
         keyExchangeAlice.setTheirPublicKey(keyExchangeBob.pubkey)
@@ -210,8 +218,10 @@ class KeyExchangeTests: XCTestCase {
     }
 
     func testMessageEncryptionAndDecryption() {
-        let keyExchangeAlice = KeyExchange()
-        let keyExchangeBob = KeyExchange()
+        let secureStore1: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain1")
+        let secureStore2: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain2")
+        let keyExchangeAlice = KeyExchange(storage: secureStore1)
+        let keyExchangeBob = KeyExchange(storage: secureStore2)
 
         // Exchange public keys between two parties
         keyExchangeAlice.setTheirPublicKey(keyExchangeBob.pubkey)
@@ -244,8 +254,10 @@ class KeyExchangeTests: XCTestCase {
     }
     
     func testEncryptWithoutTheirPublicKeyThrows() {
-        let keyExchangeAlice = KeyExchange()
-        let keyExchangeBob = KeyExchange()
+        let secureStore1: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain1")
+        let secureStore2: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain2")
+        let keyExchangeAlice = KeyExchange(storage: secureStore1)
+        let keyExchangeBob = KeyExchange(storage: secureStore2)
 
         // Exchange public keys between two parties
         keyExchangeBob.setTheirPublicKey(keyExchangeAlice.pubkey)
@@ -254,7 +266,7 @@ class KeyExchangeTests: XCTestCase {
         let originalMessage = "Message to encrypt"
         
         do {
-            let aliceEncryptedMessage = try keyExchangeAlice.encrypt(originalMessage)
+            _ = try keyExchangeAlice.encrypt(originalMessage)
             
         } catch {
             XCTAssertEqual(error as? KeyExchangeError, KeyExchangeError.keysNotExchanged)
@@ -262,8 +274,10 @@ class KeyExchangeTests: XCTestCase {
     }
     
     func testDecryptWithoutTheirPublicKeyThrows() {
-        let keyExchangeAlice = KeyExchange()
-        let keyExchangeBob = KeyExchange()
+        let secureStore1: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain1")
+        let secureStore2: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain2")
+        let keyExchangeAlice = KeyExchange(storage: secureStore1)
+        let keyExchangeBob = KeyExchange(storage: secureStore2)
 
         // Exchange public keys between two parties
         keyExchangeAlice.setTheirPublicKey(keyExchangeBob.pubkey)
@@ -275,7 +289,7 @@ class KeyExchangeTests: XCTestCase {
             let aliceEncryptedMessage = try keyExchangeAlice.encrypt(originalMessage)
             
             do {
-                let bobDecryptedMessage = try keyExchangeBob.decryptMessage(aliceEncryptedMessage)
+                _ = try keyExchangeBob.decryptMessage(aliceEncryptedMessage)
             } catch {
                 XCTAssertEqual(error as? KeyExchangeError, KeyExchangeError.keysNotExchanged)
             }
@@ -286,8 +300,10 @@ class KeyExchangeTests: XCTestCase {
     }
     
     func testEncryptWithInvalidData() {
-        let keyExchangeAlice = KeyExchange()
-        let keyExchangeBob = KeyExchange()
+        let secureStore1: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain1")
+        let secureStore2: SecureStore = Keychain(service: "com.example.keyExchangeTestKeychain2")
+        let keyExchangeAlice = KeyExchange(storage: secureStore1)
+        let keyExchangeBob = KeyExchange(storage: secureStore2)
 
         // Exchange public keys between two parties
         keyExchangeAlice.setTheirPublicKey(keyExchangeBob.pubkey)

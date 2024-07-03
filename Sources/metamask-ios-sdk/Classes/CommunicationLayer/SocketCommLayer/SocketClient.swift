@@ -57,12 +57,15 @@ public class SocketClient: CommClient {
             + "&comm=socket"
             + "&pubkey="
             + keyExchange.pubkey
+            + "&v=2"
     }
+    
+    private var isV2Protocol: Bool = false
 
     init(session: SessionManager,
-         channel: SocketChannel = SocketChannel(),
-         keyExchange: KeyExchange = KeyExchange(),
-         urlOpener: URLOpener = DefaultURLOpener(),
+         channel: SocketChannel,
+         keyExchange: KeyExchange,
+         urlOpener: URLOpener,
          trackEvent: @escaping ((Event, [String: Any]) -> Void)) {
         self.session = session
         self.channel = channel
@@ -146,7 +149,7 @@ extension SocketClient {
 
         // MARK: Clients connected event
 
-        channel.on(ClientEvent.clientsConnected(on: channelId)) { _ in
+        channel.on(ClientEvent.clientsConnected(on: channelId)) { [weak self] _ in
             Logging.log("Clients connected")
 
             // for debug purposes only
@@ -155,6 +158,12 @@ extension SocketClient {
                 object: nil,
                 userInfo: ["value": "Clients Connected"]
             )
+            
+            if self?.keyExchange.isKeysExchangedViaV2Protocol ?? false {
+                Logging.log("Connected via v2 protocol")
+                self?.isReady = true
+                self?.runJobs()
+            }
         }
 
         // MARK: Socket connected event
@@ -171,10 +180,27 @@ extension SocketClient {
 
             Logging.log("SDK connected to server")
 
-            self.channel.emit(ClientEvent.joinChannel, channelId)
+            self.channel.emit(
+                ClientEvent.joinChannel,
+                ["channelId": channelId,"clientType": "dapp"])
 
             if !self.isReady {
                 self.deeplinkToMetaMask()
+            }
+        }
+        
+        channel.on(ClientEvent.config(on: channelId)) { [weak self] data in
+            guard
+                let self = self,
+                let message = data.first as? [String: Bool],
+                let persistence = message["persistence"]
+            else { return }
+            
+            isV2Protocol = persistence
+            
+            if isV2Protocol {
+                isReady = true
+                Logging.log("SocketClient:: Channel supports protocol v2 communation")
             }
         }
     }
@@ -192,7 +218,7 @@ extension SocketClient {
                 return
             }
 
-            if !self.keyExchange.keysExchanged {
+            if isKeyExchangeMessage(message) {
                 // Exchange keys
                 self.handleReceiveKeyExchange(message)
             } else {
@@ -247,7 +273,9 @@ extension SocketClient {
                 userInfo: ["value": "Clients Disconnected"]
             )
 
-            isReady = false
+            if !isV2Protocol && !keyExchange.isKeysExchangedViaV2Protocol {
+                isReady = false
+            }
         }
     }
 }
@@ -286,6 +314,13 @@ extension SocketClient {
         do {
             let message = try SocketMessage<String>.message(from: msg)
             try handleEncryptedMessage(message)
+            if let ackId = message.ackId {
+                channel.emit("ack", [
+                    "ackId": ackId,
+                    "channelId": channelId,
+                    "clientType": message.clientType
+                ])
+            }
         } catch {
             switch error {
             case DecodingError.invalidMessage:
@@ -319,6 +354,8 @@ extension SocketClient {
         if json["type"] as? String == "terminate" {
             disconnect()
             onClientsTerminated?()
+            session.clear()
+            keyExchange.reset()
             Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
@@ -397,7 +434,7 @@ extension SocketClient {
                 initiateKeyExchange()
             }
         } else if encrypt {
-            if !isReady {
+            if !isReady && !keyExchange.isKeysExchangedViaV2Protocol {
                 Logging.log("Connection not ready. Will send once wallet is open again")
                 addRequest { [weak self] in
                     guard let self = self else { return }
