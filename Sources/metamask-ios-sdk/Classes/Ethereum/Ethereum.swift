@@ -673,6 +673,11 @@ public class Ethereum {
 
     func receiveResponse(_ data: [String: Any], id: String) {
         guard let request = submittedRequests[id] else { return }
+        
+        track?(.sdkRpcRequestDone, [
+            "from": "mobile",
+            "method": request.method
+        ])
 
         if let error = data["error"] as? [String: Any] {
             let requestError = RequestError(from: error)
@@ -700,11 +705,6 @@ public class Ethereum {
 
             return
         }
-
-        track?(.sdkRpcRequestDone, [
-            "from": "mobile",
-            "method": request.method
-        ])
 
         guard
             let method = EthereumMethod(rawValue: request.method),
