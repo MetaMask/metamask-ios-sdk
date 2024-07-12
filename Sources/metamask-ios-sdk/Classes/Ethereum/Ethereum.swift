@@ -605,7 +605,8 @@ public class Ethereum {
                                 continuation.resume(returning: .failure(error))
                             }
                         }, receiveValue: { result in
-                            continuation.resume(returning: .success(result as? [String] ?? []))
+                            let value: [String] = (result as? [String?])?.compactMap{$0} ?? []
+                            continuation.resume(returning: .success(value))
                         }).store(in: &cancellables)
                 }
             } catch {
