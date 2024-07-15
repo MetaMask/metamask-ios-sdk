@@ -766,7 +766,7 @@ public class Ethereum {
                     updateAccount(account)
                 }
                 updateChainId(chainId)
-            } else if let result = data["result"] {
+            } else {
                 if
                     let accounts = data["accounts"] as? [String],
                     let account = accounts.first {
@@ -775,7 +775,9 @@ public class Ethereum {
                 if let chainId = data["chainId"] as? String {
                     updateChainId(chainId)
                 }
-                sendResult(result, id: id)
+                if let result = data["result"] {
+                    sendResult(result, id: id)
+                }
             }
         default:
             if let chainId = data["chainId"] as? String {
