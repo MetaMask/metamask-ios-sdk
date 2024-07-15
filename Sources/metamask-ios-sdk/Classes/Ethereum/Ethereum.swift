@@ -767,6 +767,14 @@ public class Ethereum {
                 }
                 updateChainId(chainId)
             } else if let result = data["result"] {
+                if
+                    let accounts = data["accounts"] as? [String],
+                    let account = accounts.first {
+                    updateAccount(account)
+                }
+                if let chainId = data["chainId"] as? String {
+                    updateChainId(chainId)
+                }
                 sendResult(result, id: id)
             }
         default:
