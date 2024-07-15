@@ -567,15 +567,45 @@ class EthereumTests: XCTestCase {
         let requestId = Ethereum.BATCH_CONNECTION_ID
         let request = SubmittedRequest(method: "metamask_batch")
         ethereum.submittedRequests[requestId] = request
+        let ethereumMainnet = "0x1"
+        let accounts = ["0x1234"]
 
         let resultData: [String: Any] = [
-            "result": [["0x1234"], "0x1"]
+            "result": [["0x1234"], ethereumMainnet]
         ]
 
         ethereum.receiveResponse(resultData, id: requestId)
 
         XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.chainId, ethereumMainnet)
         XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.account, accounts.first)
+    }
+    
+    func testReceiveDataResponseWithMetamaskBatch() {
+        let requestId = Ethereum.BATCH_CONNECTION_ID
+        let request = SubmittedRequest(method: "metamask_batch")
+        ethereum.submittedRequests[requestId] = request
+        let polygonChainId = "0x89"
+        let accounts = ["0x1234"]
+
+        let message: [String: Any] = [
+            "data": [
+                "id": requestId,
+                "result": ["0xf9990f422f9a", "0x8904d14b2c67b3988ca27"],
+                "chainId": polygonChainId,
+                "accounts": accounts
+            ]
+        ]
+        
+        let data = message["data"] as? [String: Any] ?? [:]
+
+        ethereum.handleMessage(data)
+
+        XCTAssertTrue(mockEthereumDelegate.chainIdChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.chainId, polygonChainId)
+        XCTAssertTrue(mockEthereumDelegate.accountChangedCalled)
+        XCTAssertEqual(mockEthereumDelegate.account, accounts.first)
     }
     
     // MARK: Events
