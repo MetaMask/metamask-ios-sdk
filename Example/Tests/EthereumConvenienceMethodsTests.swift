@@ -15,6 +15,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     var ethereum: Ethereum!
     var mockInfuraProvider: MockInfuraProvider!
     let infuraApiKey = "testApiKey"
+    var store: SecureStore!
     var trackedEvents: [(Event, [String: Any])] = []
     
     override func setUp() {
@@ -24,6 +25,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
             self?.trackedEvents.append((event, params))
         }
         
+        store = Keychain(service: "com.example.ethconvenience")
         mockNetwork = MockNetwork()
         mockInfuraProvider = MockInfuraProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
         mockEthereumDelegate = MockEthereumDelegate()
@@ -31,6 +33,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
         SDKWrapper.shared.sdk = nil
         ethereum = Ethereum.shared(
             transport: .socket,
+            store: store,
             commClientFactory: mockCommClientFactory,
             infuraProvider: mockInfuraProvider,
             trackEvent: trackEventMock)
@@ -41,6 +44,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
         trackEventMock = nil
         ethereum = nil
         mockNetwork = nil
+        store.deleteAll()
         mockEthereumDelegate = nil
         mockInfuraProvider = nil
         mockCommClientFactory = nil

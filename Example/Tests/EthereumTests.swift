@@ -17,10 +17,12 @@ class EthereumTests: XCTestCase {
     let infuraApiKey = "testApiKey"
     var cancellables: Set<AnyCancellable>!
     var trackedEvents: [(Event, [String: Any])] = []
+    var store: SecureStore!
     
     override func setUp() {
         super.setUp()
         cancellables = []
+        store = Keychain(service: "com.example.ethtests")
         mockCommClientFactory = MockCommClientFactory()
         trackEventMock = { [weak self] event, params in
             self?.trackedEvents.append((event, params))
@@ -33,6 +35,7 @@ class EthereumTests: XCTestCase {
         SDKWrapper.shared.sdk = nil
         ethereum = Ethereum.shared(
             transport: .socket,
+            store: store,
             commClientFactory: mockCommClientFactory,
             infuraProvider: mockInfuraProvider,
             trackEvent: trackEventMock)
@@ -42,6 +45,7 @@ class EthereumTests: XCTestCase {
     override func tearDown() {
         trackEventMock = nil
         cancellables = nil
+        store.deleteAll()
         ethereum = nil
         mockNetwork = nil
         mockEthereumDelegate = nil
@@ -78,7 +82,7 @@ class EthereumTests: XCTestCase {
     
     func testRequestReturnsPublisher() {
         let request = EthereumRequest(method: "eth_call")
-        let publisher = ethereum.request(request)
+        let publisher = ethereum.performRequest(request)
         
         XCTAssertNotNil(publisher)
     }
@@ -87,7 +91,7 @@ class EthereumTests: XCTestCase {
         let expectation = self.expectation(description: "Request ethRequestAccounts")
         
         let request = EthereumRequest(method: "eth_requestAccounts")
-        let publisher = ethereum.request(request)
+        let publisher = ethereum.performRequest(request)
         
         XCTAssertTrue((((self.ethereum.commClient as? MockCommClient)?.connectCalled) ?? false))
         XCTAssertTrue(ethereum.connected)
@@ -111,17 +115,18 @@ class EthereumTests: XCTestCase {
     func testRequestConnected() {
         ethereum.connected = true
         let request = EthereumRequest(method: "eth_sendTransaction")
-        let publisher = ethereum.request(request)
+        let publisher = ethereum.performRequest(request)
         
         XCTAssertNotNil(publisher)
         XCTAssertTrue(((ethereum.commClient as? MockCommClient)?.sendMessageCalled) ?? false)
     }
     
-    func testRequestNotConnectedButConnectMethod() {
+    func testRequestWithConnectMethod() {
         let expectation = self.expectation(description: "Request connect method")
+        ethereum.updateTransportLayer(.socket)
         
         let request = EthereumRequest(method: "metamask_connectSign")
-        let publisher = ethereum.request(request)
+        let publisher = ethereum.performRequest(request)
         
         XCTAssertTrue(((self.ethereum.commClient as? MockCommClient)?.connectCalled) ?? false)
         XCTAssertTrue(ethereum.connected)

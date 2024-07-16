@@ -25,6 +25,13 @@ public struct RequestError: Codable, Error {
     public var localizedDescription: String {
         message
     }
+    
+    public static var genericError: RequestError {
+        RequestError(from: [
+            "code": -100,
+            "message": "Something went wrong"
+        ])
+    }
 
     public static var connectError: RequestError {
         RequestError(from: [
@@ -35,22 +42,29 @@ public struct RequestError: Codable, Error {
 
     public static var invalidUrlError: RequestError {
         RequestError(from: [
-            "code": -101,
+            "code": -102,
             "message": "Please use a valid url in AppMetaData"
         ])
     }
 
     public static var invalidTitleError: RequestError {
         RequestError(from: [
-            "code": -101,
+            "code": -103,
             "message": "Please use a valid name in AppMetaData"
         ])
     }
 
     public static var invalidBatchRequestError: RequestError {
         RequestError(from: [
-            "code": -101,
+            "code": -104,
             "message": "Something went wrong, check that your requests are valid"
+        ])
+    }
+    
+    public static var responseError: RequestError {
+        RequestError(from: [
+            "code": -105,
+            "message": "Unexpected response"
         ])
     }
 
