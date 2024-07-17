@@ -11,7 +11,7 @@ body:
   - type: input
     attributes:
       label: MetaMask iOS SDK Version
-      description: "Please specify the exact MetaMask iOS SDK  version"
+      description: "Please specify the exact MetaMask iOS SDK version"
     validations:
       required: true
   - type: input
@@ -19,7 +19,7 @@ body:
       label: MetaMask Wallet Version
       description: "Please specify the exact MetaMask Wallet AppStore version or release version if compiling from source"
     validations:
-      required: true      
+      required: true
   - type: input
     attributes:
       label: Xcode Version
@@ -31,7 +31,7 @@ body:
       label: iOS Version
       description: "Give us information about the iOS version your target device or simulator is running on"
     validations:
-      required: true          
+      required: true
   - type: textarea
     attributes:
       label: Describe the Bug
@@ -60,3 +60,5 @@ body:
     attributes:
       value: Before posting the issue go through the steps you've written down to make sure the steps provided are detailed and clear.
   - type: markdown
+    attributes:
+      value: Thank you for helping us improve the MetaMask iOS SDK by providing detailed bug reports.
