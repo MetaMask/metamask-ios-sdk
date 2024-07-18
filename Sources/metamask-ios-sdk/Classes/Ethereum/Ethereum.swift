@@ -32,39 +32,49 @@ public class Ethereum {
     /// The active/selected MetaMask account address
     var account: String = ""
 
+    let store: SecureStore
     var commClient: CommClient
     public var transport: Transport
     var commClientFactory: CommClientFactory
     
     var track: ((Event, [String: Any]) -> Void)?
+    private let ACCOUNT_KEY = "ACCOUNT_KEY"
+    private let CHAINID_KEY = "CHAIN_ID_KEY"
     
 
     private init(transport: Transport,
+                 store: SecureStore,
                  commClientFactory: CommClientFactory,
                  infuraProvider: InfuraProvider? = nil,
                  track: @escaping ((Event, [String: Any]) -> Void)) {
         self.track = track
+        self.store = store
         self.transport = transport
+        
         switch transport {
         case .socket:
             self.commClient = commClientFactory.socketClient()
         case .deeplinking(let dappScheme):
             self.commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
         }
+        
         self.commClientFactory = commClientFactory
         self.infuraProvider = infuraProvider
         self.commClient.trackEvent = trackEvent
         self.commClient.handleResponse = handleMessage
         self.commClient.onClientsTerminated = terminateConnection
+        fetchCachedSession()
     }
 
     public static func shared(transport: Transport,
+                              store: SecureStore,
                               commClientFactory: CommClientFactory,
                               infuraProvider: InfuraProvider? = nil,
                               trackEvent: @escaping ((Event, [String: Any]) -> Void)) -> Ethereum {
         guard let ethereum = EthereumWrapper.shared.ethereum else {
             let ethereum = Ethereum(
                 transport: transport,
+                store: store,
                 commClientFactory: commClientFactory,
                 infuraProvider: infuraProvider,
                 track: trackEvent)
@@ -73,16 +83,31 @@ public class Ethereum {
         }
         return ethereum
     }
+    
+    private func fetchCachedSession() {
+        guard case .deeplinking = transport else { return }
+        
+        if 
+            let account = store.string(for: ACCOUNT_KEY),
+            let chainId = store.string(for: CHAINID_KEY)
+        {
+            self.account = account
+            self.chainId = chainId
+            connected = true
+        }
+    }
 
     @discardableResult
     func updateTransportLayer(_ transport: Transport) -> Ethereum {
-        disconnect()
+        
         self.transport = transport
 
         switch transport {
         case .deeplinking(let dappScheme):
             commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
+            fetchCachedSession()
         case .socket:
+            clearSession()
             commClient = commClientFactory.socketClient()
             commClient.onClientsTerminated = terminateConnection
         }
@@ -119,22 +144,59 @@ public class Ethereum {
 
         return publisher
     }
+    
+    func performAsyncOperation<T>(_ publisher: EthereumPublisher?, defaultValue: T) async -> Result<T, RequestError> {
+        guard let publisher = publisher else {
+            return .failure(.genericError)
+        }
 
-    @discardableResult
-    func connect() async -> Result<String, RequestError> {
         return await withCheckedContinuation { continuation in
-            connect()?
+            publisher
+                .tryMap { output in
+                    // remove nil and NSNUll values in result
+                    if  let resultArray = output as? [Any?] {
+                        let resultItems = resultArray
+                            .filter({ !($0 is NSNull) })
+                            .compactMap({ $0 })
+                        guard let result = resultItems as? T else {
+                            return defaultValue
+                        }
+                        return result
+                    }
+                    guard let result = output as? T else {
+                        return defaultValue
+                    }
+                    return result
+                }
+                .mapError { error in
+                    error as? RequestError ?? RequestError.responseError
+                }
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
-                        continuation.resume(returning: .success(""))
+                        break
                     case .failure(let error):
                         continuation.resume(returning: .failure(error))
                     }
                 }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
+                    continuation.resume(returning: .success(result))
                 }).store(in: &cancellables)
         }
+    }
+    
+    func request(_ req: any RPCRequest) async -> Result<String, RequestError> {
+        let publisher = performRequest(req)
+        return await performAsyncOperation(publisher, defaultValue: String()) as Result<String, RequestError>
+    }
+    
+    func request(_ req: any RPCRequest) async -> Result<[String], RequestError> {
+        let publisher = performRequest(req)
+        return await performAsyncOperation(publisher, defaultValue: [String]()) as Result<[String], RequestError>
+    }
+    
+    @discardableResult
+    func connect() async -> Result<String, RequestError> {
+        await performAsyncOperation(connect(), defaultValue: String()) as Result<String, RequestError>
     }
 
     func connectAndSign(message: String) -> EthereumPublisher? {
@@ -146,7 +208,7 @@ public class Ethereum {
 
         if commClient is SocketClient {
             commClient.connect(with: nil)
-            return request(connectSignRequest)
+            return performRequest(connectSignRequest)
         }
 
         let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
@@ -161,19 +223,7 @@ public class Ethereum {
     }
 
     func connectAndSign(message: String) async -> Result<String, RequestError> {
-        return await withCheckedContinuation { continuation in
-            connectAndSign(message: message)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success(""))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
-                    }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
-                }).store(in: &cancellables)
-        }
+        await performAsyncOperation(connectAndSign(message: message), defaultValue: String()) as Result<String, RequestError>
     }
 
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) -> EthereumPublisher? {
@@ -203,9 +253,9 @@ public class Ethereum {
                     method: connectWithRequest.method,
                     params: connectWithParams
                 )
-                return request(connectRequest)
+                return performRequest(connectRequest)
             } else {
-                return request(connectWithRequest)
+                return performRequest(connectWithRequest)
             }
         case .deeplinking:
             let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
@@ -247,21 +297,9 @@ public class Ethereum {
             return publisher
         }
     }
-
+    
     func connectWith<T: CodableData>(_ req: EthereumRequest<T>) async -> Result<String, RequestError> {
-        return await withCheckedContinuation { continuation in
-            connectWith(req)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success(""))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
-                    }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success("\(result)"))
-                }).store(in: &cancellables)
-        }
+        return await performAsyncOperation(connectWith(req), defaultValue: String()) as Result<String, RequestError>
     }
 
     // MARK: Convenience Methods
@@ -365,15 +403,15 @@ public class Ethereum {
 
     /// Disconnect dapp
     func disconnect() {
-        updateChainId("")
-        updateAccount("")
         connected = false
         commClient.disconnect()
     }
 
     func clearSession() {
-        updateAccount("")
         updateChainId("")
+        updateAccount("")
+        store.deleteData(for: ACCOUNT_KEY)
+        store.deleteData(for: CHAINID_KEY)
         connected = false
         commClient.clearSession()
     }
@@ -388,7 +426,7 @@ public class Ethereum {
             submittedRequests[key]?.error(error)
         }
         submittedRequests.removeAll()
-        disconnect()
+        clearSession()
     }
 
     // MARK: Request Sending
@@ -496,10 +534,10 @@ public class Ethereum {
     /// Performs and Ethereum remote procedural call (RPC)
     /// - Parameter request: The RPC request. It's `parameters` need to conform to `CodableData`
     /// - Returns: A Combine publisher that will emit a result or error once a response is received
-    func request(_ request: any RPCRequest) -> EthereumPublisher? {
+    func performRequest(_ request: any RPCRequest) -> EthereumPublisher? {
         let isConnectMethod = EthereumMethod.isConnectMethod(request.methodType)
         
-        if !connected && !isConnectMethod {
+        if !connected && !isConnectMethod && account.isEmpty {
             if request.methodType == .ethRequestAccounts {
                 commClient.connect(with: nil)
                 connected = true
@@ -512,7 +550,8 @@ public class Ethereum {
             submittedRequests[id] = submittedRequest
             let publisher = submittedRequests[id]?.publisher
 
-            if connected {
+            if connected || !account.isEmpty {
+                connected = true
                 sendRequest(request)
             } else {
                 commClient.connect(with: nil)
@@ -522,38 +561,6 @@ public class Ethereum {
                 }
             }
             return publisher
-        }
-    }
-
-    func request(_ req: any RPCRequest) async -> Result<String, RequestError> {
-        return await withCheckedContinuation { continuation in
-            request(req)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success(""))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
-                    }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success(result as? String ?? ""))
-                }).store(in: &cancellables)
-        }
-    }
-
-    func request(_ req: any RPCRequest) async -> Result<[String], RequestError> {
-        return await withCheckedContinuation { continuation in
-            request(req)?
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        continuation.resume(returning: .success([]))
-                    case .failure(let error):
-                        continuation.resume(returning: .failure(error))
-                    }
-                }, receiveValue: { result in
-                    continuation.resume(returning: .success(result as? [String] ?? []))
-                }).store(in: &cancellables)
         }
     }
     
@@ -595,20 +602,7 @@ public class Ethereum {
                     method: EthereumMethod.metamaskBatch.rawValue,
                     params: jsonData)
 
-                return await withCheckedContinuation { continuation in
-                    request(batchReq)?
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            case .finished:
-                                continuation.resume(returning: .success([]))
-                            case .failure(let error):
-                                continuation.resume(returning: .failure(error))
-                            }
-                        }, receiveValue: { result in
-                            let value: [String] = (result as? [String?])?.compactMap{$0} ?? []
-                            continuation.resume(returning: .success(value))
-                        }).store(in: &cancellables)
-                }
+                return await performAsyncOperation(performRequest(batchReq), defaultValue: [String]()) as Result<[String], RequestError>
             } catch {
                 Logging.error("Ethereum:: error: \(error.localizedDescription)")
                 return .failure(RequestError(from: ["message": error.localizedDescription]))
@@ -618,19 +612,7 @@ public class Ethereum {
                 method: EthereumMethod.metamaskBatch.rawValue,
                 params: requests)
 
-            return await withCheckedContinuation { continuation in
-                request(batchRequest)?
-                    .sink(receiveCompletion: { completion in
-                        switch completion {
-                        case .finished:
-                            continuation.resume(returning: .success([]))
-                        case .failure(let error):
-                            continuation.resume(returning: .failure(error))
-                        }
-                    }, receiveValue: { result in
-                        continuation.resume(returning: .success(result as? [String] ?? []))
-                    }).store(in: &cancellables)
-            }
+            return await performAsyncOperation(performRequest(batchRequest), defaultValue: [String]()) as Result<[String], RequestError>
         }
     }
 
@@ -638,11 +620,17 @@ public class Ethereum {
     private func updateChainId(_ id: String) {
         chainId = id
         delegate?.chainIdChanged(id)
+        
+        guard !id.isEmpty else { return }
+        store.save(string: id, key: CHAINID_KEY)
     }
 
     private func updateAccount(_ account: String) {
         self.account = account
         delegate?.accountChanged(account)
+        
+        guard !account.isEmpty else { return }
+        store.save(string: account, key: ACCOUNT_KEY)
     }
 
     func sendResult(_ result: Any, id: String) {

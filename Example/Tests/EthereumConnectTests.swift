@@ -13,9 +13,11 @@ class EthereumConnectTests: XCTestCase {
     var commClientFactory: CommClientFactory!
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
+    var store: SecureStore!
     
     override func setUp() {
         super.setUp()
+        store = Keychain(service: "com.example.ethconnect")
         mockCommClient = MockCommClient()
         commClientFactory = CommClientFactory()
         trackEventMock = { _, _ in }
@@ -23,6 +25,7 @@ class EthereumConnectTests: XCTestCase {
         SDKWrapper.shared.sdk = nil
         ethereum = Ethereum.shared(
             transport: .socket,
+            store: store,
             commClientFactory: commClientFactory,
             trackEvent: trackEventMock)
     }
@@ -30,6 +33,7 @@ class EthereumConnectTests: XCTestCase {
     override func tearDown() {
         mockCommClient = nil
         trackEventMock = nil
+        store.deleteAll()
         ethereum = nil
         commClientFactory = nil
         EthereumWrapper.shared.ethereum = nil
@@ -39,8 +43,8 @@ class EthereumConnectTests: XCTestCase {
 
     // Test the singleton instance creation
     func testSingletonInstance() {
-        let instance1 = Ethereum.shared(transport: .socket, commClientFactory: commClientFactory, trackEvent: trackEventMock)
-        let instance2 = Ethereum.shared(transport: .socket, commClientFactory: commClientFactory, trackEvent: trackEventMock)
+        let instance1 = Ethereum.shared(transport: .socket, store: store, commClientFactory: commClientFactory, trackEvent: trackEventMock)
+        let instance2 = Ethereum.shared(transport: .socket, store: store, commClientFactory: commClientFactory, trackEvent: trackEventMock)
         XCTAssert(instance1 === instance2)
     }
     

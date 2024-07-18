@@ -16,7 +16,10 @@ public final class Dependencies {
     public lazy var commClientFactory: CommClientFactory = CommClientFactory()
 
     public func ethereum(transport: Transport) -> Ethereum {
-        Ethereum.shared(transport: transport, commClientFactory: commClientFactory) { event, parameters in
+        Ethereum.shared(
+            transport: transport,
+            store: store,
+            commClientFactory: commClientFactory) { event, parameters in
             self.trackEvent(event, parameters: parameters)
         }.updateTransportLayer(transport)
     }

@@ -64,6 +64,8 @@ public class MetaMaskSDK: ObservableObject {
         self.ethereum.sdkOptions = sdkOptions
         self.ethereum.updateMetadata(appMetadata)
         self.tracker.enableDebug = enableDebug
+        self.account = ethereum.account
+        self.chainId = ethereum.chainId
         setupAppLifeCycleObservers()
     }
     
