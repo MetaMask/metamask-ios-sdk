@@ -85,7 +85,7 @@ public class Ethereum {
     }
     
     private func fetchCachedSession() {
-        guard case .deeplinking = transport else { return }
+        //guard case .deeplinking = transport else { return }
         
         if 
             let account = store.string(for: ACCOUNT_KEY),
@@ -105,12 +105,13 @@ public class Ethereum {
         switch transport {
         case .deeplinking(let dappScheme):
             commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
-            fetchCachedSession()
         case .socket:
             clearSession()
             commClient = commClientFactory.socketClient()
             commClient.onClientsTerminated = terminateConnection
         }
+        
+        fetchCachedSession()
 
         commClient.trackEvent = trackEvent
         commClient.handleResponse = handleMessage
