@@ -85,8 +85,6 @@ public class Ethereum {
     }
     
     private func fetchCachedSession() {
-        //guard case .deeplinking = transport else { return }
-        
         if 
             let account = store.string(for: ACCOUNT_KEY),
             let chainId = store.string(for: CHAINID_KEY)
