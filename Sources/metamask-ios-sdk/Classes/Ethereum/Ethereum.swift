@@ -33,6 +33,7 @@ public class Ethereum {
     var account: String = ""
 
     let store: SecureStore
+    var appMetadata: AppMetadata?
     var commClient: CommClient
     public var transport: Transport
     var commClientFactory: CommClientFactory
@@ -107,6 +108,7 @@ public class Ethereum {
             commClient = commClientFactory.socketClient()
             commClient.onClientsTerminated = terminateConnection
         }
+        commClient.appMetadata = appMetadata
         
         fetchCachedSession()
 
@@ -120,6 +122,7 @@ public class Ethereum {
     }
 
     func updateMetadata(_ metadata: AppMetadata) {
+        appMetadata = metadata
         commClient.appMetadata = metadata
     }
 
@@ -541,6 +544,7 @@ public class Ethereum {
                 connected = true
                 return requestAccounts()
             }
+            
             return RequestError.failWithError(.connectError)
         } else {
             let id = request.id
