@@ -122,6 +122,7 @@ public class KeyExchange {
         keysExchanged = false
         theirPublicKey = nil
         privateKey = ""
+        isKeysExchangedViaV2Protocol = false
         
         storage.deleteData(for: privateKeyStorageKey)
         storage.deleteData(for: theirPubliKeyStorageKey)

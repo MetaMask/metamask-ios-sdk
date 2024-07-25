@@ -33,6 +33,7 @@ public class Ethereum {
     var account: String = ""
 
     let store: SecureStore
+    var appMetadata: AppMetadata?
     var commClient: CommClient
     public var transport: Transport
     var commClientFactory: CommClientFactory
@@ -85,8 +86,6 @@ public class Ethereum {
     }
     
     private func fetchCachedSession() {
-        guard case .deeplinking = transport else { return }
-        
         if 
             let account = store.string(for: ACCOUNT_KEY),
             let chainId = store.string(for: CHAINID_KEY)
@@ -105,12 +104,13 @@ public class Ethereum {
         switch transport {
         case .deeplinking(let dappScheme):
             commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
-            fetchCachedSession()
         case .socket:
-            clearSession()
             commClient = commClientFactory.socketClient()
             commClient.onClientsTerminated = terminateConnection
         }
+        commClient.appMetadata = appMetadata
+        
+        fetchCachedSession()
 
         commClient.trackEvent = trackEvent
         commClient.handleResponse = handleMessage
@@ -122,6 +122,7 @@ public class Ethereum {
     }
 
     func updateMetadata(_ metadata: AppMetadata) {
+        appMetadata = metadata
         commClient.appMetadata = metadata
     }
 
@@ -543,6 +544,7 @@ public class Ethereum {
                 connected = true
                 return requestAccounts()
             }
+            
             return RequestError.failWithError(.connectError)
         } else {
             let id = request.id

@@ -36,7 +36,7 @@ public struct RequestError: Codable, Error {
     public static var connectError: RequestError {
         RequestError(from: [
             "code": -101,
-            "message": "Not connected. Please call connect(:Dapp) first"
+            "message": "Not connected. Please connect first"
         ])
     }
 
