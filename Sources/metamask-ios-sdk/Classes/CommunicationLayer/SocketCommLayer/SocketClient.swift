@@ -112,7 +112,6 @@ public class SocketClient: CommClient {
         session.clear()
         disconnect()
         keyExchange.reset()
-        setupClient()
     }
 
     private func initiateKeyExchange() {
@@ -464,7 +463,6 @@ extension SocketClient {
                     }
                 }
             } else {
-                Logging.log("Mpendulo:: Sending \(message)")
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
                     let message: SocketMessage = .init(
