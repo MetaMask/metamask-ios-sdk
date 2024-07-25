@@ -72,6 +72,11 @@ public class SocketClient: CommClient {
         self.urlOpener = urlOpener
         self.keyExchange = keyExchange
         self.trackEvent = trackEvent
+        
+        if keyExchange.isKeysExchangedViaV2Protocol {
+            setupClient()
+            channel.connect()
+        }
     }
 
     func setupClient() {
@@ -107,6 +112,7 @@ public class SocketClient: CommClient {
         session.clear()
         disconnect()
         keyExchange.reset()
+        setupClient()
     }
 
     private func initiateKeyExchange() {
@@ -183,6 +189,10 @@ extension SocketClient {
             self.channel.emit(
                 ClientEvent.joinChannel,
                 ["channelId": channelId,"clientType": "dapp"])
+            
+            if keyExchange.isKeysExchangedViaV2Protocol {
+                isReady = true
+            }
 
             if !self.isReady {
                 self.deeplinkToMetaMask()
@@ -354,8 +364,7 @@ extension SocketClient {
         if json["type"] as? String == "terminate" {
             disconnect()
             onClientsTerminated?()
-            session.clear()
-            keyExchange.reset()
+            clearSession()
             Logging.log("Connection terminated")
         } else if json["type"] as? String == "pause" {
             Logging.log("Connection has been paused")
@@ -455,6 +464,7 @@ extension SocketClient {
                     }
                 }
             } else {
+                Logging.log("Mpendulo:: Sending \(message)")
                 do {
                     let encryptedMessage: String = try self.keyExchange.encryptMessage(message)
                     let message: SocketMessage = .init(

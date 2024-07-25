@@ -106,7 +106,6 @@ public class Ethereum {
         case .deeplinking(let dappScheme):
             commClient = commClientFactory.deeplinkClient(dappScheme: dappScheme)
         case .socket:
-            clearSession()
             commClient = commClientFactory.socketClient()
             commClient.onClientsTerminated = terminateConnection
         }
