@@ -93,6 +93,8 @@ public class Ethereum {
             self.account = account
             self.chainId = chainId
             connected = true
+            delegate?.accountChanged(account)
+            delegate?.chainIdChanged(chainId)
         }
     }
 
