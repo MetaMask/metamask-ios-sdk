@@ -2,6 +2,7 @@
 //  SocketProtocol.swift
 //
 
+import Foundation
 import SocketIO
 
 protocol SocketProtocol {
