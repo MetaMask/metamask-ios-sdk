@@ -81,7 +81,7 @@ public class MetaMaskSDK: ObservableObject {
     }
 
     public static func shared(_ appMetadata: AppMetadata,
-                              transport: Transport = .socket,
+                              transport: Transport,
                               enableDebug: Bool = true,
                               sdkOptions: SDKOptions?) -> MetaMaskSDK {
         guard let sdk = SDKWrapper.shared.sdk else {
