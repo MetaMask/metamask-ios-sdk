@@ -5,8 +5,13 @@
 
 import Foundation
 
+/**
+ An enum representing the communication types supported for communication with MetaMask wallet
+ **/
 public enum Transport: CaseIterable, Identifiable, Hashable {
+    /// Uses socket.io as a transport mechanism
     case socket
+    /// Uses deeplinking as transport mechanism. Recommended. Requires setting URI scheme
     case deeplinking(dappScheme: String)
 
     public var id: String {
