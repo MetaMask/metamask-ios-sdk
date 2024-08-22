@@ -11,7 +11,7 @@ import metamask_ios_sdk
 struct TransactionView: View {
     @EnvironmentObject var metamaskSDK: MetaMaskSDK
 
-    @State private var amount = "0x000000000000000001"
+    @State private var value = "0x8ac7230489e80000"
     @State var result: String = ""
     @State private var errorMessage = ""
     @State private var showError = false
@@ -43,9 +43,9 @@ struct TransactionView: View {
             }
 
             Section {
-                Text("Amount")
+                Text("Value")
                     .modifier(TextCallout())
-                TextField("Amount", text: $amount)
+                TextField("Value", text: $amount)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -108,7 +108,7 @@ struct TransactionView: View {
 
         let transactionResult = isConnectWith
         ? await metamaskSDK.connectWith(transactionRequest)
-        : await metamaskSDK.sendTransaction(from: metamaskSDK.account, to: to, amount: amount)
+        : await metamaskSDK.sendTransaction(from: metamaskSDK.account, to: to, value: value)
 
         showProgressView = false
 

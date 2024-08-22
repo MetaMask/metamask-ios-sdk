@@ -343,12 +343,12 @@ public class Ethereum {
         await ethereumRequest(method: .ethSignTypedDataV4, params: [address, typedData])
     }
 
-    func sendTransaction(from: String, to: String, amount: String) async -> Result<String, RequestError> {
+    func sendTransaction(from: String, to: String, value: String) async -> Result<String, RequestError> {
         await ethereumRequest(method: .ethSendTransaction, params: [
             [
                 "from": from,
                 "to": to,
-                "amount": amount
+                "value": value
             ]
         ])
     }
