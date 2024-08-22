@@ -170,8 +170,8 @@ public extension MetaMaskSDK {
         await ethereum.signTypedDataV4(typedData: typedData, address: address)
     }
 
-    func sendTransaction(from: String, to: String, amount: String) async -> Result<String, RequestError> {
-        await ethereum.sendTransaction(from: from, to: to, amount: amount)
+    func sendTransaction(from: String, to: String, value: String) async -> Result<String, RequestError> {
+        await ethereum.sendTransaction(from: from, to: to, value: value)
     }
 
     func sendRawTransaction(signedTransaction: String) async -> Result<String, RequestError> {

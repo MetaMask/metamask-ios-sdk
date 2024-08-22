@@ -176,7 +176,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
 
         let expectation = self.expectation(description: "Request should return transaction hash result")
         performSuccessfulTask({
-            await self.ethereum.sendTransaction(from: "0x1234", to: "0x5678", amount: "0x10")
+            await self.ethereum.sendTransaction(from: "0x1234", to: "0x5678", value: "0x10")
         }, expectedValue: transactionHash, expectation: expectation)
         sendResultAndAwait(transactionHash, method: .ethSendTransaction)
         await fulfillment(of: [expectation], timeout: 2.0)
