@@ -120,6 +120,7 @@ public extension MetaMaskSDK {
 
     func clearSession() {
         ethereum.clearSession()
+        connected = false
     }
 
     func terminateConnection() {
@@ -218,6 +219,7 @@ extension MetaMaskSDK: EthereumEventsDelegate {
 
     func accountChanged(_ account: String) {
         self.account = account
+        connected = true
     }
 }
 

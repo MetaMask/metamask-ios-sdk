@@ -45,7 +45,7 @@ struct TransactionView: View {
             Section {
                 Text("Value")
                     .modifier(TextCallout())
-                TextField("Value", text: $amount)
+                TextField("Value", text: $value)
                     .modifier(TextCaption())
                     .frame(minHeight: 32)
                     .modifier(TextCurvature())
@@ -94,7 +94,7 @@ struct TransactionView: View {
         let transaction = Transaction(
             to: to,
             from: metamaskSDK.account,
-            value: amount
+            value: value
         )
 
         let parameters: [Transaction] = [transaction]
