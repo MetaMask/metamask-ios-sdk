@@ -44,6 +44,8 @@ public class SocketClient: CommClient {
     public var trackEvent: ((Event, [String: Any]) -> Void)?
 
     var requestJobs: [RequestJob] = []
+    
+    var connectRpc: String?
 
     public var useDeeplinks: Bool = true
 
@@ -52,12 +54,30 @@ public class SocketClient: CommClient {
     }
 
     var deeplinkUrl: String {
-        "\(_deeplinkUrl)/connect?channelId="
+        let originatorInfo = OriginatorInfo(
+            title: appMetadata?.name,
+            url: appMetadata?.url,
+            icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
+            dappId: SDKInfo.bundleIdentifier,
+            platform: SDKInfo.platform,
+            apiVersion: SDKInfo.version
+        )
+        let originatorInfoBase64 = originatorInfo.toJsonString()?.base64Encode() ?? ""
+        let rpcBase64: String? = connectRpc?.base64Encode() ?? nil
+        
+        var deeplink = "\(_deeplinkUrl)/connect?channelId="
             + channelId
             + "&comm=socket"
             + "&pubkey="
             + keyExchange.pubkey
             + "&v=2"
+            + "&originatorInfo=\(originatorInfoBase64)"
+        
+        if let requestBase64 = rpcBase64 {
+            deeplink += "&rpc=\(requestBase64)"
+            connectRpc = nil // reset rpc request
+        }
+        return deeplink
     }
     
     private var isV2Protocol: Bool = false
@@ -90,6 +110,7 @@ public class SocketClient: CommClient {
 
     public func connect(with request: String?) {
         if channel.isConnected { return }
+        self.connectRpc = request
 
         setupClient()
         if isReconnection {
@@ -112,6 +133,7 @@ public class SocketClient: CommClient {
         session.clear()
         disconnect()
         keyExchange.reset()
+        channel.emit(ClientEvent.terminate, ["channelId": channelId,"clientType": "dapp"])
     }
 
     private func initiateKeyExchange() {
@@ -201,11 +223,13 @@ extension SocketClient {
         channel.on(ClientEvent.config(on: channelId)) { [weak self] data in
             guard
                 let self = self,
-                let message = data.first as? [String: Bool],
-                let persistence = message["persistence"]
+                let message = data.first as? [String: Any],
+                let persistence = message["persistence"] as? Bool,
+                let walletKey = message["walletKey"] as? String
             else { return }
             
             isV2Protocol = persistence
+            keyExchange.setTheirPublicKey(walletKey)
             
             if isV2Protocol {
                 isReady = true
@@ -315,6 +339,7 @@ extension SocketClient {
     }
 
     func handleMessage(_ msg: [String: Any]) {
+        
         if isKeyExchangeMessage(msg) {
             handleReceiveKeyExchange(msg)
             return
@@ -376,6 +401,9 @@ extension SocketClient {
             Logging.log("Received wallet info")
             isReady = true
         } else if let data = json["data"] as? [String: Any] {
+            if let walletKey = data["walletKey"] as? String {
+                keyExchange.setTheirPublicKey(walletKey)
+            }
             handleResponse?(data)
         }
     }

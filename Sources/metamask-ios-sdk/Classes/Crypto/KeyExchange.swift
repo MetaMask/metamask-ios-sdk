@@ -144,7 +144,6 @@ public class KeyExchange {
             let publicKey = message.pubkey,
             !publicKey.isEmpty {
             setTheirPublicKey(publicKey)
-            keysExchanged = true
             
             if message.v == 2 {
                 self.storage.save(string: privateKey, key: privateKeyStorageKey)
@@ -180,10 +179,12 @@ public class KeyExchange {
     }
 
     public func setTheirPublicKey(_ publicKey: String?) {
-        if let theirPubKey = publicKey {
-            theirPublicKey = theirPubKey
-            storage.save(string: theirPubKey, key: theirPubliKeyStorageKey)
-        }
+        guard let theirPubKey = publicKey else { return }
+        
+        theirPublicKey = theirPubKey
+        keysExchanged = true
+        storage.save(string: theirPubKey, key: theirPubliKeyStorageKey)
+        storage.save(string: privateKey, key: privateKeyStorageKey)
     }
 
     public static func isHandshakeRestartMessage(_ message: [String: Any]) -> Bool {
@@ -234,11 +235,10 @@ public class KeyExchange {
             throw KeyExchangeError.keysNotExchanged
         }
 
-        let decryted = try encyption.decrypt(
+        return try encyption.decrypt(
             message,
             privateKey: privateKey
         ).trimEscapingChars()
-        return decryted
     }
 }
 

@@ -208,17 +208,17 @@ public class Ethereum {
             params: [message]
         )
         connected = true
+        
+        let requestJson = connectSignRequest.toJsonString() ?? ""
 
         if commClient is SocketClient {
-            commClient.connect(with: nil)
+            commClient.connect(with: requestJson)
             return performRequest(connectSignRequest)
         }
 
         let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
         submittedRequests[connectSignRequest.id] = submittedRequest
         let publisher = submittedRequests[connectSignRequest.id]?.publisher
-
-        let requestJson = connectSignRequest.toJsonString() ?? ""
 
         commClient.connect(with: requestJson)
 
@@ -239,7 +239,6 @@ public class Ethereum {
 
         switch transport {
         case .socket:
-            commClient.connect(with: nil)
 
             // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
@@ -256,8 +255,10 @@ public class Ethereum {
                     method: connectWithRequest.method,
                     params: connectWithParams
                 )
+                commClient.connect(with: connectRequest.toJsonString())
                 return performRequest(connectRequest)
             } else {
+                commClient.connect(with: connectWithRequest.toJsonString())
                 return performRequest(connectWithRequest)
             }
         case .deeplinking:
