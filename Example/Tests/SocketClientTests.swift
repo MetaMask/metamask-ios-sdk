@@ -111,33 +111,6 @@ class SocketClientTests: XCTestCase {
         XCTAssertTrue(socketClient.deeplinkUrl.contains("metamask:/"))
     }
     
-    func testRequestAuthorisation() {
-        socketClient.useDeeplinks = true
-
-        let sessionId = "mockSessionId"
-        let pubkey = "0x12345"
-        
-        // force keyexchange = true
-        mockKeyExchange.keysExchanged = true
-        mockKeyExchange.pubkey = pubkey
-        
-        socketClient.requestAuthorisation()
-        
-        let openedUrl = mockUrlOpener.openedURL?.absoluteString ?? ""
-        let originatorInfoBase64 = socketClient.originatorInfo().originatorInfo.toJsonString()?.base64Encode() ?? ""
-        
-        let expectedDeeplink = "metamask://connect?channelId="
-        + sessionId
-        + "&comm=socket"
-        + "&pubkey="
-        + pubkey
-        + "&v=2"
-        + "&originatorInfo="
-        + originatorInfoBase64
-        
-        XCTAssertEqual(openedUrl, expectedDeeplink)
-    }
-    
     func testDeeplinkToMetaMask() {
         socketClient.useDeeplinks = true
 
@@ -148,7 +121,7 @@ class SocketClientTests: XCTestCase {
         mockKeyExchange.keysExchanged = true
         mockKeyExchange.pubkey = pubkey
         
-        socketClient.deeplinkToMetaMask()
+        socketClient.requestAuthorisation()
         
         let openedUrl = mockUrlOpener.openedURL?.absoluteString ?? ""
         let originatorInfoBase64 = socketClient.originatorInfo().originatorInfo.toJsonString()?.base64Encode() ?? ""
