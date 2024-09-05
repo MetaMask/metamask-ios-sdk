@@ -1,36 +1,36 @@
 //
-//  InfuraProviderTests.swift
+//  ReadOnlyRPCProviderTests.swift
 //  metamask-ios-sdk_Tests
 //
 
 import XCTest
 @testable import metamask_ios_sdk
 
-class InfuraProviderTests: XCTestCase {
+class ReadOnlyRPCProviderTests: XCTestCase {
 
-    var infuraProvider: InfuraProvider!
+    var readOnlyRPCProvider: ReadOnlyRPCProvider!
     var mockNetwork: MockNetwork!
 
     override func setUp() {
         super.setUp()
         mockNetwork = MockNetwork()
-        infuraProvider = InfuraProvider(infuraAPIKey: "testAPIKey", network: mockNetwork)
+        readOnlyRPCProvider = ReadOnlyRPCProvider(infuraAPIKey: "testAPIKey", readonlyRPCMap: [:], network: mockNetwork)
     }
 
     override func tearDown() {
-        infuraProvider = nil
+        readOnlyRPCProvider = nil
         mockNetwork = nil
         super.tearDown()
     }
 
     func testEndpoint() {
-        let ethereumMainnet = infuraProvider.endpoint(for: "0x1")
+        let ethereumMainnet = readOnlyRPCProvider.endpoint(for: "0x1")
         XCTAssertEqual(ethereumMainnet, "https://mainnet.infura.io/v3/testAPIKey")
 
-        let polygonMainnet = infuraProvider.endpoint(for: "0x89")
+        let polygonMainnet = readOnlyRPCProvider.endpoint(for: "0x89")
         XCTAssertEqual(polygonMainnet, "https://polygon-mainnet.infura.io/v3/testAPIKey")
 
-        let unknownChain = infuraProvider.endpoint(for: "0x999")
+        let unknownChain = readOnlyRPCProvider.endpoint(for: "0x999")
         XCTAssertNil(unknownChain)
     }
 
@@ -48,7 +48,7 @@ class InfuraProviderTests: XCTestCase {
         let request = EthereumRequest(id: "1", method: "eth_chainId")
         let appMetadata = AppMetadata(name: "TestApp", url: "https://testapp.com")
 
-        let result = await infuraProvider.sendRequest(request, chainId: "0x1", appMetadata: appMetadata)
+        let result = await readOnlyRPCProvider.sendRequest(request, chainId: "0x1", appMetadata: appMetadata)
 
         XCTAssertEqual(result as? String, "0x1")
     }
@@ -57,7 +57,7 @@ class InfuraProviderTests: XCTestCase {
         let request = EthereumRequest(id: "1", method: "eth_chainId")
         let appMetadata = AppMetadata(name: "TestApp", url: "https://testapp.com")
 
-        let result = await infuraProvider.sendRequest(request, chainId: "0x999", appMetadata: appMetadata)
+        let result = await readOnlyRPCProvider.sendRequest(request, chainId: "0x999", appMetadata: appMetadata)
 
         XCTAssertNil(result)
     }
@@ -68,7 +68,7 @@ class InfuraProviderTests: XCTestCase {
         let request = EthereumRequest(id: "1", method: "eth_chainId")
         let appMetadata = AppMetadata(name: "TestApp", url: "https://testapp.com")
 
-        let result = await infuraProvider.sendRequest(request, chainId: "0x1", appMetadata: appMetadata)
+        let result = await readOnlyRPCProvider.sendRequest(request, chainId: "0x1", appMetadata: appMetadata)
 
         XCTAssertNil(result)
     }

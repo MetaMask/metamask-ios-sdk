@@ -13,7 +13,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     var mockEthereumDelegate: MockEthereumDelegate!
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
-    var mockInfuraProvider: MockInfuraProvider!
+    var mockReadOnlyRPCProvider: MockReadOnlyRPCProvider!
     let infuraApiKey = "testApiKey"
     var store: SecureStore!
     var trackedEvents: [(Event, [String: Any])] = []
@@ -27,7 +27,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
         
         store = Keychain(service: "com.example.ethconvenience")
         mockNetwork = MockNetwork()
-        mockInfuraProvider = MockInfuraProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
+        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
         mockEthereumDelegate = MockEthereumDelegate()
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -35,7 +35,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
             transport: .socket,
             store: store,
             commClientFactory: mockCommClientFactory,
-            infuraProvider: mockInfuraProvider,
+            readOnlyRPCProvider: mockReadOnlyRPCProvider,
             trackEvent: trackEventMock)
         ethereum.delegate = mockEthereumDelegate
     }
@@ -46,7 +46,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
         mockNetwork = nil
         store.deleteAll()
         mockEthereumDelegate = nil
-        mockInfuraProvider = nil
+        mockReadOnlyRPCProvider = nil
         mockCommClientFactory = nil
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -55,7 +55,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
    
     func testGetChainId() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let chainId = "0x1"
         
         let expectation = self.expectation(description: "Request should return chainId")
@@ -69,7 +69,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
 
     func testGetEthAccounts() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let accounts = ["0x1234"]
          
          let expectation = self.expectation(description: "Request should return accounts")
@@ -83,7 +83,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetEthGasPrice() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let balance = "0x1000"
 
         let expectation = self.expectation(description: "Request should return gas price")
@@ -96,7 +96,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetEthBalance() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let balance = "0x1000"
 
         let expectation = self.expectation(description: "Request should return balance")
@@ -109,7 +109,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetEthBlockNumber() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let blockNumber = "0x10"
 
         let expectation = self.expectation(description: "Request should return block number")
@@ -122,7 +122,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetEthEstimateGas() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let gasEstimate = "0x5208"
 
         let expectation = self.expectation(description: "Request should return gas estimate")
@@ -135,7 +135,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetWeb3ClientVersion() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let web3Version = "Geth/v1.8.23-stable"
 
         let expectation = self.expectation(description: "Request should return web3 version")
@@ -184,7 +184,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testSendRawTransaction() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let transactionHash = "0x345678"
 
         let expectation = self.expectation(description: "Request should return transaction hash result")
@@ -197,7 +197,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetBlockTransactionCountByNumber() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x20"
 
         let expectation = self.expectation(description: "Request should return transaction count")
@@ -210,7 +210,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetBlockTransactionCountByHash() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x30"
 
         let expectation = self.expectation(description: "Request should return transaction count")
@@ -223,7 +223,7 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testGetTransactionCount() async {
         ethereum.connected = true
-        ethereum.infuraProvider = nil
+        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x40"
 
         let expectation = self.expectation(description: "Request should return transaction count")
