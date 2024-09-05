@@ -31,7 +31,7 @@ public extension CommClient {
             icon: appMetadata?.iconUrl ?? appMetadata?.base64Icon,
             dappId: SDKInfo.bundleIdentifier,
             platform: SDKInfo.platform,
-            apiVersion: SDKInfo.version
+            apiVersion: appMetadata?.apiVersion ?? SDKInfo.version
         )
 
         return RequestInfo(
