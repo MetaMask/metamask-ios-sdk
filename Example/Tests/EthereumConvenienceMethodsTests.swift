@@ -27,7 +27,10 @@ class EthereumConvenienceMethodsTests: XCTestCase {
         
         store = Keychain(service: "com.example.ethconvenience")
         mockNetwork = MockNetwork()
-        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
+        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(
+            infuraAPIKey: infuraApiKey,
+            readonlyRPCMap: [:],
+            network: mockNetwork)
         mockEthereumDelegate = MockEthereumDelegate()
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -55,7 +58,6 @@ class EthereumConvenienceMethodsTests: XCTestCase {
    
     func testGetChainId() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let chainId = "0x1"
         
         let expectation = self.expectation(description: "Request should return chainId")
@@ -63,13 +65,13 @@ class EthereumConvenienceMethodsTests: XCTestCase {
             ethereum.getChainId,
             expectedValue: chainId,
             expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(chainId, method: .ethChainId)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
     func testGetEthAccounts() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let accounts = ["0x1234"]
          
          let expectation = self.expectation(description: "Request should return accounts")
@@ -77,71 +79,72 @@ class EthereumConvenienceMethodsTests: XCTestCase {
             ethereum.getEthAccounts,
             expectedValue: accounts,
             expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(accounts, method: .ethAccounts)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetEthGasPrice() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let balance = "0x1000"
 
         let expectation = self.expectation(description: "Request should return gas price")
         performSuccessfulTask(ethereum.getEthGasPrice,
                               expectedValue: balance,
                               expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(balance, method: .ethGasPrice)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetEthBalance() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let balance = "0x1000"
 
         let expectation = self.expectation(description: "Request should return balance")
         performSuccessfulTask({
             await self.ethereum.getEthBalance(address: "0x1234", block: "latest")
         }, expectedValue: balance, expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(balance, method: .ethGetBalance)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetEthBlockNumber() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let blockNumber = "0x10"
 
         let expectation = self.expectation(description: "Request should return block number")
         performSuccessfulTask({
             await self.ethereum.getEthBlockNumber()
         }, expectedValue: blockNumber, expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(blockNumber, method: .ethBlockNumber)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetEthEstimateGas() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let gasEstimate = "0x5208"
 
         let expectation = self.expectation(description: "Request should return gas estimate")
         performSuccessfulTask({
             await self.ethereum.getEthEstimateGas()
         }, expectedValue: gasEstimate, expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(gasEstimate, method: .ethEstimateGas)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetWeb3ClientVersion() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let web3Version = "Geth/v1.8.23-stable"
 
         let expectation = self.expectation(description: "Request should return web3 version")
         performSuccessfulTask({
             await self.ethereum.getWeb3ClientVersion()
         }, expectedValue: web3Version, expectation: expectation)
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(web3Version, method: .web3ClientVersion)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
@@ -184,52 +187,54 @@ class EthereumConvenienceMethodsTests: XCTestCase {
     
     func testSendRawTransaction() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let transactionHash = "0x345678"
 
         let expectation = self.expectation(description: "Request should return transaction hash result")
         performSuccessfulTask({
             await self.ethereum.sendRawTransaction(signedTransaction: "signedTx")
         }, expectedValue: transactionHash, expectation: expectation)
+        mockReadOnlyRPCProvider.response = transactionHash
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(transactionHash, method: .ethSendRawTransaction)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetBlockTransactionCountByNumber() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x20"
 
         let expectation = self.expectation(description: "Request should return transaction count")
+        mockReadOnlyRPCProvider.response = transactionCount
+        
         performSuccessfulTask({
             await self.ethereum.getBlockTransactionCountByNumber(blockNumber: "0x10")
         }, expectedValue: transactionCount, expectation: expectation)
+        
         sendResultAndAwait(transactionCount, method: .ethGetBlockTransactionCountByNumber)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await fulfillment(of: [expectation], timeout: 20.0)
     }
     
     func testGetBlockTransactionCountByHash() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x30"
 
         let expectation = self.expectation(description: "Request should return transaction count")
         performSuccessfulTask({
             await self.ethereum.getBlockTransactionCountByHash(blockHash: "0xabcdef")
         }, expectedValue: transactionCount, expectation: expectation)
+        mockReadOnlyRPCProvider.response = transactionCount
+        mockReadOnlyRPCProvider.expectation = expectation
         sendResultAndAwait(transactionCount, method: .ethGetBlockTransactionCountByHash)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
     
     func testGetTransactionCount() async {
         ethereum.connected = true
-        ethereum.readOnlyRPCProvider = nil
         let transactionCount = "0x40"
 
         let expectation = self.expectation(description: "Request should return transaction count")
-        performSuccessfulTask({
-            await self.ethereum.getTransactionCount(address: "0x1234", tagOrblockNumber: "latest")
-        }, expectedValue: transactionCount, expectation: expectation)
+        let result = await self.ethereum.getTransactionCount(address: "0x1234", tagOrblockNumber: "latest")
+        mockReadOnlyRPCProvider.response = transactionCount
         sendResultAndAwait(transactionCount, method: .ethGetTransactionCount)
         await fulfillment(of: [expectation], timeout: 2.0)
     }

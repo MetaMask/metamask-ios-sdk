@@ -29,7 +29,10 @@ class EthereumTests: XCTestCase {
         }
         
         mockNetwork = MockNetwork()
-        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
+        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(
+            infuraAPIKey: infuraApiKey,
+            readonlyRPCMap: nil,
+            network: mockNetwork)
         mockEthereumDelegate = MockEthereumDelegate()
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -743,7 +746,5 @@ class EthereumTests: XCTestCase {
     
     func testReadOnlyRPCProvider() {
         XCTAssertTrue(ethereum.readOnlyRPCProvider is MockReadOnlyRPCProvider)
-        ethereum.readOnlyRPCProvider = nil
-        XCTAssertNil(ethereum.readOnlyRPCProvider)
     }
 }
