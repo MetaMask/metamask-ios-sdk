@@ -102,7 +102,7 @@ public class MetaMaskSDK: ObservableObject {
 }
 
 public extension MetaMaskSDK {
-    func connect() async -> Result<String, RequestError> {
+    func connect() async -> Result<[String], RequestError> {
         await ethereum.connect()
     }
 
