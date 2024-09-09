@@ -19,8 +19,7 @@ public class Ethereum {
     var submittedRequests: [String: SubmittedRequest] = [:]
     private var cancellables: Set<AnyCancellable> = []
 
-    var sdkOptions: SDKOptions?
-    var infuraProvider: InfuraProvider?
+    let readOnlyRPCProvider: ReadOnlyRPCProvider
 
     weak var delegate: EthereumEventsDelegate?
 
@@ -46,7 +45,7 @@ public class Ethereum {
     private init(transport: Transport,
                  store: SecureStore,
                  commClientFactory: CommClientFactory,
-                 infuraProvider: InfuraProvider? = nil,
+                 readOnlyRPCProvider: ReadOnlyRPCProvider,
                  track: @escaping ((Event, [String: Any]) -> Void)) {
         self.track = track
         self.store = store
@@ -60,7 +59,7 @@ public class Ethereum {
         }
         
         self.commClientFactory = commClientFactory
-        self.infuraProvider = infuraProvider
+        self.readOnlyRPCProvider = readOnlyRPCProvider
         self.commClient.trackEvent = trackEvent
         self.commClient.handleResponse = handleMessage
         self.commClient.onClientsTerminated = terminateConnection
@@ -70,14 +69,14 @@ public class Ethereum {
     public static func shared(transport: Transport,
                               store: SecureStore,
                               commClientFactory: CommClientFactory,
-                              infuraProvider: InfuraProvider? = nil,
+                              readOnlyRPCProvider: ReadOnlyRPCProvider,
                               trackEvent: @escaping ((Event, [String: Any]) -> Void)) -> Ethereum {
         guard let ethereum = EthereumWrapper.shared.ethereum else {
             let ethereum = Ethereum(
                 transport: transport,
                 store: store,
                 commClientFactory: commClientFactory,
-                infuraProvider: infuraProvider,
+                readOnlyRPCProvider: readOnlyRPCProvider,
                 track: trackEvent)
             EthereumWrapper.shared.ethereum = ethereum
             return ethereum
@@ -431,17 +430,19 @@ public class Ethereum {
         submittedRequests.removeAll()
         clearSession()
     }
+    
+    func useReadOnlyRPCProvider() -> Bool {
+        !readOnlyRPCProvider.infuraAPIKey.isEmpty || !readOnlyRPCProvider.readonlyRPCMap.isEmpty
+    }
 
     // MARK: Request Sending
 
     func sendRequest(_ request: any RPCRequest) {
         if
             EthereumMethod.isReadOnly(request.methodType),
-            (infuraProvider != nil || sdkOptions?.infuraAPIKey != nil) {
-            
-            let infuraProvider: InfuraProvider = infuraProvider ?? InfuraProvider(infuraAPIKey: sdkOptions?.infuraAPIKey ?? "")
+            useReadOnlyRPCProvider() {
             Task {
-                if let result = await infuraProvider.sendRequest(
+                if let result = await readOnlyRPCProvider.sendRequest(
                     request,
                     chainId: chainId,
                     appMetadata: commClient.appMetadata ?? AppMetadata(name: "", url: "")) {

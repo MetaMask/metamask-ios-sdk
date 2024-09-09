@@ -58,10 +58,9 @@ public class MetaMaskSDK: ObservableObject {
     }
 
     private init(appMetadata: AppMetadata, transport: Transport, enableDebug: Bool, sdkOptions: SDKOptions?) {
-        self.ethereum = Dependencies.shared.ethereum(transport: transport)
+        self.ethereum = Dependencies.shared.ethereum(transport: transport, sdkOptions: sdkOptions)
         self.transport = transport
         self.ethereum.delegate = self
-        self.ethereum.sdkOptions = sdkOptions
         self.ethereum.updateMetadata(appMetadata)
         self.tracker.enableDebug = enableDebug
         self.account = ethereum.account

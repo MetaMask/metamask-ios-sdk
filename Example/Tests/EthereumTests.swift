@@ -13,7 +13,7 @@ class EthereumTests: XCTestCase {
     var mockEthereumDelegate: MockEthereumDelegate!
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
-    var mockInfuraProvider: MockInfuraProvider!
+    var mockReadOnlyRPCProvider: MockReadOnlyRPCProvider!
     let infuraApiKey = "testApiKey"
     var cancellables: Set<AnyCancellable>!
     var trackedEvents: [(Event, [String: Any])] = []
@@ -29,7 +29,10 @@ class EthereumTests: XCTestCase {
         }
         
         mockNetwork = MockNetwork()
-        mockInfuraProvider = MockInfuraProvider(infuraAPIKey: infuraApiKey, network: mockNetwork)
+        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(
+            infuraAPIKey: infuraApiKey,
+            readonlyRPCMap: nil,
+            network: mockNetwork)
         mockEthereumDelegate = MockEthereumDelegate()
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -37,7 +40,7 @@ class EthereumTests: XCTestCase {
             transport: .socket,
             store: store,
             commClientFactory: mockCommClientFactory,
-            infuraProvider: mockInfuraProvider,
+            readOnlyRPCProvider: mockReadOnlyRPCProvider,
             trackEvent: trackEventMock)
         ethereum.delegate = mockEthereumDelegate
     }
@@ -49,7 +52,7 @@ class EthereumTests: XCTestCase {
         ethereum = nil
         mockNetwork = nil
         mockEthereumDelegate = nil
-        mockInfuraProvider = nil
+        mockReadOnlyRPCProvider = nil
         mockCommClientFactory = nil
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
@@ -60,11 +63,11 @@ class EthereumTests: XCTestCase {
         let expectation = self.expectation(description: "Read only API call")
         let request = EthereumRequest(method: "eth_blockNumber")
         ethereum.chainId = "0x1"
-        mockInfuraProvider.expectation = expectation
+        mockReadOnlyRPCProvider.expectation = expectation
         ethereum.sendRequest(request)
         
         waitForExpectations(timeout: 2.0) { _ in
-            XCTAssertTrue(self.mockInfuraProvider.sendRequestCalled)
+            XCTAssertTrue(self.mockReadOnlyRPCProvider.sendRequestCalled)
         }
     }
     
@@ -150,15 +153,15 @@ class EthereumTests: XCTestCase {
         waitForExpectations(timeout: 2.0)
     }
     
-    func testSendRequestReadOnlyWithInfuraProvider() {
+    func testSendRequestReadOnlyWithReadOnlyRPCProvider() {
         let expectation = self.expectation(description: "Read-only request with Infura provider")
         let request = EthereumRequest(method: "eth_blockNumber")
-        mockInfuraProvider.expectation = expectation
+        mockReadOnlyRPCProvider.expectation = expectation
         
         ethereum.sendRequest(request)
         
         waitForExpectations(timeout: 2.0) { _ in
-            XCTAssertTrue(self.mockInfuraProvider.sendRequestCalled)
+            XCTAssertTrue(self.mockReadOnlyRPCProvider.sendRequestCalled)
         }
     }
     
@@ -741,9 +744,7 @@ class EthereumTests: XCTestCase {
         XCTAssertFalse(mockEthereumDelegate.accountChangedCalled)
     }
     
-    func testInfuraProvider() {
-        XCTAssertTrue(ethereum.infuraProvider is MockInfuraProvider)
-        ethereum.infuraProvider = nil
-        XCTAssertNil(ethereum.infuraProvider)
+    func testReadOnlyRPCProvider() {
+        XCTAssertTrue(ethereum.readOnlyRPCProvider is MockReadOnlyRPCProvider)
     }
 }

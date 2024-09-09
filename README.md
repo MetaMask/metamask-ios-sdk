@@ -104,12 +104,12 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplication.Op
     return true
 }
 ```
-And then initialise the SDK, specifying `.deeplinking` as the transport type, passing the dapp's' scheme you added in the URL Types as the `dappScheme`.
+And then initialise the SDK, specifying `.deeplinking` as the transport type, passing the dapp's' scheme you added in the URL Types as the `dappScheme`. To use the Infura API to make read-only requests, specify your Infura API key using the `infuraAPIKey` option in `SDKOptions`. To use your own node (for example, with Hardhat) to make read-only requests, specify your node's chain ID and RPC URL using the readonlyRPCMap option.
 ```swift
 @ObservedObject var metamaskSDK = MetaMaskSDK.shared(
     appMetadata,
     transport: .deeplinking(dappScheme: "dubdapp"),
-    sdkOptions: SDKOptions(infuraAPIKey: "your-api-key") // for read-only RPC calls
+    sdkOptions: SDKOptions(infuraAPIKey: "your-api-key", readonlyRPCMap: ["0x1": "hptts://www.testrpc.com"]) // for read-only RPC calls
 )
 ```
 #### NOTE

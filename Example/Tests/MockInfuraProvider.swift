@@ -1,12 +1,12 @@
 //
-//  MockInfuraProvider.swift
+//  MockReadOnlyRPCProvider.swift
 //  metamask-ios-sdk_Tests
 //
 
 @testable import metamask_ios_sdk
 import XCTest
 
-class MockInfuraProvider: InfuraProvider {
+class MockReadOnlyRPCProvider: ReadOnlyRPCProvider {
     var sendRequestCalled = false
     var response: Any? = "{}"
     var expectation: XCTestExpectation?

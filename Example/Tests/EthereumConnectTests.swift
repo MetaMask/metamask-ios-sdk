@@ -14,6 +14,8 @@ class EthereumConnectTests: XCTestCase {
     var trackEventMock: ((Event, [String: Any]) -> Void)!
     var ethereum: Ethereum!
     var store: SecureStore!
+    var mockNetwork: MockNetwork!
+    var mockReadOnlyRPCProvider: MockReadOnlyRPCProvider!
     
     override func setUp() {
         super.setUp()
@@ -23,10 +25,13 @@ class EthereumConnectTests: XCTestCase {
         trackEventMock = { _, _ in }
         EthereumWrapper.shared.ethereum = nil
         SDKWrapper.shared.sdk = nil
+        mockNetwork = MockNetwork()
+        mockReadOnlyRPCProvider = MockReadOnlyRPCProvider(infuraAPIKey: "12345", readonlyRPCMap: [:], network: mockNetwork)
         ethereum = Ethereum.shared(
             transport: .socket,
             store: store,
-            commClientFactory: commClientFactory,
+            commClientFactory: commClientFactory, 
+            readOnlyRPCProvider: mockReadOnlyRPCProvider,
             trackEvent: trackEventMock)
     }
 
@@ -43,8 +48,18 @@ class EthereumConnectTests: XCTestCase {
 
     // Test the singleton instance creation
     func testSingletonInstance() {
-        let instance1 = Ethereum.shared(transport: .socket, store: store, commClientFactory: commClientFactory, trackEvent: trackEventMock)
-        let instance2 = Ethereum.shared(transport: .socket, store: store, commClientFactory: commClientFactory, trackEvent: trackEventMock)
+        let instance1 = Ethereum.shared(
+            transport: .socket,
+            store: store,
+            commClientFactory: commClientFactory,
+            readOnlyRPCProvider: mockReadOnlyRPCProvider,
+            trackEvent: trackEventMock)
+        let instance2 = Ethereum.shared(
+            transport: .socket,
+            store: store,
+            commClientFactory: commClientFactory,
+            readOnlyRPCProvider: mockReadOnlyRPCProvider,
+            trackEvent: trackEventMock)
         XCTAssert(instance1 === instance2)
     }
     
