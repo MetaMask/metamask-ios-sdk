@@ -198,8 +198,8 @@ public class Ethereum {
     }
     
     @discardableResult
-    func connect() async -> Result<String, RequestError> {
-        await performAsyncOperation(connect(), defaultValue: String()) as Result<String, RequestError>
+    func connect() async -> Result<[String], RequestError> {
+        await performAsyncOperation(connect(), defaultValue: []) as Result<[String], RequestError>
     }
 
     func connectAndSign(message: String) -> EthereumPublisher? {
@@ -811,7 +811,7 @@ public class Ethereum {
                 let accounts = event["accounts"] as? [String],
                 let selectedAddress = accounts.first {
                 updateAccount(selectedAddress)
-                sendResult(selectedAddress, id: Ethereum.CONNECTION_ID)
+                sendResult(accounts, id: Ethereum.CONNECTION_ID)
             }
             return
         }
