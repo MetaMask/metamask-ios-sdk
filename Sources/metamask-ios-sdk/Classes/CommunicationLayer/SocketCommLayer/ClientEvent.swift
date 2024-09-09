@@ -16,6 +16,10 @@ public struct ClientEvent {
     public static var message: String {
         "message"
     }
+    
+    public static var terminate: String {
+        "terminate"
+    }
 
     public static var joinChannel: String {
         "join_channel"
