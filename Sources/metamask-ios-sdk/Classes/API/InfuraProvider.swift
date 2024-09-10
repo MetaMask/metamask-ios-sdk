@@ -99,14 +99,17 @@ public class ReadOnlyRPCProvider {
         readonlyRPCMap[chainId]
     }
 
-    public func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
+    public func sendRequest(_ request: any RPCRequest,
+                            params: Any = "",
+                            chainId: String,
+                            appMetadata: AppMetadata) async -> Any? {
         Logging.log("ReadOnlyRPCProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
 
         let params: [String: Any] = [
             "method": request.method,
             "jsonrpc": "2.0",
             "id": request.id,
-            "params": request.params
+            "params": params
         ]
 
         guard let endpoint = endpoint(for: chainId) else {
@@ -132,10 +135,15 @@ public class ReadOnlyRPCProvider {
             }
 
             Logging.error("ReadOnlyRPCProvider:: could not get result from response \(json)")
+            
+            if let error = json["error"] as? [String: Any] {
+                return RequestError(from: error)
+            }
+            
             return nil
         } catch {
-            Logging.error("tracking error: \(error.localizedDescription)")
-            return nil
+            Logging.error("ReadOnlyRPCProvider:: error: \(error.localizedDescription)")
+            return RequestError(from: ["code": -1, "message": error.localizedDescription])
         }
     }
 }

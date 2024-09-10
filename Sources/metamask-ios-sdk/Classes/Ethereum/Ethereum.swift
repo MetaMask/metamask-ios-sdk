@@ -443,8 +443,21 @@ public class Ethereum {
             EthereumMethod.isReadOnly(request.methodType),
             useReadOnlyRPCProvider() {
             Task {
+                let readOnlyRequest = EthereumRequest(
+                    id: request.id,
+                    method: request.method
+                )
+                var params: Any = request.params
+                
+                if
+                    let paramsData = request.params as? Data,
+                    let json = try? JSONSerialization.jsonObject(with: paramsData, options: []) {
+                    params = json
+                }
+                
                 if let result = await readOnlyRPCProvider.sendRequest(
-                    request,
+                    readOnlyRequest,
+                    params: params,
                     chainId: chainId,
                     appMetadata: commClient.appMetadata ?? AppMetadata(name: "", url: "")) {
                     sendResult(result, id: request.id)
