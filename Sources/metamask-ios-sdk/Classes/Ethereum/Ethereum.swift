@@ -431,17 +431,13 @@ public class Ethereum {
         submittedRequests.removeAll()
         clearSession()
     }
-    
-    func useReadOnlyRPCProvider() -> Bool {
-        !readOnlyRPCProvider.infuraAPIKey.isEmpty || !readOnlyRPCProvider.readonlyRPCMap.isEmpty
-    }
 
     // MARK: Request Sending
 
     func sendRequest(_ request: any RPCRequest) {
         if
             EthereumMethod.isReadOnly(request.methodType),
-            useReadOnlyRPCProvider() {
+            readOnlyRPCProvider.supportsChain(chainId) {
             Task {
                 let readOnlyRequest = EthereumRequest(
                     id: request.id,
