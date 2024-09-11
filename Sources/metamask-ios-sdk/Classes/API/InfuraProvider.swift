@@ -9,6 +9,7 @@ public class ReadOnlyRPCProvider {
     let infuraAPIKey: String
     private let network: any Networking
     
+    let rpcUrls: [String: String]
     let readonlyRPCMap: [String: String]
     
     public convenience init(infuraAPIKey: String? = nil, readonlyRPCMap: [String: String]? = nil) {
@@ -18,24 +19,29 @@ public class ReadOnlyRPCProvider {
     init(infuraAPIKey: String? = nil, readonlyRPCMap: [String: String]?, network: any Networking) {
         self.infuraAPIKey = infuraAPIKey ?? ""
         self.network = network
+        self.readonlyRPCMap = readonlyRPCMap ?? [:]
         
         if let providedRPCMap = readonlyRPCMap {
             if let apiKey = infuraAPIKey {
                 // Merge infuraReadonlyRPCMap with readonlyRPCMap, overriding infura's keys if they are present in readonlyRPCMap
                 var mergedMap = ReadOnlyRPCProvider.infuraReadonlyRPCMap(apiKey)
                 providedRPCMap.forEach { mergedMap[$0.key] = $0.value }
-                self.readonlyRPCMap = mergedMap
+                self.rpcUrls = mergedMap
             } else {
                 // Use only the provided readonlyRPCMap
-                self.readonlyRPCMap = providedRPCMap
+                self.rpcUrls = providedRPCMap
             }
         } else if let apiKey = infuraAPIKey {
             // Use infuraReadonlyRPCMap as default
-            self.readonlyRPCMap = ReadOnlyRPCProvider.infuraReadonlyRPCMap(apiKey)
+            self.rpcUrls = ReadOnlyRPCProvider.infuraReadonlyRPCMap(apiKey)
         } else {
             // Default to an empty map if neither are provided
-            self.readonlyRPCMap = [:]
+            self.rpcUrls = [:]
         }
+    }
+    
+    func supportsChain(_ chainId: String) -> Bool {
+        return rpcUrls[chainId] != nil && (readonlyRPCMap[chainId] != nil || !infuraAPIKey.isEmpty)
     }
     
     static func infuraReadonlyRPCMap(_ infuraAPIKey: String) -> [String: String] {
@@ -96,17 +102,20 @@ public class ReadOnlyRPCProvider {
     }
     
     func endpoint(for chainId: String) -> String? {
-        readonlyRPCMap[chainId]
+        rpcUrls[chainId]
     }
 
-    public func sendRequest(_ request: any RPCRequest, chainId: String, appMetadata: AppMetadata) async -> Any? {
+    public func sendRequest(_ request: any RPCRequest,
+                            params: Any = "",
+                            chainId: String,
+                            appMetadata: AppMetadata) async -> Any? {
         Logging.log("ReadOnlyRPCProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
 
         let params: [String: Any] = [
             "method": request.method,
             "jsonrpc": "2.0",
             "id": request.id,
-            "params": request.params
+            "params": params
         ]
 
         guard let endpoint = endpoint(for: chainId) else {
@@ -132,10 +141,14 @@ public class ReadOnlyRPCProvider {
             }
 
             Logging.error("ReadOnlyRPCProvider:: could not get result from response \(json)")
+            if let error = json["error"] as? [String: Any] {
+                return RequestError(from: error)
+            }
+            
             return nil
         } catch {
-            Logging.error("tracking error: \(error.localizedDescription)")
-            return nil
+            Logging.error("ReadOnlyRPCProvider:: error: \(error.localizedDescription)")
+            return RequestError(from: ["code": -1, "message": error.localizedDescription])
         }
     }
 }
