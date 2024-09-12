@@ -111,7 +111,7 @@ public class DeeplinkClient: CommClient {
     public func track(event: Event) {
         let parameters: [String: Any] = [
             "id": channelId,
-            "commLayer": "socket",
+            "commLayer": "deeplink",
             "sdkVersion": SDKInfo.version,
             "url": appMetadata?.url ?? "",
             "dappId": SDKInfo.bundleIdentifier ?? "N/A",
