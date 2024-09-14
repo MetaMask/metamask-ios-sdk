@@ -14,11 +14,25 @@ public protocol Networking: ObservableObject {
 
 public class Network: Networking {
     public init() {}
+    
+    private let queue = DispatchQueue(label: "headers.queue")
 
     private var additionalHeaders: [String: String] = [
         "Accept": "application/json",
         "Content-Type": "application/json"
     ]
+    
+    func getAdditionalHeaders() -> [String: String] {
+        return queue.sync { [weak self] in
+            return self?.additionalHeaders ?? [:]
+        }
+    }
+    
+    func mergeHeaders(_ headers: [String: String]) {
+        queue.sync {
+            additionalHeaders.merge(headers) { (_, new) in new }
+        }
+    }
 
     public func fetch<T: Decodable>(_ Type: T.Type, endpoint: Endpoint) async throws -> T {
         guard let url = URL(string: endpoint.url) else {
@@ -52,12 +66,12 @@ public class Network: Networking {
     }
 
     public func addHeaders(_ headers: [String: String]) {
-        additionalHeaders.merge(headers) { (_, new) in new }
+        mergeHeaders(headers)
     }
 
     private func request(for url: URL) -> URLRequest {
         var request = URLRequest(url: url)
-        for (key, value) in additionalHeaders {
+        for (key, value) in getAdditionalHeaders() {
             request.addValue(value, forHTTPHeaderField: key)
         }
 
