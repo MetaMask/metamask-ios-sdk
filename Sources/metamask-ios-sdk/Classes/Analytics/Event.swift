@@ -11,6 +11,7 @@ public enum Event: String {
     case connectionAuthorised = "sdk_connection_authorized"
     case connectionRejected = "sdk_connection_rejected"
     case disconnected = "sdk_disconnected"
+    case connectionTerminated = "sdk_connection_terminated"
 
     var name: String {
         rawValue

@@ -16,8 +16,12 @@ protocol EthereumEventsDelegate: AnyObject {
 public class Ethereum {
     static let CONNECTION_ID = TimestampGenerator.timestamp()
     static let BATCH_CONNECTION_ID = TimestampGenerator.timestamp()
+    
     var submittedRequests: [String: SubmittedRequest] = [:]
+    private let queue = DispatchQueue(label: "submittedRequests.queue")
+    
     private var cancellables: Set<AnyCancellable> = []
+    private let cancellablesLock = NSRecursiveLock()
 
     let readOnlyRPCProvider: ReadOnlyRPCProvider
 
@@ -85,7 +89,7 @@ public class Ethereum {
     }
     
     private func fetchCachedSession() {
-        if 
+        if
             let account = store.string(for: ACCOUNT_KEY),
             let chainId = store.string(for: CHAINID_KEY)
         {
@@ -126,6 +130,42 @@ public class Ethereum {
         appMetadata = metadata
         commClient.appMetadata = metadata
     }
+    
+    func addRequest(_ submittedRequest: SubmittedRequest, id: String) {
+        queue.async { [weak self] in
+            self?.submittedRequests[id] = submittedRequest
+        }
+    }
+    
+    func getAllRequests() -> [String: SubmittedRequest] {
+        return queue.sync { [weak self] in
+            return self?.submittedRequests ?? [:]
+        }
+    }
+
+    func getRequest(id: String) -> SubmittedRequest? {
+        return queue.sync { [weak self] in
+            return self?.submittedRequests[id]
+        }
+    }
+
+    func removeRequest(id: String) {
+        queue.async { [weak self] in
+            self?.submittedRequests.removeValue(forKey: id)
+        }
+    }
+    
+    func removeAllRequests() {
+        queue.async { [weak self] in
+            self?.submittedRequests.removeAll()
+        }
+    }
+    
+    private func syncCancellables() -> Set<AnyCancellable> {
+        cancellablesLock.sync {
+            return cancellables
+        }
+    }
 
     // MARK: Session Management
 
@@ -141,8 +181,8 @@ public class Ethereum {
         }
 
         let submittedRequest = SubmittedRequest(method: "")
-        submittedRequests[Ethereum.CONNECTION_ID] = submittedRequest
-        let publisher = submittedRequests[Ethereum.CONNECTION_ID]?.publisher
+        addRequest(submittedRequest, id: Ethereum.CONNECTION_ID)
+        let publisher = getRequest(id: Ethereum.CONNECTION_ID)?.publisher
 
         return publisher
     }
@@ -153,7 +193,7 @@ public class Ethereum {
         }
 
         return await withCheckedContinuation { continuation in
-            publisher
+            let cancellable = publisher
                 .tryMap { output in
                     // remove nil and NSNUll values in result
                     if  let resultArray = output as? [Any?] {
@@ -182,7 +222,11 @@ public class Ethereum {
                     }
                 }, receiveValue: { result in
                     continuation.resume(returning: .success(result))
-                }).store(in: &cancellables)
+                })
+            
+            cancellablesLock.sync {
+                cancellables.insert(cancellable)
+            }
         }
     }
     
@@ -216,8 +260,8 @@ public class Ethereum {
         }
 
         let submittedRequest = SubmittedRequest(method: connectSignRequest.method)
-        submittedRequests[connectSignRequest.id] = submittedRequest
-        let publisher = submittedRequests[connectSignRequest.id]?.publisher
+        addRequest(submittedRequest, id: connectSignRequest.id)
+        let publisher = getRequest(id: connectSignRequest.id)?.publisher
 
         commClient.connect(with: requestJson)
 
@@ -262,8 +306,8 @@ public class Ethereum {
             }
         case .deeplinking:
             let submittedRequest = SubmittedRequest(method: connectWithRequest.method)
-            submittedRequests[connectWithRequest.id] = submittedRequest
-            let publisher = submittedRequests[connectWithRequest.id]?.publisher
+            addRequest(submittedRequest, id: connectWithRequest.id)
+            let publisher = getRequest(id: connectWithRequest.id)?.publisher
 
             // React Native SDK has request params as Data
             if let paramsData = req.params as? Data {
@@ -421,14 +465,14 @@ public class Ethereum {
 
     func terminateConnection() {
         if connected {
-            track?(.connectionRejected, [:])
+            track?(.connectionTerminated, [:])
         }
 
         let error = RequestError(from: ["message": "The connection request has been rejected"])
-        submittedRequests.forEach { key, _ in
-            submittedRequests[key]?.error(error)
+        getAllRequests().forEach { key, _ in
+            getRequest(id: key)?.error(error)
         }
-        submittedRequests.removeAll()
+        removeAllRequests()
         clearSession()
     }
 
@@ -534,8 +578,8 @@ public class Ethereum {
         )
 
         let submittedRequest = SubmittedRequest(method: requestAccountsRequest.method)
-        submittedRequests[requestAccountsRequest.id] = submittedRequest
-        let publisher = submittedRequests[requestAccountsRequest.id]?.publisher
+        addRequest(submittedRequest, id: requestAccountsRequest.id)
+        let publisher = getRequest(id: requestAccountsRequest.id)?.publisher
 
         commClient.addRequest { [weak self] in
             self?.sendRequest(requestAccountsRequest)
@@ -562,8 +606,9 @@ public class Ethereum {
         } else {
             let id = request.id
             let submittedRequest = SubmittedRequest(method: request.method)
-            submittedRequests[id] = submittedRequest
-            let publisher = submittedRequests[id]?.publisher
+            addRequest(submittedRequest, id: id)
+            
+            let publisher = getRequest(id: id)?.publisher
 
             if connected || !account.isEmpty {
                 connected = true
@@ -649,13 +694,13 @@ public class Ethereum {
     }
 
     func sendResult(_ result: Any, id: String) {
-        submittedRequests[id]?.send(result)
-        submittedRequests.removeValue(forKey: id)
+        getRequest(id: id)?.send(result)
+        removeRequest(id: id)
     }
 
     func sendError(_ error: RequestError, id: String) {
-        submittedRequests[id]?.error(error)
-        submittedRequests.removeValue(forKey: id)
+        getRequest(id: id)?.error(error)
+        removeRequest(id: id)
 
         if error.codeType == .unauthorisedRequest {
             clearSession()
@@ -676,7 +721,7 @@ public class Ethereum {
     }
 
     func receiveResponse(_ data: [String: Any], id: String) {
-        guard let request = submittedRequests[id] else { return }
+        guard let request = getRequest(id: id) else { return }
         
         track?(.sdkRpcRequestDone, [
             "from": "mobile",

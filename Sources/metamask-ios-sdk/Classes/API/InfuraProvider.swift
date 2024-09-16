@@ -109,7 +109,6 @@ public class ReadOnlyRPCProvider {
                             params: Any = "",
                             chainId: String,
                             appMetadata: AppMetadata) async -> Any? {
-        Logging.log("ReadOnlyRPCProvider:: Sending request \(request.method) on chain \(chainId) via Infura API")
 
         let params: [String: Any] = [
             "method": request.method,
@@ -122,6 +121,8 @@ public class ReadOnlyRPCProvider {
             Logging.error("ReadOnlyRPCProvider:: Infura endpoint for chainId \(chainId) is not available")
             return nil
         }
+        
+        Logging.log("ReadOnlyRPCProvider:: Sending request \(request.method) on chain \(chainId) using endpoint \(endpoint) via Infura API")
 
         let devicePlatformInfo = DeviceInfo.platformDescription
         network.addHeaders([
