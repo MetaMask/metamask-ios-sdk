@@ -214,11 +214,13 @@ public extension MetaMaskSDK {
 extension MetaMaskSDK: EthereumEventsDelegate {
     func chainIdChanged(_ chainId: String) {
         self.chainId = chainId
+        NotificationCenter.default.post(name: .MetaMaskChainIdChanged, object: nil, userInfo: ["chainId": chainId])
     }
 
     func accountChanged(_ account: String) {
         self.account = account
         connected = true
+        NotificationCenter.default.post(name: .MetaMaskAccountChanged, object: nil, userInfo: ["account": account])
     }
 }
 
