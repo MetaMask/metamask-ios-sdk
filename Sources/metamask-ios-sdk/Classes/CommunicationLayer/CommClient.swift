@@ -8,6 +8,7 @@ import Foundation
 public typealias RequestJob = () -> Void
 
 public protocol CommClient {
+    var channelId: String { get set }
     var appMetadata: AppMetadata? { get set }
     var sessionDuration: TimeInterval { get set }
     var onClientsTerminated: (() -> Void)? { get set }

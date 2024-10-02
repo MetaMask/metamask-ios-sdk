@@ -9,7 +9,7 @@ import Foundation
 public class DeeplinkClient: CommClient {
 
     private let session: SessionManager
-    var channelId: String = ""
+    public var channelId: String = ""
     let dappScheme: String
     let urlOpener: URLOpener
 
@@ -20,6 +20,7 @@ public class DeeplinkClient: CommClient {
 
     let keyExchange: KeyExchange
     let deeplinkManager: DeeplinkManager
+    private var isConnecting = false
 
     public var sessionDuration: TimeInterval {
         get {
@@ -93,13 +94,13 @@ public class DeeplinkClient: CommClient {
             let account = options["account"] ?? ""
             let chainId = options["chainId"] ?? ""
             let message = "mmsdk?scheme=\(dappScheme)&message=\(message)&channelId=\(channelId ?? "")&account=\(account)@\(chainId)"
-            Logging.log("DeeplinkClient:: Sending message \(message)")
             sendMessage(message)
         }
     }
 
     public func connect(with request: String? = nil) {
         track(event: .connectionRequest)
+        isConnecting = true
 
         sendMessage(.connect(
             pubkey: nil,
@@ -111,7 +112,7 @@ public class DeeplinkClient: CommClient {
     public func track(event: Event) {
         let parameters: [String: Any] = [
             "id": channelId,
-            "commLayer": "socket",
+            "commLayer": "deeplinking",
             "sdkVersion": SDKInfo.version,
             "url": appMetadata?.url ?? "",
             "dappId": SDKInfo.bundleIdentifier ?? "N/A",
@@ -182,6 +183,13 @@ public class DeeplinkClient: CommClient {
             guard let data = json["data"] as? [String: Any] else {
                 Logging.log("DeeplinkClient:: Ignoring response \(json)")
                 return
+            }
+            if
+                isConnecting,
+                data["accounts"] != nil,
+                data["chainId"] != nil {
+                isConnecting = false
+                track(event: .connected)
             }
             handleResponse?(data)
         } catch {
