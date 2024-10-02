@@ -7,6 +7,8 @@ import metamask_ios_sdk
 import XCTest
 
 class MockCommClient: CommClient {
+    var channelId: String = "randomId"
+    
     var connectCalled = false
     var sendMessageCalled = false
     var disConnectCalled = false

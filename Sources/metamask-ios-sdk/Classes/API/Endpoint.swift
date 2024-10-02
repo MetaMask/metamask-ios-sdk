@@ -12,7 +12,7 @@ public enum Endpoint {
     public var url: String {
         switch self {
         case .analytics:
-            return Endpoint.SERVER_URL.appending("debug")
+            return Endpoint.SERVER_URL.appending("evt")
         }
     }
 }

@@ -14,7 +14,7 @@ public class SocketClient: CommClient {
     private let channel: SocketChannel
     let urlOpener: URLOpener
 
-    var channelId: String = ""
+    public var channelId: String = ""
 
     public var isConnected: Bool {
         channel.isConnected
@@ -234,6 +234,7 @@ extension SocketClient {
             if isV2Protocol {
                 isReady = true
                 Logging.log("SocketClient:: Channel supports protocol v2 communation")
+                track(event: .connected)
             }
         }
     }
